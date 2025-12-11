@@ -12,6 +12,7 @@ import { EventFormModal } from "../componentes/EventFormModal";
 import { CidadeFormModal } from "../componentes/CidadeFormModal";
 import { PontoFormModal } from "../componentes/PontoFormModal";
 
+
 type Tab = "eventos" | "turismo" | "cidades";
 
 const formatDate = (d: string) =>
@@ -87,15 +88,19 @@ export const DouradosEventosPage: React.FC = () => {
 
   // === callbacks de CRUD usando o context ===
 
-  const handleSalvarEvento = (dados: Omit<Evento, "id"> & { id?: string }) => {
-    createOrUpdateEvento(dados);
+  const handleSalvarEvento = async (
+    dados: Omit<Evento, "id"> & { id?: string }
+  ) => {
+    await createOrUpdateEvento(dados);
     setEventoEdit(null);
   };
+
 
   const handleExcluirEvento = (id: string) => {
     if (!window.confirm("Excluir este evento?")) return;
     deleteEvento(id);
   };
+
 
   const handleSalvarCidade = (
     dados: Omit<Cidade, "id" | "pontos"> & { id?: string }
