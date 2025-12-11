@@ -12,6 +12,7 @@ import { EventFormModal } from "../componentes/EventFormModal";
 import { CidadeFormModal } from "../componentes/CidadeFormModal";
 import { PontoFormModal } from "../componentes/PontoFormModal";
 
+
 type Tab = "eventos" | "turismo" | "cidades";
 
 const formatDate = (d: string) =>
@@ -33,7 +34,7 @@ export const DouradosEventosPage: React.FC = () => {
   const [tab, setTab] = useState<Tab>("eventos");
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // filtros de eventos
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("");
@@ -87,15 +88,19 @@ export const DouradosEventosPage: React.FC = () => {
 
   // === callbacks de CRUD usando o context ===
 
-  const handleSalvarEvento = (dados: Omit<Evento, "id"> & { id?: string }) => {
-    createOrUpdateEvento(dados);
+  const handleSalvarEvento = async (
+    dados: Omit<Evento, "id"> & { id?: string }
+  ) => {
+    await createOrUpdateEvento(dados);
     setEventoEdit(null);
   };
+
 
   const handleExcluirEvento = (id: string) => {
     if (!window.confirm("Excluir este evento?")) return;
     deleteEvento(id);
   };
+
 
   const handleSalvarCidade = (
     dados: Omit<Cidade, "id" | "pontos"> & { id?: string }
@@ -142,6 +147,12 @@ ${ev.desc}`
 
   return (
     <div className="min-h-screen text-[#e9f2ff] bg-slate-950">
+      <a
+        href="#conteudo-principal"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-slate-900 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg"
+      >
+        Ir para o conteúdo
+      </a>
       {/* overlay do menu lateral */}
       {isSideMenuOpen && (
         <div
@@ -189,7 +200,10 @@ ${ev.desc}`
         </section>
       )}
 
-      <main className="max-w-5xl mx-auto px-4 pb-16 pt-8">
+      <main
+        id="conteudo-principal"
+        className="max-w-5xl mx-auto px-4 pb-16 pt-8"
+      >
         {/* hero */}
         <section className="flex flex-col items-center justify-center text-center mb-8">
           <Card className="w-full max-w-3xl p-6 relative overflow-hidden">
@@ -209,8 +223,15 @@ ${ev.desc}`
         </section>
 
         {/* tabs */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div
+          className="mb-6 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label="Seções Principais"
+        >
           <Button
+            role="tab"
+            aria-selected={tab === "eventos"}
+            aria-controls="painel-eventos"
             variant={tab === "eventos" ? "primary" : "secondary"}
             size="sm"
             onClick={() => setTab("eventos")}
@@ -218,6 +239,9 @@ ${ev.desc}`
             Eventos
           </Button>
           <Button
+            role="tab"
+            aria-selected={tab === "turismo"}
+            aria-controls="painel-turismo"
             variant={tab === "turismo" ? "primary" : "secondary"}
             size="sm"
             onClick={() => setTab("turismo")}
@@ -225,6 +249,9 @@ ${ev.desc}`
             Turismo
           </Button>
           <Button
+            role="tab"
+            aria-selected={tab === "cidades"}
+            aria-controls="painel-cidades"
             variant={tab === "cidades" ? "primary" : "secondary"}
             size="sm"
             onClick={() => setTab("cidades")}
@@ -235,57 +262,75 @@ ${ev.desc}`
 
         {/* painéis */}
         {tab === "eventos" && (
-          <EventList
-            eventos={eventosFiltrados}
-            onNewEvent={() => setEventoEdit({} as Evento)}
-            onEditEvent={setEventoEdit}
-            onDeleteEvent={handleExcluirEvento}
-            onDetails={handleDetalhesEvento}
-          />
+          <section
+            id="painel-eventos"
+            role="tabpanel"
+            aria-labelledby="tab-eventos"
+          >
+            <EventList
+              eventos={eventosFiltrados}
+              onNewEvent={() => setEventoEdit({} as Evento)}
+              onEditEvent={setEventoEdit}
+              onDeleteEvent={handleExcluirEvento}
+              onDetails={handleDetalhesEvento}
+            />
+          </section>
         )}
 
         {tab === "turismo" && (
-          <TourismSection
-            cidades={cidades}
-            cidadeSelecionada={cidadeSelecionada ?? null}
-            cidadeSelecionadaId={cidadeSelecionadaId}
-            onCidadeSelecionadaChange={setCidadeSelecionadaId}
-            buscaPonto={buscaPonto}
-            onBuscaPontoChange={setBuscaPonto}
-            pontosFiltrados={pontosFiltrados}
-            onNovoPonto={() => {
-              if (!cidadeSelecionada) {
-                window.alert("Selecione uma cidade primeiro.");
-                return;
-              }
-              setPontoCidadeId(cidadeSelecionada.id);
-              setPontoEdit({} as PontoTuristico);
-            }}
-            onEditarCidade={(cidade) => setCidadeEdit(cidade)}
-            onEditarPonto={(ponto) => {
-              if (!cidadeSelecionada) return;
-              setPontoCidadeId(cidadeSelecionada.id);
-              setPontoEdit(ponto);
-            }}
-            onExcluirPonto={(pontoId) => {
-              if (!cidadeSelecionada) return;
-              handleExcluirPonto(cidadeSelecionada.id, pontoId);
-            }}
-            onIrParaCidades={() => setTab("cidades")}
-          />
+          <section
+            id="painel-turismo"
+            role="tabpanel"
+            aria-labelledby="tab-turismo"
+          >
+            <TourismSection
+              cidades={cidades}
+              cidadeSelecionada={cidadeSelecionada ?? null}
+              cidadeSelecionadaId={cidadeSelecionadaId}
+              onCidadeSelecionadaChange={setCidadeSelecionadaId}
+              buscaPonto={buscaPonto}
+              onBuscaPontoChange={setBuscaPonto}
+              pontosFiltrados={pontosFiltrados}
+              onNovoPonto={() => {
+                if (!cidadeSelecionada) {
+                  window.alert("Selecione uma cidade primeiro.");
+                  return;
+                }
+                setPontoCidadeId(cidadeSelecionada.id);
+                setPontoEdit({} as PontoTuristico);
+              }}
+              onEditarCidade={(cidade) => setCidadeEdit(cidade)}
+              onEditarPonto={(ponto) => {
+                if (!cidadeSelecionada) return;
+                setPontoCidadeId(cidadeSelecionada.id);
+                setPontoEdit(ponto);
+              }}
+              onExcluirPonto={(pontoId) => {
+                if (!cidadeSelecionada) return;
+                handleExcluirPonto(cidadeSelecionada.id, pontoId);
+              }}
+              onIrParaCidades={() => setTab("cidades")}
+            />
+          </section>
         )}
 
         {tab === "cidades" && (
-          <CitiesSection
-            cidades={cidades}
-            onNovaCidade={() => setCidadeEdit({} as Cidade)}
-            onVerPontos={(cidadeId) => {
-              setCidadeSelecionadaId(cidadeId);
-              setTab("turismo");
-            }}
-            onEditarCidade={(cidade) => setCidadeEdit(cidade)}
-            onExcluirCidade={handleExcluirCidade}
-          />
+          <section
+            id="painel-cidades"
+            role="tabpanel"
+            aria-labelledby="tab-cidades"
+          >
+            <CitiesSection
+              cidades={cidades}
+              onNovaCidade={() => setCidadeEdit({} as Cidade)}
+              onVerPontos={(cidadeId) => {
+                setCidadeSelecionadaId(cidadeId);
+                setTab("turismo");
+              }}
+              onEditarCidade={(cidade) => setCidadeEdit(cidade)}
+              onExcluirCidade={handleExcluirCidade}
+            />
+          </section>
         )}
       </main>
 
