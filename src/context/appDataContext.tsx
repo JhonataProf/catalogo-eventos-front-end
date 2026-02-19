@@ -106,7 +106,10 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
     if (typeof window === "undefined") return;
 
     const hasLocal = loadFromStorage();
-    if (hasLocal) return;
+    if(hasLocal && (!hasLocal.cidades || !hasLocal.eventos)) {
+      localStorage.removeItem(LS_KEY)
+    }
+    // if (hasLocal) return;
 
     setLoading(true);
     fetchAppState()

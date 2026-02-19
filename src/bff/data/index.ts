@@ -75,7 +75,7 @@ export default {
                     nome: "Parque dos Ipês", 
                     tipo: "Parque", 
                     horario: "Livre", 
-                    img: "https://images.unsplash.com/photo-1526481280698-8fcc13fdcde7?q=80&w=1200&auto=format&fit=crop", 
+                    img: "https://images.unsplash.com/photo-1526481280698-8fcc13fdcde7?q=80&w=1200&auto=format&fit=crophttps://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4-FN4Kdk_VscMHVup5_aMEkiO0nZZKWcQrA&shttps://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4-FN4Kdk_VscMHVup5_aMEkiO0nZZKWcQrA&s", 
                     desc: "Área verde para caminhada, corrida e lazer ao ar livre." 
                 },
                 { 
@@ -83,14 +83,14 @@ export default {
                     nome: "Praça Antônio João", 
                     tipo: "Praça", 
                     horario: "24h", 
-                    img: "https://images.unsplash.com/photo-1587308525991-b8dec88ccbe7?q=80&w=1200&auto=format&fit=crop", 
+                    img: "https://images.unsplash.com/photo-1587308525991-b8dec88ccbe7?q=80&w=1200&auto=format&fit=crophttps://douradosagora.com.br/media/posts/386117/programacao-do-dourados-brilha-comeca-nessa-sexta-com-atracoes-na-praca-17328243721271.jpeghttps://douradosagora.com.br/media/posts/386117/programacao-do-dourados-brilha-comeca-nessa-sexta-com-atracoes-na-praca-17328243721271.jpeg", 
                     desc: "Cartão-postal no centro, palco de feiras e eventos culturais." },
                 { 
                     id: createId(), 
                     nome: "Museu Histórico", 
                     tipo: "Museu", 
                     horario: "Ter–Dom, 9h–17h", 
-                    img: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1200&auto=format&fit=crop", 
+                    img: "https://cdn.douradosnews.com.br/img/c/1280/960/dn_noticia/2020/03/museu-colonia-agricola-1-1.jpghttps://cdn.douradosnews.com.br/img/c/1280/960/dn_noticia/2020/03/museu-colonia-agricola-1-1.jpg", 
                     desc: "Acervo sobre a história e a formação regional." },
             ]
         },
