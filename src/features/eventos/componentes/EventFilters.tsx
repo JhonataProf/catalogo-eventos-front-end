@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../../../shared/ui";
+import { Button, SelectField } from "../../../shared/ui";
 
 interface EventFiltersProps {
   search: string;
@@ -24,7 +24,7 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
 }) => {
   return (
     <div>
-      <p className="text-xs tracking-[0.2em] uppercase text-[#9fb0c8] font-semibold mb-3">
+      <p className="text-xs tracking-[0.2em] uppercase text-[#3c203b] font-semibold mb-3">
         Busca Rápida
       </p>
 
@@ -41,8 +41,8 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
 
         <label className="flex-1 text-sm flex flex-col gap-1">
           <span>Categoria</span>
-          <select
-            className="w-full rounded-xl border border-white/20 bg-slate-800 px-3 py-2 text-sm outline-none"
+          <SelectField
+            label="Categoria"
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
           >
@@ -52,7 +52,7 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
             <option>Feira</option>
             <option>Teatro</option>
             <option>Gastronomia</option>
-          </select>
+          </SelectField>
         </label>
 
         <label className="flex-1 text-sm flex flex-col gap-1">

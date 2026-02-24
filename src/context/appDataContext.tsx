@@ -7,8 +7,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { createCidadeApi, createEventoApi, deleteCidadeApi, deleteEventoApi, fetchAppState, updateCidadeApi, updateEventoApi } from "../bff/appBff";
 import type { Cidade, Evento, PontoTuristico } from "../domain";
-import { fetchAppState, createEventoApi, updateEventoApi, deleteEventoApi, deleteCidadeApi, updateCidadeApi, createCidadeApi } from "../bff/appBff";
 
 
 export interface AppState {
@@ -81,10 +81,7 @@ function loadFromStorage(): AppState | null {
 export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [state, setState] = useState<AppState>(() => {
-    if (typeof window === "undefined") return emptyState;
-    return loadFromStorage() ?? emptyState;
-  });
+  const [state, setState] = useState<AppState>(emptyState);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,9 +101,6 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
   // Carregar da fake API se não tiver nada no localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const hasLocal = loadFromStorage();
-    if (hasLocal) return;
 
     setLoading(true);
     fetchAppState()

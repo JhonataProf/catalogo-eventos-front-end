@@ -35,7 +35,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         id={selectId}
         aria-describedby={describedBy}
         aria-invalid={!!error}
-        className={`rounded-xl border px-3 py-2 outline-none bg-slate-800 border-white/20 focus:border-[#74f1ff] focus:ring-2 focus:ring-[#74f1ff]/60 ${className}`}
+        className={`rounded-xl border px-3 py-2 outline-none bg-slate-300 border-white/20 focus:border-[#3c203b] focus:ring-2 focus:ring-[#3c203b]/60 ${className}`}
         {...rest}
       >
         {children}

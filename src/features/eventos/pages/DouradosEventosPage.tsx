@@ -146,7 +146,7 @@ ${ev.desc}`
   // === UI ===
 
   return (
-    <div className="min-h-screen text-[#e9f2ff] bg-slate-950">
+    <div className="min-h-screen text-[#3c203b] bg-slate-320">
       <a
         href="#conteudo-principal"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-slate-900 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg"
@@ -178,7 +178,7 @@ ${ev.desc}`
 
       {/* filtros de eventos */}
       {showFilters && (
-        <section className="border-b border-white/10 bg-slate-900/80">
+        <section className="border-b border-white/10 bg-slate-300/80">
           <div className="max-w-5xl mx-auto px-4 py-4">
             <Card className="p-4">
               <EventFilters
@@ -207,13 +207,13 @@ ${ev.desc}`
         {/* hero */}
         <section className="flex flex-col items-center justify-center text-center mb-8">
           <Card className="w-full max-w-3xl p-6 relative overflow-hidden">
-            <p className="text-xs tracking-[0.2em] uppercase text-[#9fb0c8] font-semibold">
+            <p className="text-xs tracking-[0.2em] uppercase text-[#3c203b] font-semibold">
               Agenda &amp; Guia • Dourados/MS
             </p>
             <h1 className="mt-2 mb-3 text-2xl md:text-3xl font-extrabold">
               Descubra o que rola na cidade e explore o melhor do turismo local.
             </h1>
-            <p className="text-sm md:text-base text-[#cfe0fb] leading-relaxed">
+            <p className="text-sm md:text-base text-[#3c203b] leading-relaxed">
               Uma plataforma simples e poderosa para divulgar{" "}
               <strong>eventos</strong>, conhecer{" "}
               <strong>pontos turísticos</strong> e cadastrar informações de{" "}
