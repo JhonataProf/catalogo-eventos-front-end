@@ -1,10 +1,25 @@
 import React from "react";
+import { DouradosEventosPage } from "../features/eventos/pages/DouradosEventosPage";
+import AboutPage from "../pages/AboutPage";
 import EventosPage from "../pages/EventosPage";
+import DefaultTemplate from "../shared/templates/DefaultTemplate";
+import TourismPage from "../pages/TourismPage";
 
-export const AppRoutes: React.FC = () => {
-  // se quiser, aqui entraria o BrowserRouter depois
-  // return <DouradosEventosPage />;
-  return (
-    <EventosPage />
-  );
-};
+export interface RouteConfig {
+  path: string;
+  element: React.ReactNode;
+  children?: RouteConfig[];
+}
+
+export const AppRoutes: RouteConfig[] = [
+  {
+    path: "",
+    element: <DefaultTemplate />,
+    children: [
+      { path: "/", element: <DouradosEventosPage /> },
+      { path: "/eventos", element: <EventosPage /> },
+      { path: "/sobre", element: <AboutPage /> },
+      { path: "/turismo", element: <TourismPage /> }
+    ],
+  },
+];

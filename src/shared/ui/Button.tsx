@@ -20,13 +20,13 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "border-[#a58cff]/60 bg-gradient-to-r from-[#74f1ff]/30 to-[#a58cff]/30 hover:from-[#74f1ff]/40 hover:to-[#a58cff]/40 text-[#e9f2ff]",
+    "border-[#a58cff]/60 bg-gradient-to-r from-[#74f1ff]/30 to-[#a58cff]/30 hover:from-[#74f1ff]/40 hover:to-[#a58cff]/40 text-[#007389]",
   secondary:
-    "border-white/10 bg-white/10 hover:bg-white/15 text-[#e9f2ff]",
+    "border-white/10 bg-white/10 hover:bg-white/15 text-[#607389]",
   danger:
-    "border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-red-100",
+    "border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-[#951d0b]",
   ghost:
-    "border-transparent bg-transparent hover:bg-white/5 text-[#e9f2ff]",
+    "border-transparent bg-transparent hover:bg-white/5 text-[#9e582a]",
 };
 
 const sizes: Record<Size, string> = {

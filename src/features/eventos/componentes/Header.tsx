@@ -1,3 +1,5 @@
+import Logo from "../../../assets/celeiro_ms_logo.jpg";
+
 export interface HeaderProps {
   open: boolean;
   handleSideMenuOpen: () => void;
@@ -10,7 +12,7 @@ export default function Header({
   open,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-320/80 backdrop-blur">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
         <button
           className="flex flex-col gap-[5px] w-7 h-6 lg:hidden"
@@ -38,9 +40,13 @@ export default function Header({
         </button>
 
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[conic-gradient(at_50%_50%,#74f1ff,#7cffc1,#a58cff,#74f1ff)] shadow-[0_0_16px_rgba(116,241,255,0.35)]" />
+          <img
+            src={Logo}
+            alt="Logo do Celeiro do MS"
+            className="w-8 h-8 object-cover rounded-full"
+          />
           <span className="font-extrabold tracking-[0.05em] text-lg">
-            Dourados<span className="opacity-70">+</span>
+            Celeiro do <span className="opacity-70">MS</span>
           </span>
         </div>
 
