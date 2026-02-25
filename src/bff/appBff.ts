@@ -1,7 +1,7 @@
 // src/bff/appBff.ts
-import { api } from "../http/api";
 import type { AppState } from "../context/appDataContext";
-import type { Evento, Cidade } from "../domain";
+import type { Cidade, Evento } from "../domain";
+import { api } from "../http/api";
 
 // --------- Carga inicial ---------
 export async function fetchAppState(): Promise<AppState> {
@@ -9,6 +9,8 @@ export async function fetchAppState(): Promise<AppState> {
     api.get<Evento[]>("/eventos"),
     api.get<Cidade[]>("/cidades"),
   ]);
+  console.log("fetchAppState: eventos", eventosRes.data);
+  console.log("fetchAppState: cidades", cidadesRes.data);
 
   return {
     eventos: eventosRes.data,
@@ -20,6 +22,7 @@ export async function fetchAppState(): Promise<AppState> {
 
 export async function createEventoApi(payload: Evento): Promise<Evento> {
   const response = await api.post<Evento>("/eventos", payload);
+  console.log("createEventoApi response:", response.data);
   return response.data;
 }
 

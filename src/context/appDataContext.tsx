@@ -7,8 +7,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { createCidadeApi, createEventoApi, deleteCidadeApi, deleteEventoApi, fetchAppState, updateCidadeApi, updateEventoApi } from "../bff/appBff";
 import type { Cidade, Evento, PontoTuristico } from "../domain";
-import { fetchAppState, createEventoApi, updateEventoApi, deleteEventoApi, deleteCidadeApi, updateCidadeApi, createCidadeApi } from "../bff/appBff";
 
 
 export interface AppState {
@@ -105,8 +105,8 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const hasLocal = loadFromStorage();
-    if (hasLocal) return;
+    // const hasLocal = loadFromStorage();
+    // if (hasLocal) return;
 
     setLoading(true);
     fetchAppState()
