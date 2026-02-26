@@ -38,9 +38,7 @@ const DetailsEventsPage: React.FC = () => {
           <p className="text-sm text-[#9fb0c8] mb-4">
             {`Data: ${evento?.data} | Horário: ${evento?.hora} | Local: ${evento?.local}`}
           </p>
-          <p className="text-base text-gray-800">
-            {evento?.desc}
-          </p>
+          <p className="text-base text-gray-800">{evento?.desc}</p>
         </>
       )}
     </section>

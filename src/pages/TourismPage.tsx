@@ -89,7 +89,11 @@ const TourismPage: React.FC = () => {
                   <p className="text-xs text-[#9fb0c8]">
                     Horário: {p.horario || "—"}
                   </p>
-                  <Button variant="primary" size="lg" onClick={() => navigate(`/ponto-turistico/${p.id}`)}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={() => navigate(`/ponto-turistico/${p.id}`)}
+                  >
                     Ver detalhes
                   </Button>
                 </div>
