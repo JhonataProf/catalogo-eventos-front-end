@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import { useAppData } from "../context/appDataContext";
 import { Button, Card, TextField } from "../shared/ui";
 import { RoundedSelect } from "../shared/ui/RoundedSelect";
+import { useNavigate } from "react-router-dom";
 
 const TourismPage: React.FC = () => {
   const {
     state: { cidades },
   } = useAppData();
+  const navigate = useNavigate();
 
   const [buscaPonto, setBuscaPonto] = useState("");
 
@@ -87,7 +89,7 @@ const TourismPage: React.FC = () => {
                   <p className="text-xs text-[#9fb0c8]">
                     Horário: {p.horario || "—"}
                   </p>
-                  <Button variant="primary" size="lg" onClick={() => {}}>
+                  <Button variant="primary" size="lg" onClick={() => navigate(`/ponto-turistico/${p.id}`)}>
                     Ver detalhes
                   </Button>
                 </div>

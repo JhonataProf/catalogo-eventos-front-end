@@ -1,11 +1,13 @@
-import { useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { useAppData } from "../context/appDataContext";
 import type { Evento } from "../domain";
 import { Button, Card, Tag, TextField } from "../shared/ui";
 import { RoundedSelect } from "../shared/ui/RoundedSelect";
+import { useNavigate } from "react-router-dom";
 
 const EventosPage = () => {
 
+  const navigate = useNavigate();
   const {
       state: { cidades },
     } = useAppData();
@@ -91,7 +93,7 @@ const EventosPage = () => {
                       <Tag variant="default">Horário: {e.hora || "—"}</Tag>
                       <Tag variant="default">local: {e.local || "—"}</Tag>
                       </div>
-                      <Button variant="primary" size="lg" onClick={() => {}}>
+                      <Button variant="primary" size="lg" onClick={() => navigate(`/eventos/${e.id}`)}>
                         Ver detalhes
                       </Button>
                     </div>
