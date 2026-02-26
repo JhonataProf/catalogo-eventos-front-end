@@ -1,24 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAppData } from "../context/appDataContext";
-import type { Cidade, PontoTuristico } from "../domain";
-import { Button, Card, SelectField, TextField } from "../shared/ui";
-
-interface TourismSectionProps {
-  cidades: Cidade[];
-  cidadeSelecionada: Cidade | null;
-  cidadeSelecionadaId: string | null;
-  onCidadeSelecionadaChange: (id: string | null) => void;
-
-  buscaPonto: string;
-  onBuscaPontoChange: (value: string) => void;
-  pontosFiltrados: PontoTuristico[];
-
-  onNovoPonto: () => void;
-  onEditarCidade: (cidade: Cidade) => void;
-  onEditarPonto: (ponto: PontoTuristico) => void;
-  onExcluirPonto: (pontoId: string) => void;
-  onIrParaCidades: () => void;
-}
+import { Button, Card, TextField } from "../shared/ui";
+import { RoundedSelect } from "../shared/ui/RoundedSelect";
 
 const TourismPage: React.FC = () => {
   const {
@@ -26,9 +9,6 @@ const TourismPage: React.FC = () => {
   } = useAppData();
 
   const [buscaPonto, setBuscaPonto] = useState("");
-  const [pontoEdit, setPontoEdit] = useState<PontoTuristico | null>(null);
-  const [pontoCidadeId, setPontoCidadeId] = useState<string | null>(null);
-  const [cidadeEdit, setCidadeEdit] = useState<Cidade | null>(null);
 
   const [cidadeSelecionadaId, setCidadeSelecionadaId] = useState<string | null>(
     () => cidades[0]?.id ?? null,
@@ -45,64 +25,37 @@ const TourismPage: React.FC = () => {
     );
   }, [buscaPonto, cidadeSelecionada]);
 
-  const onNovoPonto = () => {
-    if (!cidadeSelecionada) {
-      window.alert("Selecione uma cidade primeiro.");
-      return;
-    }
-    setPontoCidadeId(cidadeSelecionada.id);
-    setPontoEdit({} as PontoTuristico);
-  };
-
   return (
     <section
       aria-label="Pontos turísticos"
-      className="mt-4 grid gap-4 lg:grid-cols-3"
+      className="container mx-auto px-4 sm:px-6 lg:px-8"
     >
       {/* esquerda: filtros + lista */}
       <div className="lg:col-span-2 flex flex-col gap-4">
-        <Card className="p-4">
-          <div className="flex flex-col md:flex-row gap-3 items-stretch">
-            <SelectField
+        <Card className="w-full p-4">
+          <div className="w-full flex flex-col md:flex-row gap-3 items-start md:items-center">
+            <RoundedSelect
               value={cidadeSelecionadaId ?? ""}
-              onChange={(e) => setCidadeSelecionadaId(e.target.value)}
+              onChange={(value) => setCidadeSelecionadaId(value)}
               label={"Cidade"}
-            >
-              {cidades.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nome} - {c.uf}
-                </option>
-              ))}
-            </SelectField>
+              options={cidades.map((c) => ({
+                value: c.id,
+                label: `${c.nome} - ${c.uf}`,
+              }))}
+            />
             <TextField
               label="Buscar ponto turístico"
-              className="w-full rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm outline-none"
+              containerClassName="w-full"
+              className="rounded-xl border border-blue-400 bg-white/10 px-3 py-2 text-sm outline-none"
               placeholder="Ex.: Parque, Museu…"
               value={buscaPonto}
               onChange={(e) => setBuscaPonto(e.target.value)}
             />
           </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" onClick={onNovoPonto}>
-              + Novo ponto turístico
-            </Button>
-            {cidadeSelecionada && (
-              <Button
-                size="sm"
-                onClick={() => setCidadeEdit(cidadeSelecionada)}
-              >
-                Editar cidade atual
-              </Button>
-            )}
-            <Button size="sm" onClick={() => {}}>
-              Gerenciar cidades
-            </Button>
-          </div>
         </Card>
 
         {/* lista de pontos */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 p-4">
           {pontosFiltrados.length === 0 ? (
             <Card className="p-4 text-sm text-[#9fb0c8] md:col-span-2">
               Nenhum ponto encontrado para esta cidade.
@@ -134,37 +87,14 @@ const TourismPage: React.FC = () => {
                   <p className="text-xs text-[#9fb0c8]">
                     Horário: {p.horario || "—"}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                    <Button size="sm" onClick={() => {}}>
-                      Editar
-                    </Button>
-                    <Button variant="danger" size="sm" onClick={() => {}}>
-                      Excluir
-                    </Button>
-                  </div>
+                  <Button variant="primary" size="lg" onClick={() => {}}>
+                    Ver detalhes
+                  </Button>
                 </div>
               </Card>
             ))
           )}
         </div>
-      </div>
-
-      {/* direita: cards informativos */}
-      <div className="flex flex-col gap-4">
-        <Card className="p-4">
-          <h3 className="text-base font-extrabold mb-1">Sobre</h3>
-          <p className="text-xs text-[#9fb0c8]">
-            Cadastre e gerencie pontos turísticos de Dourados e de outras
-            cidades da região para montar um guia completo.
-          </p>
-        </Card>
-        <Card className="p-4">
-          <h3 className="text-base font-extrabold mb-1">Próximos passos</h3>
-          <p className="text-xs text-[#9fb0c8]">
-            Em versões futuras você pode incluir avaliações dos usuários, tags
-            temáticas (gastronomia, aventura, família) e rotas sugeridas.
-          </p>
-        </Card>
       </div>
     </section>
   );
