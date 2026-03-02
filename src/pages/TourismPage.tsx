@@ -34,6 +34,7 @@ const TourismPage: React.FC = () => {
     >
       {/* esquerda: filtros + lista */}
       <div className="lg:col-span-2 flex flex-col gap-4">
+        <h1 className="text-3xl font-bold mb-4">{`Pontos turísticos em ${cidadeSelecionada?.nome}`}</h1>
         <Card className="w-full p-4">
           <div className="w-full flex flex-col md:flex-row gap-3 items-start md:items-center">
             <RoundedSelect

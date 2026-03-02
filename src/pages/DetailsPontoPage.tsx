@@ -15,7 +15,9 @@ const DetailsPontoPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchPontoTuristico();
+    (async () => {
+      await fetchPontoTuristico();
+    })();
   }, [fetchPontoTuristico]);
 
   return (

@@ -4,9 +4,9 @@ const AboutPage = () => {
 
   return (
     <Card className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Sobre o Dourados+</h1>
+      <h1 className="text-3xl font-bold mb-4">Sobre o Celeiro do MS</h1>
       <p className="mb-4">
-        O Dourados+ é um projeto inovador desenvolvido por alunos do Senac-MS,
+        O Celeiro do MS é um projeto inovador desenvolvido por alunos do Senac-MS,
         com o objetivo de criar um catálogo digital de eventos, pontos
         turísticos e informações sobre as cidades da região de Dourados. Este
         projeto visa promover a cultura local, incentivar o turismo e facilitar
@@ -21,7 +21,7 @@ const AboutPage = () => {
         cidade.
       </p>
       <p>
-        O Dourados+ é mais do que um simples catálogo; é uma ferramenta de
+        O Celeiro do MS é mais do que um simples catálogo; é uma ferramenta de
         conexão entre a comunidade local e os visitantes, promovendo o
         desenvolvimento cultural e econômico da região. Através deste projeto,
         esperamos contribuir para o fortalecimento da identidade local e para o

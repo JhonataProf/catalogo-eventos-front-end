@@ -13,6 +13,16 @@ export async function findPontoById(id: string): Promise<PontoTuristico> {
   const response = await api.get<PontoTuristico>(`/pontos/${id}`);
   return response.data;
 }
+
+export async function findEventosByCidadeId(id: string): Promise<Evento[]> {
+  const response = await api.get<Evento[]>(`/eventos/cidade/${id}`);
+  return response.data;
+}
+
+export async function findPontosByCidadeId(id: string): Promise<PontoTuristico[]> {
+  const response = await api.get<PontoTuristico[]>(`/pontos/cidade/${id}`);
+  return response.data;
+}
 // --------- Carga inicial ---------
 export async function fetchAppState(): Promise<AppState> {
   const [eventosRes, cidadesRes, pontosRes] = await Promise.all([
