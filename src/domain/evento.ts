@@ -16,5 +16,6 @@ export interface Evento {
   preco: string;
   img: string;
   desc: string;
+  destaque?: boolean;
 }
 

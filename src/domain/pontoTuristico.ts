@@ -5,4 +5,5 @@ export interface PontoTuristico {
   horario: string;
   img: string;
   desc: string;
+  destaque?: boolean;
 }

@@ -1,5 +1,4 @@
 // src/bff/appBff.ts
-import type { AppState } from "../context/appDataContext";
 import type { Cidade, Evento, PontoTuristico } from "../domain";
 import { api } from "../http/api";
 
@@ -24,22 +23,22 @@ export async function findPontosByCidadeId(id: string): Promise<PontoTuristico[]
   return response.data;
 }
 // --------- Carga inicial ---------
-export async function fetchAppState(): Promise<AppState> {
-  const [eventosRes, cidadesRes, pontosRes] = await Promise.all([
-    api.get<Evento[]>("/eventos"),
-    api.get<Cidade[]>("/cidades"),
-    api.get<PontoTuristico[]>("/pontos")
-  ]);
-  console.log("fetchAppState: eventos", eventosRes.data);
-  console.log("fetchAppState: cidades", cidadesRes.data);
-  console.log("fetchAppState: pontos", pontosRes.data);
+// export async function fetchAppState(): Promise<AppState> {
+//   const [eventosRes, cidadesRes, pontosRes] = await Promise.all([
+//     api.get<Evento[]>("/eventos"),
+//     api.get<Cidade[]>("/cidades"),
+//     api.get<PontoTuristico[]>("/pontos")
+//   ]);
+//   console.log("fetchAppState: eventos", eventosRes.data);
+//   console.log("fetchAppState: cidades", cidadesRes.data);
+//   console.log("fetchAppState: pontos", pontosRes.data);
 
-  return {
-    eventos: eventosRes.data,
-    cidades: cidadesRes.data,
-    pontos: pontosRes.data,
-  };
-}
+//   return {
+//     eventos: eventosRes.data,
+//     cidades: cidadesRes.data,
+//     pontos: pontosRes.data,
+//   };
+// }
 
 // --------- Eventos ---------
 

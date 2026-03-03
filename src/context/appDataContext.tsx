@@ -7,9 +7,15 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { createCidadeApi, createEventoApi, deleteCidadeApi, deleteEventoApi, fetchAppState, updateCidadeApi, updateEventoApi } from "../bff/appBff";
+import {
+  createCidadeApi,
+  createEventoApi,
+  deleteCidadeApi,
+  deleteEventoApi,
+  updateCidadeApi,
+  updateEventoApi,
+} from "../bff/appBff";
 import type { Cidade, Evento, PontoTuristico } from "../domain";
-
 
 export interface AppState {
   eventos: Evento[];
@@ -25,27 +31,26 @@ interface AppDataContextValue {
 
   // Eventos (AGORA assíncronos)
   createOrUpdateEvento: (
-    evento: Omit<Evento, "id"> & { id?: string }
+    evento: Omit<Evento, "id"> & { id?: string },
   ) => Promise<void>;
   deleteEvento: (id: string) => Promise<void>;
 
   // Cidades (mantém síncrono, por enquanto só no front)
   createOrUpdateCidade: (
-    cidade: Omit<Cidade, "id" | "pontos"> & { id?: string }
+    cidade: Omit<Cidade, "id" | "pontos"> & { id?: string },
   ) => void;
   deleteCidade: (id: string) => void;
 
   // Pontos
   createOrUpdatePonto: (
     cidadeId: string,
-    ponto: Omit<PontoTuristico, "id"> & { id?: string }
+    ponto: Omit<PontoTuristico, "id"> & { id?: string },
   ) => void;
   deletePonto: (cidadeId: string, pontoId: string) => void;
 }
 
-
 const AppDataContext = createContext<AppDataContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 const LS_KEY = "douradosplus-data-v1";
@@ -84,9 +89,12 @@ function loadFromStorage(): AppState | null {
 export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [state, setState] = useState<AppState>(emptyState);
-
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState<AppState>(
+    () => loadFromStorage() ?? emptyState,
+  );
+  const [loading, setLoading] = useState(
+    state.eventos.length === 0 && state.cidades.length === 0,
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Persistência em localStorage
@@ -97,23 +105,29 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
       JSON.stringify({
         events: state.eventos,
         cidades: state.cidades,
-      })
+        pontos: state.pontos, // se for manter
+      }),
     );
   }, [state]);
 
-  // Carregar da fake API se não tiver nada no localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const hasCache =
+      state.eventos.length > 0 ||
+      state.cidades.length > 0 ||
+      state.pontos.length > 0;
+    if (hasCache) return;
 
     setLoading(true);
-    fetchAppState()
-      .then((data: AppState) => setState(data))
-      .catch((err: unknown) => {
-        console.error(err);
-        setError("Não foi possível carregar os dados iniciais.");
-      })
-      .finally(() => setLoading(false));
+    // fetchAppState()
+    //   .then((data: AppState) => setState(data))
+    //   .catch((err: unknown) => {
+    //     console.error(err);
+    //     setError("Não foi possível carregar os dados iniciais.");
+    //   })
+    //   .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ====== CRUD Eventos (igual antes, só usando setState) ======
@@ -180,61 +194,69 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
         setError("Não foi possível excluir o evento.");
       }
     },
-    []
+    [],
   );
-
 
   // ====== CRUD Cidades ======
 
   const createOrUpdateCidade: AppDataContextValue["createOrUpdateCidade"] =
-    useCallback(async (cidade) => {
-      setError(null);
-      const isUpdate = !!cidade.id;
-      const id = cidade.id ?? createId();
+    useCallback(
+      async (cidade) => {
+        setError(null);
 
-      const existente = state.cidades.find((c) => c.id === id);
-      const payload: Cidade = {
-        id,
-        nome: cidade.nome,
-        uf: cidade.uf || "MS",
-        desc: cidade.desc ?? "",
-        pontos: existente?.pontos ?? [],
-        eventos: existente?.eventos ?? [],
-      }
-      try {
-        let saved;
+        const isUpdate = !!cidade.id;
+        const id = cidade.id ?? createId();
 
-        if (isUpdate) {
-          saved = await updateCidadeApi(payload);
-        } else {
-          saved = await createCidadeApi(payload);
+        // extrai existente de forma segura via "snapshot" atual (com dependência)
+        // (OK desde que deps estejam corretas)
+        const existente = (prevCidades: Cidade[]) =>
+          prevCidades.find((c) => c.id === id);
+
+        try {
+          let saved: Cidade;
+
+          // monta payload usando state atual mas de forma controlada:
+          const payload = ((): Cidade => {
+            const ex = existente(state.cidades); // deps: [state.cidades]
+            return {
+              id,
+              nome: cidade.nome,
+              uf: cidade.uf || "MS",
+              desc: cidade.desc ?? "",
+              pontos: ex?.pontos ?? [],
+              eventos: ex?.eventos ?? [],
+            };
+          })();
+
+          // eslint-disable-next-line prefer-const
+          saved = isUpdate
+            ? await updateCidadeApi(payload)
+            : await createCidadeApi(payload);
+
+          setState((prev) => {
+            const cidades = [...prev.cidades];
+            const idx = cidades.findIndex((c) => c.id === id);
+            if (idx >= 0) cidades[idx] = saved;
+            else cidades.push(saved);
+            return { ...prev, cidades };
+          });
+        } catch (err) {
+          console.error(err);
+          setError("Não foi possível salvar a cidade.");
         }
-        setState((prev) => {
-          const cidades = [...prev.cidades];
-          const idx = prev.cidades.findIndex((c) => c.id === id);
-          if (idx >= 0) {
-            cidades[idx] = saved;
-          } else {
-            cidades.push(saved);
-          }
-
-          return { ...prev, cidades };
-        });
-      } catch (err) {
-        console.error(err);
-        setError("Não foi possível salvar a cidade.");
-      }
-    }, []);
+      },
+      [state.cidades],
+    );
 
   const deleteCidade: AppDataContextValue["deleteCidade"] = useCallback(
     async (id) => {
-      await deleteCidadeApi(id)
+      await deleteCidadeApi(id);
       setState((prev) => ({
         ...prev,
         cidades: prev.cidades.filter((c) => c.id !== id),
       }));
     },
-    []
+    [],
   );
 
   // ====== CRUD Pontos ======
@@ -266,7 +288,6 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
 
   const deletePonto: AppDataContextValue["deletePonto"] = useCallback(
     async (cidadeId, pontoId) => {
-      
       setState((prev) => {
         const cidades = prev.cidades.map((c) => {
           if (c.id !== cidadeId) return c;
@@ -278,7 +299,7 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
         return { ...prev, cidades };
       });
     },
-    []
+    [],
   );
 
   const value = useMemo<AppDataContextValue>(
@@ -304,7 +325,7 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
       deleteCidade,
       createOrUpdatePonto,
       deletePonto,
-    ]
+    ],
   );
 
   return (
@@ -312,6 +333,7 @@ export const AppDataProvider: React.FC<React.PropsWithChildren> = ({
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAppData() {
   const ctx = useContext(AppDataContext);
   if (!ctx) {

@@ -1,11 +1,18 @@
-import React from "react";
-import { DouradosEventosPage } from "../features/eventos/pages/DouradosEventosPage";
-import AboutPage from "../pages/AboutPage";
-import DetailsEventsPage from "../pages/DetailsEventsPage";
-import DetailsPontoPage from "../pages/DetailsPontoPage";
-import EventosPage from "../pages/EventosPage";
-import TourismPage from "../pages/TourismPage";
+import React, { lazy, Suspense } from "react";
 import DefaultTemplate from "../shared/templates/DefaultTemplate";
+import { PageLoader } from "./PageLoader";
+import TourismPage from "../pages/TourismPage";
+import EventosPage from "../pages/EventosPage";
+import AboutPage from "../pages/AboutPage";
+
+
+const withSuspense = (node: React.ReactNode) => <Suspense fallback={<PageLoader />}>{node}</Suspense>;
+
+const HomePage = lazy(() => import("../features/home/pages/HomePage"));
+const CityDetailsPage = lazy(() => import("../pages/CityDetailsPage"));
+
+// mantenha suas outras pages (EventosPage/TourismPage/AboutPage/Details...)
+// como lazy também
 
 export interface RouteConfig {
   path: string;
@@ -18,13 +25,17 @@ export const AppRoutes: RouteConfig[] = [
     path: "",
     element: <DefaultTemplate />,
     children: [
-      { path: "/", element: <DouradosEventosPage /> },
-      { path: "/eventos", element: <EventosPage /> },
-      { path: "/sobre", element: <AboutPage /> },
-      { path: "/turismo", element: <TourismPage /> },
-      {  path: "/eventos/:id", element: <DetailsEventsPage /> },
-      { path: "/ponto-turistico/:id", element: <DetailsPontoPage /> },
-      {  path: "*", element: <div className="p-4 text-center text-sm text-[#9fb0c8]">Página não encontrada</div> },
+      { path: "/", element: withSuspense(<HomePage />) },
+      { path: "/cidades/:slug", element: withSuspense(<CityDetailsPage />) },
+      { path: "/pontos-turisticos", element: withSuspense(<TourismPage />) },
+      { path: "/eventos", element: withSuspense(<EventosPage />) },
+      { path: "/sobre", element: withSuspense(<AboutPage />) },
+
+      // suas rotas existentes:
+      // { path: "/eventos/:id", element: withSuspense(<DetailsEventsPage />) },
+      // { path: "/pontos-turisticos/:id", element: withSuspense(<DetailsPontoPage />) },
+
+      { path: "*", element: <div className="p-4 text-center text-sm text-slate-500">Página não encontrada</div> },
     ],
   },
 ];
