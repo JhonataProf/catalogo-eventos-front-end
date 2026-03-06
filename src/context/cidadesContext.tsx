@@ -39,7 +39,7 @@ export const CidadesProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, []);
 
-  const finbBySlug = async (slugValue: string): Promise<void> => {
+  const finbBySlug = useCallback(async (slugValue: string): Promise<void> => {
     const formmated = slugValue.toLowerCase().replace(/\s+/g, "-");
 
     const item = await findCidadeBySlug(formmated);
@@ -48,16 +48,7 @@ export const CidadesProvider: React.FC<React.PropsWithChildren> = ({
       ...state,
       items: newItems
     })
-    // return {
-    //   nome: item.nome,
-    //   uf: item.uf.toString(),
-    //   slug: item.slug ?? item.nome.toLowerCase().replace(/\s+/g, "-"),
-    //   image:
-    //     item.imagem ??
-    //     "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1200&auto=format&fit=crop",
-    //   descricao: item.desc,
-    // };
-  };
+  }, [setState, state])
 
   const value = useMemo<CidadesContextValue>(
     () => ({ state, fetchAll, finbBySlug }),

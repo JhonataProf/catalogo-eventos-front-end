@@ -44,7 +44,7 @@ export function FeaturedCarousel({ items }: { items: FeaturedCardVM[] }) {
 
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
           <div className="flex items-center gap-2">
-            <Tag variant={current.kind === "evento" ? "primary" : "success"}>
+            <Tag variant={current.kind === "evento" ? "success" : "neutral"}>
               {current.kind === "evento"
                 ? "Evento em destaque"
                 : "Ponto turístico em destaque"}

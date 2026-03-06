@@ -1,13 +1,33 @@
+import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Card } from "../shared/ui";
-import { getCidadeSlugByNome } from "../features/home/utils/cidadeSlug";
 import { useEventosPublic } from "../context/eventosStore";
+import { getCidadeSlugByNome } from "../features/home/utils/cidadeSlug";
+import { Button, Card } from "../shared/ui";
 
 export default function DetailsEventsPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { state: { eventoSelecionado: evento, loading, error, cidade: cidadeDoEvento }, findById } = useEventosPublic()
-  findById(Number(id));
+  const {
+    state: {
+      eventoSelecionado: evento,
+      loading,
+      error,
+      cidade: cidadeDoEvento,
+    },
+    findById,
+  } = useEventosPublic();
+
+  const fetchEvento = useCallback(
+    () =>
+      (async () => {
+        void findById(Number(id));
+      })(),
+    [id, findById],
+  );
+
+  useEffect(() => {
+    fetchEvento();
+  }, [id, fetchEvento]);
 
   return (
     <section
@@ -41,30 +61,29 @@ export default function DetailsEventsPage() {
 
           <p className="text-base text-slate-800">{evento.desc}</p>
           <div className="mt-6 flex flex-wrap gap-2">
-                        <Button variant="secondary" onClick={() => navigate(-1)}>
-                          Voltar
-                        </Button>
-                        <Button
-                          variant="primary"
-                          onClick={() => navigate("/pontos-turisticos")}
-                        >
-                          Ver lista de pontos
-                        </Button>
-                        {cidadeDoEvento ? (
-                          <Button
-                            variant="secondary"
-                            onClick={() => {
-                              const slug = getCidadeSlugByNome(cidadeDoEvento.nome);
-                              if (slug) navigate(`/cidades/${slug}`);
-                            }}
-                          >
-                            Ver cidade
-                          </Button>
-                        ) : null}
-                      </div>
+            <Button variant="secondary" onClick={() => navigate(-1)}>
+              Voltar
+            </Button>
+            <Button variant="primary" onClick={() => navigate("/eventos")}>
+              Ver lista de eventos
+            </Button>
+            {cidadeDoEvento ? (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const slug = getCidadeSlugByNome(cidadeDoEvento.nome);
+                  if (slug) navigate(`/cidades/${slug}`);
+                }}
+              >
+                Ver cidade
+              </Button>
+            ) : null}
+          </div>
         </>
       ) : (
-        <Card className="p-6 text-sm text-slate-600">Evento não encontrado.</Card>
+        <Card className="p-6 text-sm text-slate-600">
+          Evento não encontrado.
+        </Card>
       )}
     </section>
   );

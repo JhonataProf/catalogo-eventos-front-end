@@ -392,7 +392,7 @@ export async function listDestaques(params?: {
   // json-server: query destaque=true
   // API real: se não aceitar "destaque" como param, vai cair no fallback e filtrar
   const [eventosRes, pontosRes] = await Promise.all([
-    api.get<unknown>("/eventos", {
+    api.get<Evento>("/eventos", {
       params: {
         page,
         limit,
@@ -405,7 +405,7 @@ export async function listDestaques(params?: {
         _order: "asc",
       },
     }),
-    api.get<unknown>("/pontos-turisticos", {
+    api.get<PontoTuristico>("/pontos-turisticos", {
       params: {
         page,
         limit,
@@ -467,95 +467,4 @@ export async function listDestaques(params?: {
         }));
 
   return { eventos, pontos };
-}
-
-// ===== CRUD EVENTOS =====
-export async function createEventoApi(
-  payload: Omit<Evento, "id" | "createdAt" | "updatedAt">
-): Promise<Evento> {
-  // API real: costuma retornar envelope; json-server retorna item cru
-  const res = await api.post<unknown>("/eventos", payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<Evento>(data)) return data.data.item;
-  if (isJsonServerItem<Evento>(data)) return data;
-
-  throw new Error("Resposta inesperada ao criar evento.");
-}
-
-export async function updateEventoApi(
-  id: number,
-  payload: Partial<Omit<Evento, "id" | "createdAt" | "updatedAt">>
-): Promise<Evento> {
-  const res = await api.put<unknown>(`/eventos/${id}`, payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<Evento>(data)) return data.data.item;
-  if (isJsonServerItem<Evento>(data)) return data;
-
-  throw new Error("Resposta inesperada ao atualizar evento.");
-}
-
-export async function deleteEventoApi(id: number): Promise<void> {
-  await api.delete(`/eventos/${id}`);
-}
-
-// ===== CRUD PONTOS =====
-export async function createPontoApi(
-  payload: Omit<PontoTuristico, "id" | "createdAt" | "updatedAt">
-): Promise<PontoTuristico> {
-  const res = await api.post<unknown>("/pontos-turisticos", payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<PontoTuristico>(data)) return data.data.item;
-  if (isJsonServerItem<PontoTuristico>(data)) return data;
-
-  throw new Error("Resposta inesperada ao criar ponto turístico.");
-}
-
-export async function updatePontoApi(
-  id: number,
-  payload: Partial<Omit<PontoTuristico, "id" | "createdAt" | "updatedAt">>
-): Promise<PontoTuristico> {
-  const res = await api.put<unknown>(`/pontos-turisticos/${id}`, payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<PontoTuristico>(data)) return data.data.item;
-  if (isJsonServerItem<PontoTuristico>(data)) return data;
-
-  throw new Error("Resposta inesperada ao atualizar ponto turístico.");
-}
-
-export async function deletePontoApi(id: number): Promise<void> {
-  await api.delete(`/pontos-turisticos/${id}`);
-}
-
-// ===== CRUD CIDADES =====
-export async function createCidadeApi(
-  payload: Omit<Cidade, "id" | "createdAt" | "updatedAt">
-): Promise<Cidade> {
-  const res = await api.post<unknown>("/cidades", payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<Cidade>(data)) return data.data.item;
-  if (isJsonServerItem<Cidade>(data)) return data;
-
-  throw new Error("Resposta inesperada ao criar cidade.");
-}
-
-export async function updateCidadeApi(
-  id: number,
-  payload: Partial<Omit<Cidade, "id" | "createdAt" | "updatedAt">>
-): Promise<Cidade> {
-  const res = await api.put<unknown>(`/cidades/${id}`, payload);
-  const data: unknown = res.data;
-
-  if (isApiItemResponse<Cidade>(data)) return data.data.item;
-  if (isJsonServerItem<Cidade>(data)) return data;
-
-  throw new Error("Resposta inesperada ao atualizar cidade.");
-}
-
-export async function deleteCidadeApi(id: number): Promise<void> {
-  await api.delete(`/cidades/${id}`);
 }
