@@ -15,17 +15,9 @@ import {
   TextField,
   RoundedSelect,
 } from "../shared/ui";
+import type { PontoView, Query } from "../context/pontosStore";
 
 const FALLBACK_IMG = "https://picsum.photos/900/520?blur=1";
-
-type Query = {
-  cidadeId?: number;
-};
-
-type PontoView = {
-  ponto: PontoTuristico;
-  cidadeLabel: string;
-};
 
 function PontoCard({
   item,
