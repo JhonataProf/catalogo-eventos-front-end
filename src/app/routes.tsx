@@ -1,12 +1,12 @@
 import type { ReactElement } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
-import { PublicLayout } from "@/shared/layouts/PublicLayout";
-import { HomePage } from "@/features/home/pages/HomePage";
-import { EventosPage } from "@/features/eventos-publicos/pages/EventosPage";
-import { EventoDetailsPage } from "@/features/eventos-publicos/pages/EventoDetailsPage";
-import { PontosTuristicosPage } from "@/features/pontos-publicos/pages/PontosTuristicosPage";
-import { PontoTuristicoDetailsPage } from "@/features/pontos-publicos/pages/PontoTuristicoDetailsPage";
-import { CityDetailsPage } from "@/features/cidades/pages/CityDetailsPage";
+import { PublicLayout } from "@/shell/public/layouts/PublicLayout";
+import { HomePage } from "@/domains/home-institucional/pages/HomePage";
+import { EventosPage } from "@/domains/catalogo-publico/eventos/pages/EventosPage";
+import { PontosTuristicosPage } from "@/domains/catalogo-publico/pontos/pages/PontosTuristicosPage";
+import { PontoTuristicoDetailsPage } from "@/domains/catalogo-publico/pontos/pages/PontoTuristicoDetailsPage";
+import { CityDetailsPage } from "@/domains/cidades-institucional/pages/CityDetailsPage";
+import { EventoDetailsPage } from "@/domains/catalogo-publico/eventos/pages/EventoDetailsPage";
 
 export function AppRoutes(): ReactElement | null {
   return useRoutes([

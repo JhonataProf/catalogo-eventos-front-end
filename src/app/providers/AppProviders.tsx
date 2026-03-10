@@ -1,6 +1,6 @@
+import { CidadeAtualProvider } from "@/domains/cidade-atual/cidadeAtual.context";
 import type { PropsWithChildren, ReactElement } from "react";
 import { BrowserRouter } from "react-router-dom";
-import { CidadeAtualProvider } from "@/features/cidade-atual/cidadeAtual.context";
 
 export function AppProviders({
   children,
