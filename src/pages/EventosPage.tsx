@@ -11,6 +11,7 @@ import {
   TextField,
 } from "../shared/ui";
 import { useEventosPublic } from "../context/eventosStore";
+import { useEffect } from "react";
 
 // type EmptyQuery = Record<string, never>;
 
@@ -24,9 +25,14 @@ export default function EventosPage() {
     setSearch,
     setCategory,
     reset,
-    loadNext,
+    fetchFirstPage,
     canLoadMore,
+    loadMore
   } = useEventosPublic();
+
+  useEffect(() => {
+    fetchFirstPage();
+  }, [fetchFirstPage]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,7 +78,7 @@ export default function EventosPage() {
             size="sm"
             onClick={() => {
               reset();
-              void loadNext();
+              void loadMore();
             }}
           >
             Recarregar
@@ -106,7 +112,7 @@ export default function EventosPage() {
 
       <div className="flex justify-center">
         {canLoadMore ? (
-          <Button variant="primary" onClick={loadNext} disabled={loading}>
+          <Button variant="primary" onClick={loadMore} disabled={loading}>
             {loading ? "Carregando..." : "Carregar mais"}
           </Button>
         ) : (

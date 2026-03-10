@@ -1,21 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Cidade, PontoTuristico } from "../domain";
+import { useCidadesPublic } from "../context/cidadesStore";
 import {
-  listCidades,
-  listPontosByCidadeId,
-  listPontosTuristicos,
-} from "../bff/appBff";
-import { usePaginatedResource } from "../shared/hooks/usePaginatedResource";
+  usePontosPublic,
+  type PontosQuery,
+  type PontoView,
+} from "../context/pontosStore";
+import type { Cidade } from "../domain";
 import {
   Button,
   Card,
+  RoundedSelect,
   SectionHeader,
   Tag,
   TextField,
-  RoundedSelect,
 } from "../shared/ui";
-import type { PontoView, Query } from "../context/pontosStore";
 
 const FALLBACK_IMG = "https://picsum.photos/900/520?blur=1";
 
@@ -81,33 +80,22 @@ function PontoCard({
 export default function PontosTuristicosPage() {
   const navigate = useNavigate();
 
-  // ====== filtros (locais) ======
-  const [search, setSearch] = useState("");
-  const [tipo, setTipo] = useState("");
-
-  // ====== filtro de cidade (server-side) ======
-  const [cidadeId, setCidadeId] = useState<number | undefined>(undefined);
-
-  // ====== cidades (para dropdown) ======
-  const [cidades, setCidades] = useState<Cidade[]>([]);
-  const [loadingCidades, setLoadingCidades] = useState(true);
+  const {
+    state: { items: cidades },
+  } = useCidadesPublic();
+  const {
+    state: { items: pontos, loading, error, page },
+    query: { cidadeId, search, tipo },
+    setQuery,
+    canLoadMore,
+    reset,
+    fetchPage,
+    fetchFirstPage,
+  } = usePontosPublic();
 
   useEffect(() => {
-    (async () => {
-      setLoadingCidades(true);
-      try {
-        const res = await listCidades({
-          page: 1,
-          limit: 500,
-          sortBy: "nome",
-          sortDir: "asc",
-        });
-        setCidades(res.items);
-      } finally {
-        setLoadingCidades(false);
-      }
-    })();
-  }, []);
+    fetchFirstPage();
+  }, [fetchFirstPage]);
 
   const cidadesMap = useMemo(() => {
     return new Map<number, Cidade>(cidades.map((c) => [c.id, c]));
@@ -123,49 +111,10 @@ export default function PontosTuristicosPage() {
     ];
   }, [cidades]);
 
-  // ====== paginação (server-side) ======
-  const loadPage = useCallback(
-    async ({
-      page,
-      limit,
-      query,
-    }: {
-      page: number;
-      limit: number;
-      query: Query;
-    }) => {
-      const base = { page, limit, sortBy: "nome", sortDir: "asc" as const };
-
-      const res = query.cidadeId
-        ? await listPontosByCidadeId(query.cidadeId, base)
-        : await listPontosTuristicos(base);
-
-      return {
-        items: res.items,
-        page: res.page,
-        totalPages: res.totalPages,
-        total: res.total,
-      };
-    },
-    [],
-  );
-
-  const query = useMemo<Query>(() => ({ cidadeId }), [cidadeId]);
-
-  const {
-    items: pontos,
-    loading,
-    error,
-    canLoadMore,
-    loadNext,
-    reset,
-  } = usePaginatedResource<PontoTuristico, Query>({
-    query,
-    limit: 12,
-    loadPage,
-    auto: true,
-    resetOnQueryChange: true, // <- aqui é o "mágico": troca cidade => reset + reload
-  });
+  const handleQuery = async (query: PontosQuery): Promise<void> => {
+    void setQuery(query);
+    fetchPage(page, { cidadeId, search, tipo });
+  };
 
   // ====== ViewModels (para UI) ======
   const pontosView = useMemo<PontoView[]>(() => {
@@ -186,17 +135,6 @@ export default function PontosTuristicosPage() {
     ];
   }, [pontosView]);
 
-  // ====== filtros locais (não re-bate na API) ======
-  const filtrados = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return pontosView.filter(({ ponto, cidadeLabel }) => {
-      const okTipo = !tipo || ponto.tipo === tipo;
-      const txt = `${ponto.nome} ${ponto.tipo} ${cidadeLabel}`.toLowerCase();
-      const okSearch = !q || txt.includes(q);
-      return okTipo && okSearch;
-    });
-  }, [pontosView, search, tipo]);
-
   return (
     <div className="flex flex-col gap-6">
       <SectionHeader
@@ -214,17 +152,19 @@ export default function PontosTuristicosPage() {
             label="Buscar"
             placeholder="Ex: parque, museu, praça..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleQuery({ search: e.target.value })}
           />
 
           <div className="flex flex-col gap-1 text-sm">
             <label className="font-medium">Cidade</label>
             <RoundedSelect
               value={cidadeId ? String(cidadeId) : ""}
-              onChange={(v) => setCidadeId(v ? Number(v) : undefined)}
+              onChange={(v) =>
+                handleQuery({ cidadeId: v ? Number(v) : undefined })
+              }
               options={cidadeOptions}
-              placeholder={loadingCidades ? "Carregando..." : "Todas"}
-              disabled={loadingCidades}
+              placeholder={loading ? "Carregando..." : "Todas"}
+              disabled={loading}
             />
           </div>
 
@@ -232,7 +172,11 @@ export default function PontosTuristicosPage() {
             <label className="font-medium">Tipo</label>
             <RoundedSelect
               value={tipo}
-              onChange={setTipo}
+              onChange={(e) =>
+                handleQuery({
+                  tipo: e as unknown as "museu" | "parque" | "praça",
+                })
+              }
               options={tipoOptions}
               placeholder="Todos"
             />
@@ -244,9 +188,7 @@ export default function PontosTuristicosPage() {
             variant="secondary"
             size="sm"
             onClick={() => {
-              setSearch("");
-              setTipo("");
-              setCidadeId(undefined);
+              handleQuery({ search: "", tipo: "", cidadeId: undefined });
             }}
           >
             Limpar filtros
@@ -257,14 +199,14 @@ export default function PontosTuristicosPage() {
             size="sm"
             onClick={() => {
               reset();
-              loadNext();
+              fetchPage(page, { cidadeId, search, tipo });
             }}
           >
             Recarregar
           </Button>
 
           <div className="ml-auto text-xs text-slate-500">
-            {filtrados.length} exibido(s)
+            {pontos.length} exibido(s)
           </div>
         </div>
       </Card>
@@ -272,19 +214,19 @@ export default function PontosTuristicosPage() {
       {/* erros/empty */}
       {error ? <Card className="p-6 text-sm text-red-600">{error}</Card> : null}
 
-      {filtrados.length === 0 && !loading ? (
+      {pontos.length === 0 && !loading ? (
         <Card className="p-6 text-sm text-slate-600">
           Nenhum ponto turístico encontrado.
         </Card>
       ) : null}
 
       {/* grid */}
-      {filtrados.length > 0 ? (
+      {pontosView.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtrados.map((item) => (
+          {pontosView.map((pontoView) => (
             <PontoCard
-              key={item.ponto.id}
-              item={item}
+              key={pontoView.ponto.id}
+              item={pontoView}
               onOpen={(id) => navigate(`/pontos-turisticos/${id}`)}
             />
           ))}
@@ -294,7 +236,14 @@ export default function PontosTuristicosPage() {
       {/* load more */}
       <div className="flex justify-center">
         {canLoadMore ? (
-          <Button variant="primary" onClick={loadNext} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              const nextPage = page + 1;
+              fetchPage(nextPage, { cidadeId, search, tipo });
+            }}
+            disabled={loading}
+          >
             {loading ? "Carregando..." : "Carregar mais"}
           </Button>
         ) : (

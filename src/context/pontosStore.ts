@@ -6,6 +6,8 @@ export type PontosQuery = {
   cidadeId?: number;
   limit?: number;
   sortBy?: string;
+  search?: string;
+  tipo?: "museu" | "parque" | "praça"| ""
   sortDir?: SortDir;
 };
 
@@ -25,9 +27,8 @@ export type PontosState = {
   total: number;
   loading: boolean;
   error: string | null;
-  search: string;
-  tipo: string;
-  cidadeId: number;
+  auto?: boolean;
+  
 };
 
 export const initial: PontosState = {
@@ -37,16 +38,17 @@ export const initial: PontosState = {
   total: 0,
   loading: false,
   error: null,
-  search: "",
-  tipo: "",
-  cidadeId: 0
+  auto: true,
 };
 
 export type PontosContextValue = {
   state: PontosState;
   query: PontosQuery;
-
+  canLoadMore: boolean;
+  
+  reset: () => void;
   fetchFirstPage: (query?: PontosQuery) => Promise<void>;
+  fetchPage: (page: number, q: PontosQuery) => Promise<void>;
   loadMore: () => Promise<void>;
   setQuery: (query: PontosQuery) => void;
 };

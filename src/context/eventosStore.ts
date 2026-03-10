@@ -47,7 +47,6 @@ export type EventosContextValue = {
   findById: (id: number) => Promise<void>;
   findCidadeEvento: (id: number) => Promise<void>;
   canLoadMore: boolean;
-  loadNext: () => Promise<void>;
 
 };
 

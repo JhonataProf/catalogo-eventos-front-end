@@ -8,6 +8,7 @@ import { CidadesProvider } from "../context/cidadesContext";
 import { EventosProvider } from "../context/eventosContext";
 import { ConfirmProvider } from "../shared/ui/confirm/ConfirmProvider";
 import { AppRoutes } from "./routes";
+import { PontosProvider } from "../context/pontosContext";
 
 function toRRRoutes(routes: typeof AppRoutes): RouteObject[] {
   return routes.map((r) => ({
@@ -24,7 +25,9 @@ export default function App() {
     <ConfirmProvider>
       <CidadesProvider>
         <EventosProvider>
-          <RouterProvider router={router} />
+          <PontosProvider>
+            <RouterProvider router={router} />
+          </PontosProvider>
         </EventosProvider>
       </CidadesProvider>
     </ConfirmProvider>
