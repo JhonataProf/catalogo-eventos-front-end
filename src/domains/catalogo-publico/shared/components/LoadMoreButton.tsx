@@ -14,14 +14,14 @@ export function LoadMoreButton({
     <div className="mt-8 flex justify-center">
       <Button
         variant="ghost"
-        isLoading
+        isLoading={isLoading}
         onClick={() => {
           void onClick();
         }}
         disabled={isLoading}
         className="inline-flex min-w-40 items-center justify-center rounded-2xl border border-zinc-300 bg-white px-5 py-3 text-sm font-semibold text-zinc-800 transition hover:border-emerald-600 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? "Carregando..." : "Carregar mais"}
+        Carregar mais
       </Button>
     </div>
   );
