@@ -1,79 +1,90 @@
 import type { ChangeEvent, ReactElement } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import Logo from "@/assets/celeiro_ms_logo.jpg";
 import { useCidadeAtual } from "@/domains/cidade-atual/useCidadeAtual";
 import { useCidadesPublicas } from "@/domains/cidade-atual/useCidadesPublicas";
-
-function getNavLinkClassName(isActive: boolean): string {
-  return isActive
-    ? "text-[var(--color-secondary)]"
-    : "text-zinc-700 hover:text-[var(--color-secondary)]";
-}
+import type { ICidade } from "@/entities/cidade/cidade.types";
 
 export function TopNav(): ReactElement {
   const { cidade, setCidadeBySlug } = useCidadeAtual();
   const { cidades } = useCidadesPublicas();
 
   function handleCidadeChange(event: ChangeEvent<HTMLSelectElement>): void {
-    const selectedSlug: string = event.target.value;
-    setCidadeBySlug(selectedSlug);
+    setCidadeBySlug(event.target.value);
   }
 
+  const linkBase: string =
+    "rounded-xl px-3 py-2 text-sm font-medium transition";
+  const linkActive: string = "bg-black/5 text-zinc-900";
+  const linkIdle: string = "text-zinc-600 hover:bg-black/5 hover:text-zinc-900";
+
   return (
-    <header className="border-b border-black/5 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center justify-between gap-6">
-          <Link to="/" className="flex flex-col">
-            <span className="text-lg font-bold text-[var(--color-secondary)]">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <NavLink to="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:rgba(0,152,201,0.12)]">
+              <img
+                src={Logo}
+                alt="Logo do Celeiro do MS"
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            </div>
+          </NavLink>
+
+          <div className="leading-tight">
+            <p className="text-sm font-semibold text-zinc-900">
               Celeiro do MS
-            </span>
-            <span className="text-xs text-zinc-500">
-              Portal regional de turismo e experiências
-            </span>
-          </Link>
-
-          <nav className="hidden items-center gap-6 md:flex">
-            <NavLink
-              to="/"
-              className={({ isActive }: { isActive: boolean }) =>
-                getNavLinkClassName(isActive)
-              }
-            >
-              Home
-            </NavLink>
-
-            <NavLink
-              to="/eventos"
-              className={({ isActive }: { isActive: boolean }) =>
-                getNavLinkClassName(isActive)
-              }
-            >
-              Eventos
-            </NavLink>
-
-            <NavLink
-              to="/pontos-turisticos"
-              className={({ isActive }: { isActive: boolean }) =>
-                getNavLinkClassName(isActive)
-              }
-            >
-              Pontos turísticos
-            </NavLink>
-
-            <NavLink
-              to="/cidades/dourados"
-              className={({ isActive }: { isActive: boolean }) =>
-                getNavLinkClassName(isActive)
-              }
-            >
-              Cidades
-            </NavLink>
-          </nav>
+            </p>
+            <p className="text-xs text-zinc-500">Turismo &amp; Eventos</p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <nav
+          className="order-3 flex w-full items-center gap-1 overflow-x-auto md:order-2 md:w-auto"
+          aria-label="Navegação principal"
+        >
+          <NavLink
+            to="/"
+            className={({ isActive }: { isActive: boolean }) =>
+              `${linkBase} ${isActive ? linkActive : linkIdle}`
+            }
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/pontos-turisticos"
+            className={({ isActive }: { isActive: boolean }) =>
+              `${linkBase} ${isActive ? linkActive : linkIdle}`
+            }
+          >
+            Pontos turísticos
+          </NavLink>
+
+          <NavLink
+            to="/eventos"
+            className={({ isActive }: { isActive: boolean }) =>
+              `${linkBase} ${isActive ? linkActive : linkIdle}`
+            }
+          >
+            Eventos
+          </NavLink>
+
+          <NavLink
+            to="/cidades/dourados"
+            className={({ isActive }: { isActive: boolean }) =>
+              `${linkBase} ${isActive ? linkActive : linkIdle}`
+            }
+          >
+            Cidades
+          </NavLink>
+        </nav>
+
+        <div className="order-2 flex items-center gap-2 md:order-3">
           <label
             htmlFor="cidade-atual"
-            className="text-sm font-medium text-zinc-700"
+            className="hidden text-sm font-medium text-zinc-700 sm:block"
           >
             Cidade atual
           </label>
@@ -84,42 +95,13 @@ export function TopNav(): ReactElement {
             onChange={handleCidadeChange}
             className="rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none transition focus:border-[var(--color-primary)]"
           >
-            {cidades.map((item) => (
+            {cidades.map((item: ICidade) => (
               <option key={item.id} value={item.slug}>
                 {item.nome}
               </option>
             ))}
           </select>
         </div>
-
-        <nav className="flex items-center gap-4 md:hidden">
-          <NavLink
-            to="/"
-            className={({ isActive }: { isActive: boolean }) =>
-              getNavLinkClassName(isActive)
-            }
-          >
-            Home
-          </NavLink>
-
-          <NavLink
-            to="/eventos"
-            className={({ isActive }: { isActive: boolean }) =>
-              getNavLinkClassName(isActive)
-            }
-          >
-            Eventos
-          </NavLink>
-
-          <NavLink
-            to="/pontos-turisticos"
-            className={({ isActive }: { isActive: boolean }) =>
-              getNavLinkClassName(isActive)
-            }
-          >
-            Pontos turísticos
-          </NavLink>
-        </nav>
       </div>
     </header>
   );

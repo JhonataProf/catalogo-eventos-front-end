@@ -1,42 +1,83 @@
 import type { ReactElement } from "react";
-import { Container } from "@/design-system/ui/Container";
+import { Link } from "react-router-dom";
+import { Container } from "@/design-system/ui";
 
 export function SiteFooter(): ReactElement {
   return (
-    <footer className="mt-12 border-t border-black/5 bg-white">
+    <footer className="mt-12 border-t border-zinc-200 bg-white">
       <Container className="py-10">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-zinc-900">Celeiro do MS</h2>
-            <p className="text-sm leading-6 text-zinc-600">
-              Portal público para divulgação de cidades, eventos, atrativos e
-              experiências da região.
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">Celeiro do MS</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              Plataforma para divulgação de eventos, cidades e pontos turísticos
+              da região.
             </p>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-900">
-              Informações
-            </h3>
-            <ul className="space-y-2 text-sm text-zinc-600">
-              <li>Sobre o portal</li>
-              <li>Cidades da região</li>
-              <li>Eventos e atrativos</li>
-              <li>Contato institucional</li>
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">Navegação</p>
+            <ul className="mt-2 space-y-2 text-sm text-zinc-600">
+              <li>
+                <Link className="hover:text-zinc-900" to="/eventos">
+                  Eventos
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-zinc-900" to="/pontos-turisticos">
+                  Pontos turísticos
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-zinc-900" to="/cidades/dourados">
+                  Cidades
+                </Link>
+              </li>
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-900">
-              Redes sociais e créditos
-            </h3>
-            <ul className="space-y-2 text-sm text-zinc-600">
-              <li>Instagram</li>
-              <li>Facebook</li>
-              <li>YouTube</li>
-              <li>Desenvolvido para o portal Celeiro do MS</li>
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">
+              Mídias sociais
+            </p>
+            <ul className="mt-2 space-y-2 text-sm text-zinc-600">
+              <li>
+                <a href="#" aria-label="Instagram" className="hover:text-zinc-900">
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a href="#" aria-label="Facebook" className="hover:text-zinc-900">
+                  Facebook
+                </a>
+              </li>
+              <li>
+                <a href="#" aria-label="YouTube" className="hover:text-zinc-900">
+                  YouTube
+                </a>
+              </li>
             </ul>
           </div>
+
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">Créditos</p>
+            <p className="mt-2 text-sm text-zinc-600">
+              © {new Date().getFullYear()} Celeiro do MS. Todos os direitos reservados.
+            </p>
+            <p className="mt-2 text-xs text-zinc-500">
+              Desenvolvido para divulgação regional.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 flex items-center justify-between text-xs text-zinc-500">
+          <span>Feito com foco em UX e performance.</span>
+
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
+            <span className="h-2 w-2 rounded-full bg-[var(--color-secondary)]" />
+            <span className="h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+          </span>
         </div>
       </Container>
     </footer>

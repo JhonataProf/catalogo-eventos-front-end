@@ -1,52 +1,59 @@
 import type { ReactElement } from "react";
-import { Card, Section } from "@/shared/ui";
+import { Card, Container, SectionHeader } from "@/design-system/ui";
 
 export function CeleiroIntroSection(): ReactElement {
   return (
-    <Section
-      title="Sobre o Celeiro do MS"
-      description="Uma iniciativa voltada à valorização do território, da cultura, do turismo e das experiências regionais."
-      spacing="xl"
-    >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card padding="lg">
-          <div className="space-y-4">
-            <p className="text-base leading-7 text-zinc-700">
-              O Celeiro do MS reúne municípios e potencializa a divulgação de
-              eventos, pontos turísticos, experiências culturais, identidade
-              regional e oportunidades de visitação.
-            </p>
+    <section className="py-14">
+      <Container>
+        <SectionHeader
+          kicker="Quem somos"
+          tone="success"
+          description="Conheça o propósito do Celeiro do MS e como apoiamos a divulgação regional."
+        >
+          Sobre o Celeiro do MS
+        </SectionHeader>
 
-            <p className="text-base leading-7 text-zinc-700">
-              A proposta do portal é facilitar o acesso a informações públicas,
-              fortalecer a presença digital dos territórios e criar uma navegação
-              integrada entre cidades, atrações e agenda regional.
-            </p>
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <Card className="border-[color:rgba(13,139,84,0.12)] p-6">
+            <div className="space-y-3">
+              <span className="inline-flex rounded-full bg-[var(--color-bg-light)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-secondary)]">
+                Missão
+              </span>
 
-            <p className="text-base leading-7 text-zinc-700">
-              Mais do que um catálogo, esta plataforma funciona como uma vitrine
-              institucional para apresentar a força cultural, turística e
-              econômica da região.
-            </p>
-          </div>
-        </Card>
+              <p className="text-sm leading-6 text-zinc-600">
+                Divulgar eventos e atrativos turísticos, fortalecendo a economia
+                local e ampliando o acesso à informação regional.
+              </p>
+            </div>
+          </Card>
 
-        <Card padding="lg" className="bg-[var(--color-bg-muted)]">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-zinc-900">
-              O que você encontra aqui
-            </h3>
+          <Card className="border-[color:rgba(0,152,201,0.12)] p-6">
+            <div className="space-y-3">
+              <span className="inline-flex rounded-full bg-[color:rgba(0,152,201,0.10)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-primary)]">
+                Visão
+              </span>
 
-            <ul className="space-y-3 text-sm leading-6 text-zinc-700">
-              <li>• Eventos e agenda regional</li>
-              <li>• Pontos turísticos e locais de visitação</li>
-              <li>• Informações por cidade</li>
-              <li>• Navegação integrada do território</li>
-              <li>• Experiência pública simples e acessível</li>
-            </ul>
-          </div>
-        </Card>
-      </div>
-    </Section>
+              <p className="text-sm leading-6 text-zinc-600">
+                Ser a principal referência digital de turismo e agenda cultural da
+                região do Celeiro do MS.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="border-[color:rgba(223,218,12,0.22)] p-6">
+            <div className="space-y-3">
+              <span className="inline-flex rounded-full bg-[color:rgba(223,218,12,0.18)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[color:#7b7400]">
+                Valores
+              </span>
+
+              <p className="text-sm leading-6 text-zinc-600">
+                Transparência, valorização regional, simplicidade de uso e
+                experiência de navegação acessível para diferentes públicos.
+              </p>
+            </div>
+          </Card>
+        </div>
+      </Container>
+    </section>
   );
 }
