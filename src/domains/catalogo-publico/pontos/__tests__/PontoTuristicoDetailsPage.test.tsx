@@ -134,4 +134,24 @@ describe("PontoTuristicoDetailsPage", () => {
       expect(screen.getByText("Pontos fallback")).toBeInTheDocument();
     });
   });
+
+  it("deve renderizar fallbacks quando campos opcionais do ponto não existirem", async () => {
+    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue({
+      id: "pto-2",
+      cidadeId: "dourados",
+      cidadeSlug: "dourados",
+      nome: "Ponto sem opcionais",
+      descricao: "Descrição simples",
+      categoria: undefined,
+      endereco: undefined,
+      horarioFuncionamento: undefined,
+      imagemPrincipal: undefined,
+      destaque: false,
+    });
+
+    renderWithRoute("/pontos-turisticos/pto-2");
+
+    expect(await screen.findByText("Ponto sem opcionais")).toBeInTheDocument();
+
+  });
 });

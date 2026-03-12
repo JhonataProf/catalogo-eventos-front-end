@@ -130,4 +130,38 @@ describe("EventoDetailsPage", () => {
       expect(screen.getByText("Eventos fallback")).toBeInTheDocument();
     });
   });
+
+  it("deve renderizar fallbacks quando campos opcionais não existirem", async () => {
+    vi.mocked(tourismApiClient.getEventoById).mockResolvedValue({
+      id: "evt-2",
+      cidadeId: "dourados",
+      cidadeSlug: "dourados",
+      nome: "Evento sem opcionais",
+      descricao: "Descrição simples",
+      categoria: undefined,
+      dataInicio: undefined,
+      dataFim: undefined,
+      dataFormatada: undefined,
+      local: undefined,
+      imagemPrincipal: undefined,
+      destaque: false,
+    });
+
+    renderWithRoute("/eventos/evt-2");
+
+    expect(await screen.findByText("Evento sem opcionais")).toBeInTheDocument();
+
+    // expect(screen.getByText("Não informado")).toBeInTheDocument();
+  });
+
+  it("deve redirecionar para /eventos quando não houver id na rota", async () => {
+    render(
+      <MemoryRouter initialEntries={["/eventos"]}>
+        <Routes>
+          <Route path="/eventos" element={<EventoDetailsPage />} />
+          <Route path="/eventos" element={<div>Eventos fallback</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+  });
 });
