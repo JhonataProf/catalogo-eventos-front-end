@@ -185,8 +185,6 @@ describe("EventosPage", () => {
       </MemoryRouter>,
     );
 
-    screen.debug();
-
     expect(
       screen.getByRole("button", { name: /carregando/i }),
     ).toBeInTheDocument();
