@@ -1,12 +1,12 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card } from "@/design-system/ui";
-import type { ICeleiroCidade } from "../data/celeiroCidades";
+import type { ICity } from "@/entities/city/city.types";
 
 const FALLBACK_CITY_IMG = "/images/fallbacks/cidade-card.jpg";
 
 export interface ICityCardProps {
-  cidade: ICeleiroCidade;
+  cidade: ICity;
 }
 
 export function CityCard({ cidade }: ICityCardProps): ReactElement {
@@ -15,7 +15,7 @@ export function CityCard({ cidade }: ICityCardProps): ReactElement {
       <div className="relative overflow-hidden">
         <img
           src={cidade.imageUrl}
-          alt={`Foto de ${cidade.nome}`}
+          alt={`Foto de ${cidade.name}`}
           className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
           loading="lazy"
           onError={(event) => {
@@ -29,13 +29,13 @@ export function CityCard({ cidade }: ICityCardProps): ReactElement {
       <div className="space-y-4 p-5">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-secondary)]">
-            {cidade.estado}
+            {cidade.state}
           </p>
-          <h3 className="text-lg font-semibold text-zinc-900">{cidade.nome}</h3>
+          <h3 className="text-lg font-semibold text-zinc-900">{cidade.name}</h3>
         </div>
 
         <p className="line-clamp-3 text-sm leading-6 text-zinc-600">
-          {cidade.resumo}
+          {cidade.summary}
         </p>
 
         <Link to={`/cidades/${cidade.slug}`} className="inline-flex w-full">

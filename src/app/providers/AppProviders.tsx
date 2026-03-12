@@ -1,4 +1,4 @@
-import { CidadeAtualProvider } from "@/domains/cidade-atual/cidadeAtual.context";
+import { AuthProvider } from "@/domains/admin-cms/auth/AuthProvider";
 import type { PropsWithChildren, ReactElement } from "react";
 import { BrowserRouter } from "react-router-dom";
 
@@ -7,7 +7,7 @@ export function AppProviders({
 }: PropsWithChildren): ReactElement {
   return (
     <BrowserRouter>
-      <CidadeAtualProvider>{children}</CidadeAtualProvider>
+      <AuthProvider>{children}</AuthProvider>
     </BrowserRouter>
   );
 }

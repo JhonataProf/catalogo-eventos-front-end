@@ -1,9 +1,11 @@
 import type { ReactElement } from "react";
-import { Section, SectionHeader } from "@/design-system/ui";
-import { CELEIRO_CIDADES } from "../data/celeiroCidades";
+import { Card, Section, SectionHeader } from "@/design-system/ui";
+import { usePublicCities } from "@/domains/public-portal/cities/hooks/usePublicCities";
 import { CityCard } from "./CityCard";
 
 export function CitiesGridSection(): ReactElement {
+  const { cities, isLoading, error } = usePublicCities();
+
   return (
     <Section spacing="xl">
       <SectionHeader
@@ -14,11 +16,29 @@ export function CitiesGridSection(): ReactElement {
         Cidades do Celeiro do MS
       </SectionHeader>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {CELEIRO_CIDADES.map((cidade) => (
-          <CityCard key={cidade.slug} cidade={cidade} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="mt-8">
+          <Card>
+            <p className="text-sm text-zinc-600">Carregando cidades...</p>
+          </Card>
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="mt-8">
+          <Card className="border border-red-200 bg-red-50">
+            <p className="text-sm font-medium text-red-700">{error}</p>
+          </Card>
+        </div>
+      ) : null}
+
+      {!isLoading && !error ? (
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {cities.map((cidade) => (
+            <CityCard key={cidade.id} cidade={cidade} />
+          ))}
+        </div>
+      ) : null}
     </Section>
   );
 }

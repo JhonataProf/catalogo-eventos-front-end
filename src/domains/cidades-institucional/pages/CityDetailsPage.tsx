@@ -1,10 +1,8 @@
-import type { ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { Button, Card, Container, Section, SectionHeader } from "@/design-system/ui";
-import {
-  findCeleiroCidadeBySlug,
-  type ICeleiroCidade,
-} from "@/domains/home-institucional/data/celeiroCidades";
+import type { ICity } from "@/entities/city/city.types";
+import { adminApiClient } from "@/services/admin-api/client";
 
 interface ICityRouteParams {
   slug?: string;
@@ -13,9 +11,61 @@ interface ICityRouteParams {
 export function CityDetailsPage(): ReactElement {
   const params = useParams<keyof ICityRouteParams>();
   const slug: string | undefined = params.slug;
-  const cidade: ICeleiroCidade | undefined = slug
-    ? findCeleiroCidadeBySlug(slug)
-    : undefined;
+
+  const [cidade, setCidade] = useState<ICity | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [notFound, setNotFound] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isActive: boolean = true;
+
+    async function loadCity(): Promise<void> {
+      if (!slug) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+
+        const response: ICity | null = await adminApiClient.getCityBySlug(slug);
+
+        if (!isActive) {
+          return;
+        }
+
+        if (!response || !response.published) {
+          setNotFound(true);
+          return;
+        }
+
+        setCidade(response);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadCity();
+
+    return () => {
+      isActive = false;
+    };
+  }, [slug]);
+
+  if (notFound) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (isLoading) {
+    return (
+      <Section spacing="xl">
+        <p className="text-sm text-zinc-600">Carregando cidade...</p>
+      </Section>
+    );
+  }
 
   if (!cidade) {
     return <Navigate to="/" replace />;
@@ -35,16 +85,16 @@ export function CityDetailsPage(): ReactElement {
                 </span>
 
                 <h1 className="text-4xl font-bold leading-tight text-zinc-900 md:text-5xl">
-                  {cidade.nome}
+                  {cidade.name}
                 </h1>
 
                 <p className="text-lg font-medium text-zinc-600">
-                  {cidade.estado}
+                  {cidade.state}
                 </p>
               </div>
 
               <p className="max-w-2xl text-base leading-7 text-zinc-700">
-                {cidade.resumo}
+                {cidade.summary}
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
@@ -63,11 +113,15 @@ export function CityDetailsPage(): ReactElement {
             </div>
 
             <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-soft">
-              <img
-                src={cidade.imageUrl}
-                alt={cidade.nome}
-                className="h-[360px] w-full object-cover"
-              />
+              {cidade.imageUrl ? (
+                <img
+                  src={cidade.imageUrl}
+                  alt={cidade.name}
+                  className="h-[360px] w-full object-cover"
+                />
+              ) : (
+                <div className="h-[360px] w-full bg-zinc-100" />
+              )}
             </div>
           </div>
         </Container>
@@ -77,7 +131,7 @@ export function CityDetailsPage(): ReactElement {
         <SectionHeader
           description="Uma visão institucional inicial da cidade dentro do portal Celeiro do MS."
         >
-          Conheça {cidade.nome}
+          Conheça {cidade.name}
         </SectionHeader>
 
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -86,8 +140,8 @@ export function CityDetailsPage(): ReactElement {
               Identidade local
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {cidade.nome} integra o território do Celeiro do MS e compõe uma
-              rede regional de cultura, turismo e experiências locais.
+              {cidade.description ??
+                `${cidade.name} integra o território do Celeiro do MS e compõe uma rede regional de cultura, turismo e experiências locais.`}
             </p>
           </Card>
 
@@ -109,27 +163,6 @@ export function CityDetailsPage(): ReactElement {
               A navegação futura pode destacar roteiros, atrativos, experiências
               culturais e conteúdos institucionais específicos da cidade.
             </p>
-          </Card>
-        </div>
-      </Section>
-
-      <Section spacing="lg">
-        <SectionHeader
-          description="Esta estrutura já está pronta para receber dados reais quando sua API estiver consolidada."
-        >
-          Próximos conteúdos desta cidade
-        </SectionHeader>
-
-        <div className="mt-8">
-          <Card>
-            <ul className="space-y-3 text-sm leading-6 text-zinc-700">
-              <li>• Banner institucional da cidade</li>
-              <li>• Seção “sobre a cidade” com conteúdo editorial</li>
-              <li>• Destaques de eventos</li>
-              <li>• Destaques de pontos turísticos</li>
-              <li>• Galeria de imagens</li>
-              <li>• Informações de contato e redes institucionais</li>
-            </ul>
           </Card>
         </div>
       </Section>
