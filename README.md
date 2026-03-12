@@ -71,5 +71,3 @@ export default defineConfig([
   },
 ])
 ```
-# catalogo-front-end
-# catalogo-front-end
