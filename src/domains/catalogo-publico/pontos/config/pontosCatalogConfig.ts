@@ -1,26 +1,22 @@
-import type {
-  ICatalogoItem,
-  ICatalogoQuery,
-  ICatalogoResult,
-} from "@/domains/catalogo-publico/shared/model/catalogo.types";
-import type { IPontoTuristico } from "@/entities/ponto-turistico/pontoTuristico.types";
-import { tourismApiClient } from "@/services/tourism-api/client";
+import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
+import { publicApiClient } from "@/services/public-api/client";
+import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
 
-function mapPontoToCatalogoItem(
-  ponto: IPontoTuristico
+function mapTouristPointToCatalogItem(
+  touristPoint: ITouristPoint
 ): ICatalogoItem {
   return {
-    id: ponto.id,
+    id: touristPoint.id,
     kind: "ponto-turistico",
-    cidadeId: ponto.cidadeId,
-    cidadeSlug: ponto.cidadeSlug,
-    titulo: ponto.nome,
-    descricao: ponto.descricao,
-    imagemUrl: ponto.imagemPrincipal,
-    categoria: ponto.categoria,
-    localLabel: ponto.endereco,
-    destaque: ponto.destaque,
-    href: `/pontos-turisticos/${ponto.id}`,
+    cidadeId: touristPoint.cityId,
+    cidadeSlug: touristPoint.citySlug,
+    titulo: touristPoint.name,
+    descricao: touristPoint.description,
+    imagemUrl: touristPoint.imageUrl,
+    categoria: touristPoint.category,
+    localLabel: touristPoint.address,
+    destaque: touristPoint.featured,
+    href: `/pontos-turisticos/${touristPoint.id}`,
     ctaLabel: "Ver local",
   };
 }
@@ -28,16 +24,16 @@ function mapPontoToCatalogoItem(
 export async function fetchPontosCatalogo(
   query: ICatalogoQuery
 ): Promise<ICatalogoResult> {
-  const response = await tourismApiClient.listPontosByCidade({
-    cidade: query.cidade,
+  const response = await publicApiClient.listPublishedTouristPoints({
+    citySlug: query.cidade,
+    search: query.busca,
+    category: query.categoria,
     page: query.page,
     limit: query.limit,
-    busca: query.busca,
-    categoria: query.categoria,
   });
 
   return {
-    items: response.items.map(mapPontoToCatalogoItem),
+    items: response.items.map(mapTouristPointToCatalogItem),
     total: response.total,
     page: response.page,
     limit: response.limit,

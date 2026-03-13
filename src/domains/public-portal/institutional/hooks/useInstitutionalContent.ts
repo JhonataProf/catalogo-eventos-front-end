@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { IInstitutionalContent } from "@/entities/institutional/institutional.types";
-import { adminApiClient } from "@/services/admin-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 export interface IUseInstitutionalContentResult {
   content: IInstitutionalContent | null;
@@ -22,7 +22,7 @@ export function useInstitutionalContent(): IUseInstitutionalContentResult {
         setError("");
 
         const response: IInstitutionalContent =
-          await adminApiClient.getInstitutionalContent();
+          await publicApiClient.getInstitutionalContent();
 
         if (!isActive) {
           return;

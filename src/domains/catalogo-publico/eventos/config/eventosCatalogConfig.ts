@@ -1,25 +1,21 @@
-import type {
-  ICatalogoItem,
-  ICatalogoQuery,
-  ICatalogoResult,
-} from "@/domains/catalogo-publico/shared/model/catalogo.types";
-import type { IEvento } from "@/entities/evento/evento.types";
-import { tourismApiClient } from "@/services/tourism-api/client";
+import type { IEvent } from "@/entities/event/event.types";
+import { publicApiClient } from "@/services/public-api/client";
+import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
 
-function mapEventoToCatalogoItem(evento: IEvento): ICatalogoItem {
+function mapEventToCatalogItem(event: IEvent): ICatalogoItem {
   return {
-    id: evento.id,
+    id: event.id,
     kind: "evento",
-    cidadeId: evento.cidadeId,
-    cidadeSlug: evento.cidadeSlug,
-    titulo: evento.nome,
-    descricao: evento.descricao,
-    imagemUrl: evento.imagemPrincipal,
-    categoria: evento.categoria,
-    dataLabel: evento.dataFormatada,
-    localLabel: evento.local,
-    destaque: evento.destaque,
-    href: `/eventos/${evento.id}`,
+    cidadeId: event.cityId,
+    cidadeSlug: event.citySlug,
+    titulo: event.name,
+    descricao: event.description,
+    imagemUrl: event.imageUrl,
+    categoria: event.category,
+    dataLabel: event.formattedDate,
+    localLabel: event.location,
+    destaque: event.featured,
+    href: `/eventos/${event.id}`,
     ctaLabel: "Ver evento",
   };
 }
@@ -27,16 +23,16 @@ function mapEventoToCatalogoItem(evento: IEvento): ICatalogoItem {
 export async function fetchEventosCatalogo(
   query: ICatalogoQuery
 ): Promise<ICatalogoResult> {
-  const response = await tourismApiClient.listEventosByCidade({
-    cidade: query.cidade,
+  const response = await publicApiClient.listPublishedEvents({
+    citySlug: query.cidade,
+    search: query.busca,
+    category: query.categoria,
     page: query.page,
     limit: query.limit,
-    busca: query.busca,
-    categoria: query.categoria,
   });
 
   return {
-    items: response.items.map(mapEventoToCatalogoItem),
+    items: response.items.map(mapEventToCatalogItem),
     total: response.total,
     page: response.page,
     limit: response.limit,

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import type { IEvento } from "@/entities/evento/evento.types";
 import { Button, Card, Container, Section, SectionHeader } from "@/design-system/ui";
-import { tourismApiClient } from "@/services/tourism-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 interface IEventoRouteParams {
   id?: string;
@@ -12,7 +12,7 @@ export function EventoDetailsPage(): ReactElement {
   const params = useParams<keyof IEventoRouteParams>();
   const id: string | undefined = params.id;
 
-  const [evento, setEvento] = useState<IEvento | null>(null);
+  const [evento, setEvento] = useState<Partial<IEvento> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
 
@@ -28,7 +28,7 @@ export function EventoDetailsPage(): ReactElement {
 
       try {
         setIsLoading(true);
-        const response: IEvento | null = await tourismApiClient.getEventoById(id);
+        const response: Partial<IEvento> | null = await publicApiClient.getPublishedEventById(id);
 
         if (!isActive) {
           return;

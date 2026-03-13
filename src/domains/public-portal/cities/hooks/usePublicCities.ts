@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ICity } from "@/entities/city/city.types";
-import { adminApiClient } from "@/services/admin-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 export interface IUsePublicCitiesResult {
   cities: ICity[];
@@ -21,7 +21,8 @@ export function usePublicCities(): IUsePublicCitiesResult {
         setIsLoading(true);
         setError("");
 
-        const response: ICity[] = await adminApiClient.listCities();
+        const response: ICity[] = await publicApiClient.listPublishedCities();
+        setCities(response);
 
         if (!isActive) {
           return;

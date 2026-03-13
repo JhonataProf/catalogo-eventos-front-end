@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Container } from "@/design-system/ui";
 import type { ISocialLink } from "@/entities/social-link/socialLink.types";
-import { adminApiClient } from "@/services/admin-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 export function SiteFooter(): ReactElement {
   const [socialLinks, setSocialLinks] = useState<ISocialLink[]>([]);
@@ -12,13 +12,13 @@ export function SiteFooter(): ReactElement {
 
     async function loadSocialLinks(): Promise<void> {
       try {
-        const response: ISocialLink[] = await adminApiClient.listSocialLinks();
+        const response: ISocialLink[] = await publicApiClient.listActiveSocialLinks()
 
         if (!isActive) {
           return;
         }
 
-        setSocialLinks(response.filter((item: ISocialLink) => item.active));
+        setSocialLinks(response);
       } catch {
         if (!isActive) {
           return;

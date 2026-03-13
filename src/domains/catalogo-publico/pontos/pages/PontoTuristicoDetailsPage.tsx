@@ -1,8 +1,14 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import type { IPontoTuristico } from "@/entities/ponto-turistico/pontoTuristico.types";
-import { Button, Card, Container, Section, SectionHeader } from "@/design-system/ui";
-import { tourismApiClient } from "@/services/tourism-api/client";
+import {
+  Button,
+  Card,
+  Container,
+  Section,
+  SectionHeader,
+} from "@/design-system/ui";
+import { publicApiClient } from "@/services/public-api/client";
 
 interface IPontoRouteParams {
   id?: string;
@@ -12,7 +18,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
   const params = useParams<keyof IPontoRouteParams>();
   const id: string | undefined = params.id;
 
-  const [ponto, setPonto] = useState<IPontoTuristico | null>(null);
+  const [ponto, setPonto] = useState<Partial<IPontoTuristico> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
 
@@ -28,8 +34,8 @@ export function PontoTuristicoDetailsPage(): ReactElement {
 
       try {
         setIsLoading(true);
-        const response: IPontoTuristico | null =
-          await tourismApiClient.getPontoById(id);
+        const response: Partial<IPontoTuristico> | null =
+          await publicApiClient.getPublishedTouristPointById(id);
 
         if (!isActive) {
           return;
@@ -131,9 +137,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
       </section>
 
       <Section spacing="xl">
-        <SectionHeader
-          description="Estrutura inicial preparada para receber conteúdo mais rico da API real."
-        >
+        <SectionHeader description="Estrutura inicial preparada para receber conteúdo mais rico da API real.">
           Informações do atrativo
         </SectionHeader>
 

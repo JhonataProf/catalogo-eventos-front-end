@@ -1,8 +1,14 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { Button, Card, Container, Section, SectionHeader } from "@/design-system/ui";
+import {
+  Button,
+  Card,
+  Container,
+  Section,
+  SectionHeader,
+} from "@/design-system/ui";
 import type { ICity } from "@/entities/city/city.types";
-import { adminApiClient } from "@/services/admin-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 interface ICityRouteParams {
   slug?: string;
@@ -29,7 +35,8 @@ export function CityDetailsPage(): ReactElement {
       try {
         setIsLoading(true);
 
-        const response: ICity | null = await adminApiClient.getCityBySlug(slug);
+        const response: ICity | null =
+          await publicApiClient.getPublishedCityBySlug(slug);
 
         if (!isActive) {
           return;
@@ -128,9 +135,7 @@ export function CityDetailsPage(): ReactElement {
       </section>
 
       <Section spacing="xl">
-        <SectionHeader
-          description="Uma visão institucional inicial da cidade dentro do portal Celeiro do MS."
-        >
+        <SectionHeader description="Uma visão institucional inicial da cidade dentro do portal Celeiro do MS.">
           Conheça {cidade.name}
         </SectionHeader>
 

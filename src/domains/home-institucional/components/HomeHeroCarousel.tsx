@@ -1,18 +1,30 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Container } from "@/design-system/ui";
-import { HOME_HIGHLIGHTS, type IHomeHighlight } from "../data/homeHighlights";
+import type { IEvent } from "@/entities/event/event.types";
+import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
+import { publicApiClient } from "@/services/public-api/client";
+
+interface IHomeHighlightItem {
+  id: string;
+  kind: "evento" | "ponto-turistico";
+  titulo: string;
+  descricao: string;
+  cidadeNome: string;
+  imageUrl?: string;
+  href: string;
+}
 
 const FALLBACK_IMG = "/images/fallbacks/celeiro-highlight.jpg";
 const AUTO_PLAY_INTERVAL_MS = 4500;
 
-function getTagLabel(kind: IHomeHighlight["kind"]): string {
+function getTagLabel(kind: IHomeHighlightItem["kind"]): string {
   return kind === "evento"
     ? "Evento em destaque"
     : "Ponto turístico em destaque";
 }
 
-function getTagClassName(kind: IHomeHighlight["kind"]): string {
+function getTagClassName(kind: IHomeHighlightItem["kind"]): string {
   return kind === "evento"
     ? "bg-[var(--color-accent)] text-zinc-900"
     : "bg-white/90 text-zinc-900";
@@ -21,39 +33,112 @@ function getTagClassName(kind: IHomeHighlight["kind"]): string {
 export function HomeHeroCarousel(): ReactElement | null {
   const navigate = useNavigate();
   const [index, setIndex] = useState<number>(0);
+  const [items, setItems] = useState<IHomeHighlightItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (HOME_HIGHLIGHTS.length <= 1) {
+    let isActive: boolean = true;
+
+    async function loadHighlights(): Promise<void> {
+      try {
+        setIsLoading(true);
+
+        const response = await publicApiClient.getHomeHighlights();
+
+        if (!isActive) {
+          return;
+        }
+
+        const nextItems: IHomeHighlightItem[] = [
+          ...response.events.map((event: IEvent) => ({
+            id: event.id,
+            kind: "evento" as const,
+            titulo: event.name,
+            descricao: event.description,
+            cidadeNome: event.citySlug,
+            imageUrl: event.imageUrl,
+            href: `/eventos/${event.id}`,
+          })),
+          ...response.touristPoints.map((touristPoint: ITouristPoint) => ({
+            id: touristPoint.id,
+            kind: "ponto-turistico" as const,
+            titulo: touristPoint.name,
+            descricao: touristPoint.description,
+            cidadeNome: touristPoint.citySlug,
+            imageUrl: touristPoint.imageUrl,
+            href: `/pontos-turisticos/${touristPoint.id}`,
+          })),
+        ];
+
+        setItems(nextItems);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadHighlights();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (items.length <= 1) {
       return;
     }
 
     const timerId: number = window.setInterval(() => {
       setIndex((currentIndex: number) => {
-        return (currentIndex + 1) % HOME_HIGHLIGHTS.length;
+        return (currentIndex + 1) % items.length;
       });
     }, AUTO_PLAY_INTERVAL_MS);
 
     return () => {
       window.clearInterval(timerId);
     };
-  }, []);
+  }, [items.length]);
 
   useEffect(() => {
-    HOME_HIGHLIGHTS.forEach((item: IHomeHighlight) => {
+    items.forEach((item: IHomeHighlightItem) => {
       const image = new Image();
       image.src = item.imageUrl || FALLBACK_IMG;
     });
-  }, []);
+  }, [items]);
 
-  if (HOME_HIGHLIGHTS.length === 0) {
+  useEffect(() => {
+    if (index < items.length) {
+      return;
+    }
+
+    setIndex(0);
+  }, [index, items.length]);
+
+  const hasItems: boolean = useMemo(() => items.length > 0, [items.length]);
+
+  if (isLoading) {
+    return (
+      <section className="pt-8 md:pt-12">
+        <Container>
+          <Card>
+            <p className="text-sm text-zinc-600">Carregando destaques...</p>
+          </Card>
+        </Container>
+      </section>
+    );
+  }
+
+  if (!hasItems) {
     return null;
   }
 
-  const currentItem: IHomeHighlight = HOME_HIGHLIGHTS[index];
+  const currentItem: IHomeHighlightItem = items[index];
 
   function handleNext(): void {
     setIndex((currentIndex: number) => {
-      return (currentIndex + 1) % HOME_HIGHLIGHTS.length;
+      return (currentIndex + 1) % items.length;
     });
   }
 
@@ -78,27 +163,23 @@ export function HomeHeroCarousel(): ReactElement | null {
 
         <Card className="overflow-hidden p-0">
           <div className="relative h-64 sm:h-80 lg:h-[420px]">
-            {HOME_HIGHLIGHTS.map((item: IHomeHighlight, itemIndex: number) => {
+            {items.map((item: IHomeHighlightItem, itemIndex: number) => {
               const isActive: boolean = itemIndex === index;
 
               return (
-                <>
-                  <img
-                    key={item.id}
-                    src={item.imageUrl || FALLBACK_IMG}
-                    alt={item.titulo}
-                    className={[
-                      "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
-                      isActive
-                        ? "opacity-100"
-                        : "pointer-events-none opacity-0",
-                    ].join(" ")}
-                    loading={itemIndex === 0 ? "eager" : "lazy"}
-                    onError={(event) => {
-                      event.currentTarget.src = FALLBACK_IMG;
-                    }}
-                  />
-                </>
+                <img
+                  key={item.id}
+                  src={item.imageUrl || FALLBACK_IMG}
+                  alt={item.titulo}
+                  className={[
+                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+                    isActive ? "opacity-100" : "pointer-events-none opacity-0",
+                  ].join(" ")}
+                  loading={itemIndex === 0 ? "eager" : "lazy"}
+                  onError={(event) => {
+                    event.currentTarget.src = FALLBACK_IMG;
+                  }}
+                />
               );
             })}
 
@@ -121,10 +202,10 @@ export function HomeHeroCarousel(): ReactElement | null {
 
                 <span
                   className="text-xs text-white/80"
-                  aria-label={`Destaque ${index + 1} de ${HOME_HIGHLIGHTS.length}`}
+                  aria-label={`Destaque ${index + 1} de ${items.length}`}
                   data-testid="carousel-counter"
                 >
-                  {index + 1}/{HOME_HIGHLIGHTS.length}
+                  {index + 1}/{items.length}
                 </span>
               </div>
 
@@ -150,40 +231,38 @@ export function HomeHeroCarousel(): ReactElement | null {
                   Ver detalhes
                 </Button>
 
-                {HOME_HIGHLIGHTS.length > 1 ? (
+                {items.length > 1 ? (
                   <Button variant="ghost" onClick={handleNext}>
                     Próximo
                   </Button>
                 ) : null}
               </div>
 
-              {HOME_HIGHLIGHTS.length > 1 ? (
+              {items.length > 1 ? (
                 <div
                   className="mt-5 flex gap-2"
                   aria-label="Indicadores do carrossel"
                 >
-                  {HOME_HIGHLIGHTS.map(
-                    (item: IHomeHighlight, itemIndex: number) => {
-                      const isActive: boolean = itemIndex === index;
+                  {items.map((item: IHomeHighlightItem, itemIndex: number) => {
+                    const isActive: boolean = itemIndex === index;
 
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          aria-label={`Ir para destaque ${itemIndex + 1}`}
-                          aria-current={isActive ? "true" : undefined}
-                          data-testid={`carousel-dot-${itemIndex + 1}`}
-                          onClick={() => setIndex(itemIndex)}
-                          className={[
-                            "h-2.5 rounded-full transition",
-                            isActive
-                              ? "w-8 bg-[var(--color-accent)]"
-                              : "w-2.5 bg-white/40 hover:bg-white/70",
-                          ].join(" ")}
-                        />
-                      );
-                    },
-                  )}
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        aria-label={`Ir para destaque ${itemIndex + 1}`}
+                        aria-current={isActive ? "true" : undefined}
+                        data-testid={`carousel-dot-${itemIndex + 1}`}
+                        onClick={() => setIndex(itemIndex)}
+                        className={[
+                          "h-2.5 rounded-full transition",
+                          isActive
+                            ? "w-8 bg-[var(--color-accent)]"
+                            : "w-2.5 bg-white/40 hover:bg-white/70",
+                        ].join(" ")}
+                      />
+                    );
+                  })}
                 </div>
               ) : null}
             </div>
