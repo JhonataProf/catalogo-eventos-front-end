@@ -20,6 +20,10 @@ import {
   setEventsMock,
   setTouristPointsMock,
   getTouristPointsMock,
+  getHomeBannersMock,
+  getHomeHighlightsMock,
+  setHomeBannersMock,
+  setHomeHighlightsMock,
 } from "./mock-data";
 
 import type {
@@ -39,6 +43,15 @@ import type {
   ITouristPoint,
   IUpdateTouristPointInput,
 } from "@/entities/tourist-point/touristPoint.types";
+
+import type {
+  ICreateHomeBannerInput,
+  ICreateHomeHighlightInput,
+  IHomeBanner,
+  IHomeHighlight,
+  IUpdateHomeBannerInput,
+  IUpdateHomeHighlightInput,
+} from "@/entities/home-content/homeContent.types";
 
 export const adminApiClient: IAdminApiClient = {
   async getInstitutionalContent(): Promise<IInstitutionalContent> {
@@ -345,5 +358,123 @@ export const adminApiClient: IAdminApiClient = {
     );
 
     setTouristPointsMock(nextItems);
+  },
+
+  async listHomeBanners(): Promise<IHomeBanner[]> {
+    await adminMockDelay();
+    return getHomeBannersMock();
+  },
+
+  async createHomeBanner(
+    input: ICreateHomeBannerInput
+  ): Promise<IHomeBanner> {
+    await adminMockDelay();
+
+    const currentItems: IHomeBanner[] = getHomeBannersMock();
+
+    const nextItem: IHomeBanner = {
+      id: `banner-${crypto.randomUUID()}`,
+      ...input,
+    };
+
+    setHomeBannersMock([...currentItems, nextItem]);
+
+    return nextItem;
+  },
+
+  async updateHomeBanner(
+    input: IUpdateHomeBannerInput
+  ): Promise<IHomeBanner> {
+    await adminMockDelay();
+
+    const currentItems: IHomeBanner[] = getHomeBannersMock();
+    const currentItem: IHomeBanner | undefined = currentItems.find(
+      (item: IHomeBanner) => item.id === input.id
+    );
+
+    if (!currentItem) {
+      throw new Error("Banner não encontrado.");
+    }
+
+    const nextItem: IHomeBanner = {
+      ...currentItem,
+      ...input,
+    };
+
+    setHomeBannersMock(
+      currentItems.map((item: IHomeBanner) =>
+        item.id === input.id ? nextItem : item
+      )
+    );
+
+    return nextItem;
+  },
+
+  async deleteHomeBanner(id: string): Promise<void> {
+    await adminMockDelay();
+
+    const currentItems: IHomeBanner[] = getHomeBannersMock();
+    setHomeBannersMock(
+      currentItems.filter((item: IHomeBanner) => item.id !== id)
+    );
+  },
+
+  async listHomeHighlights(): Promise<IHomeHighlight[]> {
+    await adminMockDelay();
+    return getHomeHighlightsMock();
+  },
+
+  async createHomeHighlight(
+    input: ICreateHomeHighlightInput
+  ): Promise<IHomeHighlight> {
+    await adminMockDelay();
+
+    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+
+    const nextItem: IHomeHighlight = {
+      id: `highlight-${crypto.randomUUID()}`,
+      ...input,
+    };
+
+    setHomeHighlightsMock([...currentItems, nextItem]);
+
+    return nextItem;
+  },
+
+  async updateHomeHighlight(
+    input: IUpdateHomeHighlightInput
+  ): Promise<IHomeHighlight> {
+    await adminMockDelay();
+
+    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+    const currentItem: IHomeHighlight | undefined = currentItems.find(
+      (item: IHomeHighlight) => item.id === input.id
+    );
+
+    if (!currentItem) {
+      throw new Error("Destaque não encontrado.");
+    }
+
+    const nextItem: IHomeHighlight = {
+      ...currentItem,
+      ...input,
+    };
+
+    setHomeHighlightsMock(
+      currentItems.map((item: IHomeHighlight) =>
+        item.id === input.id ? nextItem : item
+      )
+    );
+
+    return nextItem;
+  },
+
+  async deleteHomeHighlight(id: string): Promise<void> {
+    await adminMockDelay();
+
+    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+    setHomeHighlightsMock(
+      currentItems.filter((item: IHomeHighlight) => item.id !== id)
+    );
   },
 };

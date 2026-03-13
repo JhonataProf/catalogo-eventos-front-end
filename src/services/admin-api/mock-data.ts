@@ -3,6 +3,10 @@ import type { IInstitutionalContent } from "@/entities/institutional/institution
 import type { ISocialLink } from "@/entities/social-link/socialLink.types";
 import type { IEvent } from "@/entities/event/event.types";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types"
+import type {
+  IHomeBanner,
+  IHomeHighlight,
+} from "@/entities/home-content/homeContent.types";
 
 let institutionalContentMock: IInstitutionalContent = {
   id: "institutional-content-1",
@@ -179,6 +183,46 @@ let touristPointsMock: ITouristPoint[] = [
   },
 ];
 
+let homeBannersMock: IHomeBanner[] = [
+  {
+    id: "banner-1",
+    title: "Descubra o Celeiro do MS",
+    subtitle: "Cultura, turismo e experiências regionais em destaque.",
+    imageUrl: "/images/banners/banner-home-1.jpg",
+    ctaLabel: "Explorar eventos",
+    ctaUrl: "/eventos",
+    active: true,
+    order: 1,
+  },
+];
+
+let homeHighlightsMock: IHomeHighlight[] = [
+  {
+    id: "highlight-1",
+    type: "event",
+    referenceId: "event-1",
+    title: "Festival Gastronômico de Dourados",
+    description: "Sabores regionais, música e experiências culturais.",
+    cityName: "Dourados",
+    imageUrl: "/images/highlights/festival-gastronomico.jpg",
+    ctaUrl: "/eventos/event-1",
+    active: true,
+    order: 1,
+  },
+  {
+    id: "highlight-2",
+    type: "tourist-point",
+    referenceId: "tourist-point-1",
+    title: "Parque Antenor Martins",
+    description: "Natureza, lazer e convivência em Dourados.",
+    cityName: "Dourados",
+    imageUrl: "/images/highlights/parque-antenor-martins.jpg",
+    ctaUrl: "/pontos-turisticos/tourist-point-1",
+    active: true,
+    order: 2,
+  },
+];
+
 export async function adminMockDelay(delayMs: number = 300): Promise<void> {
   await new Promise<void>((resolve: () => void) => {
     window.setTimeout(resolve, delayMs);
@@ -231,4 +275,22 @@ export function getTouristPointsMock(): ITouristPoint[] {
 
 export function setTouristPointsMock(nextValue: ITouristPoint[]): void {
   touristPointsMock = [...nextValue];
+}
+
+export function getHomeBannersMock(): IHomeBanner[] {
+  return [...homeBannersMock].sort((left, right) => left.order - right.order);
+}
+
+export function setHomeBannersMock(nextValue: IHomeBanner[]): void {
+  homeBannersMock = [...nextValue];
+}
+
+export function getHomeHighlightsMock(): IHomeHighlight[] {
+  return [...homeHighlightsMock].sort(
+    (left, right) => left.order - right.order
+  );
+}
+
+export function setHomeHighlightsMock(nextValue: IHomeHighlight[]): void {
+  homeHighlightsMock = [...nextValue];
 }

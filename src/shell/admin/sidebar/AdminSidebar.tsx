@@ -39,12 +39,21 @@ export function AdminSidebar(): ReactElement {
         </NavLink>
 
         <NavLink
-          to="/admin/home"
+          to="/admin/home/banners"
           className={({ isActive }: { isActive: boolean }) =>
             getLinkClassName(isActive)
           }
         >
-          Home
+          Home · Banners
+        </NavLink>
+
+        <NavLink
+          to="/admin/home/destaques"
+          className={({ isActive }: { isActive: boolean }) =>
+            getLinkClassName(isActive)
+          }
+        >
+          Home · Destaques
         </NavLink>
 
         <NavLink

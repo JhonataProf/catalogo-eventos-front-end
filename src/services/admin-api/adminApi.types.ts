@@ -25,6 +25,15 @@ import type {
   IUpdateTouristPointInput,
 } from "@/entities/tourist-point/touristPoint.types";
 
+import type {
+  ICreateHomeBannerInput,
+  ICreateHomeHighlightInput,
+  IHomeBanner,
+  IHomeHighlight,
+  IUpdateHomeBannerInput,
+  IUpdateHomeHighlightInput,
+} from "@/entities/home-content/homeContent.types";
+
 export interface IAdminApiClient {
   getInstitutionalContent: () => Promise<IInstitutionalContent>;
   updateInstitutionalContent: (
@@ -58,4 +67,18 @@ export interface IAdminApiClient {
     input: IUpdateTouristPointInput,
   ) => Promise<ITouristPoint>;
   deleteTouristPoint: (id: string) => Promise<void>;
+
+  listHomeBanners: () => Promise<IHomeBanner[]>;
+  createHomeBanner: (input: ICreateHomeBannerInput) => Promise<IHomeBanner>;
+  updateHomeBanner: (input: IUpdateHomeBannerInput) => Promise<IHomeBanner>;
+  deleteHomeBanner: (id: string) => Promise<void>;
+
+  listHomeHighlights: () => Promise<IHomeHighlight[]>;
+  createHomeHighlight: (
+    input: ICreateHomeHighlightInput
+  ) => Promise<IHomeHighlight>;
+  updateHomeHighlight: (
+    input: IUpdateHomeHighlightInput
+  ) => Promise<IHomeHighlight>;
+  deleteHomeHighlight: (id: string) => Promise<void>;
 }
