@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Container } from "@/design-system/ui";
-import type { IEvent } from "@/entities/event/event.types";
-import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { publicApiClient } from "@/services/public-api/client";
+import { IHomeHighlight } from "@/entities/home-content/homeContent.types";
 
 interface IHomeHighlightItem {
   id: string;
-  kind: "evento" | "ponto-turistico";
+  kind: "evento" | "ponto-turistico" | "custom";
   titulo: string;
   descricao: string;
-  cidadeNome: string;
+  cidadeNome?: string;
   imageUrl?: string;
   href: string;
 }
@@ -43,32 +42,24 @@ export function HomeHeroCarousel(): ReactElement | null {
       try {
         setIsLoading(true);
 
-        const response = await publicApiClient.getHomeHighlights();
+        const response = await publicApiClient.getHomeContent();
 
-        if (!isActive) {
-          return;
-        }
-
-        const nextItems: IHomeHighlightItem[] = [
-          ...response.events.map((event: IEvent) => ({
-            id: event.id,
-            kind: "evento" as const,
-            titulo: event.name,
-            descricao: event.description,
-            cidadeNome: event.citySlug,
-            imageUrl: event.imageUrl,
-            href: `/eventos/${event.id}`,
-          })),
-          ...response.touristPoints.map((touristPoint: ITouristPoint) => ({
-            id: touristPoint.id,
-            kind: "ponto-turistico" as const,
-            titulo: touristPoint.name,
-            descricao: touristPoint.description,
-            cidadeNome: touristPoint.citySlug,
-            imageUrl: touristPoint.imageUrl,
-            href: `/pontos-turisticos/${touristPoint.id}`,
-          })),
-        ];
+        const nextItems: IHomeHighlightItem[] = response.highlights.map(
+          (item: IHomeHighlight) => ({
+            id: item.id,
+            kind:
+              item.type === "event"
+                ? "evento"
+                : item.type === "tourist-point"
+                  ? "ponto-turistico"
+                  : "custom",
+            titulo: item.title,
+            descricao: item.description,
+            cidadeNome: item.cityName,
+            imageUrl: item.imageUrl,
+            href: item.ctaUrl || "/",
+          }),
+        );
 
         setItems(nextItems);
       } finally {

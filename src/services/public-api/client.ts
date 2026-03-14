@@ -5,7 +5,12 @@ import type { ISocialLink } from "@/entities/social-link/socialLink.types";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { adminApiClient } from "@/services/admin-api/client";
 import type {
+  IHomeBanner,
+  IHomeHighlight,
+} from "@/entities/home-content/homeContent.types";
+import type {
   IPublicApiClient,
+  IPublicHomeContentResponse,
   IPublicHomeHighlightsResponse,
   IPublicListParams,
   IPublicListResponse,
@@ -22,7 +27,10 @@ function normalizeText(value: string): string {
     .trim();
 }
 
-function matchesSearch(source: string | undefined, search: string | undefined): boolean {
+function matchesSearch(
+  source: string | undefined,
+  search: string | undefined,
+): boolean {
   if (!search) {
     return true;
   }
@@ -37,7 +45,7 @@ function matchesSearch(source: string | undefined, search: string | undefined): 
 function paginateItems<TItem>(
   items: TItem[],
   page: number = DEFAULT_PAGE,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): IPublicListResponse<TItem> {
   const safePage: number = page > 0 ? page : DEFAULT_PAGE;
   const safeLimit: number = limit > 0 ? limit : DEFAULT_LIMIT;
@@ -71,13 +79,14 @@ export const publicApiClient: IPublicApiClient = {
   },
 
   async listPublishedEvents(
-    params: IPublicListParams
+    params: IPublicListParams,
   ): Promise<IPublicListResponse<IEvent>> {
     const events: IEvent[] = await adminApiClient.listEvents();
 
     const filteredItems: IEvent[] = events.filter((item: IEvent) => {
       const matchesPublished: boolean = item.published;
-      const matchesCity: boolean = !params.citySlug || item.citySlug === params.citySlug;
+      const matchesCity: boolean =
+        !params.citySlug || item.citySlug === params.citySlug;
       const matchesCategory: boolean =
         !params.category || item.category === params.category;
       const matchesText: boolean =
@@ -101,7 +110,7 @@ export const publicApiClient: IPublicApiClient = {
   },
 
   async listPublishedTouristPoints(
-    params: IPublicListParams
+    params: IPublicListParams,
   ): Promise<IPublicListResponse<ITouristPoint>> {
     const touristPoints: ITouristPoint[] =
       await adminApiClient.listTouristPoints();
@@ -117,14 +126,18 @@ export const publicApiClient: IPublicApiClient = {
           matchesSearch(item.name, params.search) ||
           matchesSearch(item.description, params.search);
 
-        return matchesPublished && matchesCity && matchesCategory && matchesText;
-      }
+        return (
+          matchesPublished && matchesCity && matchesCategory && matchesText
+        );
+      },
     );
 
     return paginateItems(filteredItems, params.page, params.limit);
   },
 
-  async getPublishedTouristPointById(id: string): Promise<ITouristPoint | null> {
+  async getPublishedTouristPointById(
+    id: string,
+  ): Promise<ITouristPoint | null> {
     const touristPoint: ITouristPoint | null =
       await adminApiClient.getTouristPointById(id);
 
@@ -154,8 +167,20 @@ export const publicApiClient: IPublicApiClient = {
     return {
       events: events.filter((item: IEvent) => item.published && item.featured),
       touristPoints: touristPoints.filter(
-        (item: ITouristPoint) => item.published && item.featured
+        (item: ITouristPoint) => item.published && item.featured,
       ),
+    };
+  },
+
+  async getHomeContent(): Promise<IPublicHomeContentResponse> {
+    const [banners, highlights] = await Promise.all([
+      adminApiClient.listHomeBanners(),
+      adminApiClient.listHomeHighlights(),
+    ]);
+
+    return {
+      banners: banners.filter((item: IHomeBanner) => item.active),
+      highlights: highlights.filter((item: IHomeHighlight) => item.active),
     };
   },
 };

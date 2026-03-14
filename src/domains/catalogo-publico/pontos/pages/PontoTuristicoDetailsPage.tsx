@@ -1,6 +1,3 @@
-import { useEffect, useState, type ReactElement } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import type { IPontoTuristico } from "@/entities/ponto-turistico/pontoTuristico.types";
 import {
   Button,
   Card,
@@ -8,24 +5,27 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
+import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { publicApiClient } from "@/services/public-api/client";
+import { useEffect, useState, type ReactElement } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
 
-interface IPontoRouteParams {
+interface ITouristPointRouteParams {
   id?: string;
 }
 
 export function PontoTuristicoDetailsPage(): ReactElement {
-  const params = useParams<keyof IPontoRouteParams>();
+  const params = useParams<keyof ITouristPointRouteParams>();
   const id: string | undefined = params.id;
 
-  const [ponto, setPonto] = useState<Partial<IPontoTuristico> | null>(null);
+  const [touristPoint, setTouristPoint] = useState<ITouristPoint | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
 
   useEffect(() => {
     let isActive: boolean = true;
 
-    async function loadPonto(): Promise<void> {
+    async function loadTouristPoint(): Promise<void> {
       if (!id) {
         setNotFound(true);
         setIsLoading(false);
@@ -34,7 +34,8 @@ export function PontoTuristicoDetailsPage(): ReactElement {
 
       try {
         setIsLoading(true);
-        const response: Partial<IPontoTuristico> | null =
+
+        const response: ITouristPoint | null =
           await publicApiClient.getPublishedTouristPointById(id);
 
         if (!isActive) {
@@ -46,7 +47,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
           return;
         }
 
-        setPonto(response);
+        setTouristPoint(response);
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -54,7 +55,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
       }
     }
 
-    void loadPonto();
+    void loadTouristPoint();
 
     return () => {
       isActive = false;
@@ -73,7 +74,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
     );
   }
 
-  if (!ponto) {
+  if (!touristPoint) {
     return <Navigate to="/pontos-turisticos" replace />;
   }
 
@@ -84,36 +85,36 @@ export function PontoTuristicoDetailsPage(): ReactElement {
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-5">
               <div className="space-y-2">
-                {ponto.categoria ? (
+                {touristPoint.category ? (
                   <span className="inline-flex rounded-full bg-[var(--color-bg-light)] px-3 py-1 text-sm font-medium text-[var(--color-secondary)]">
-                    {ponto.categoria}
+                    {touristPoint.category}
                   </span>
                 ) : null}
 
                 <h1 className="text-4xl font-bold leading-tight text-zinc-900 md:text-5xl">
-                  {ponto.nome}
+                  {touristPoint.name}
                 </h1>
 
                 <div className="space-y-1 text-sm text-zinc-600">
-                  {ponto.endereco ? <p>{ponto.endereco}</p> : null}
-                  {ponto.horarioFuncionamento ? (
-                    <p>{ponto.horarioFuncionamento}</p>
+                  {touristPoint.address ? <p>{touristPoint.address}</p> : null}
+                  {touristPoint.openingHours ? (
+                    <p>{touristPoint.openingHours}</p>
                   ) : null}
                 </div>
               </div>
 
               <p className="max-w-2xl text-base leading-7 text-zinc-700">
-                {ponto.descricao}
+                {touristPoint.description}
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link to={`/cidades/${ponto.cidadeSlug}`}>
+                <Link to={`/cidades/${touristPoint.citySlug}`}>
                   <Button variant="secondary" size="lg">
                     Ver cidade
                   </Button>
                 </Link>
 
-                <Link to={`/pontos-turisticos?cidade=${ponto.cidadeSlug}`}>
+                <Link to={`/pontos-turisticos?cidade=${touristPoint.citySlug}`}>
                   <Button variant="ghost" size="lg">
                     Voltar para pontos turísticos
                   </Button>
@@ -122,10 +123,10 @@ export function PontoTuristicoDetailsPage(): ReactElement {
             </div>
 
             <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-soft">
-              {ponto.imagemPrincipal ? (
+              {touristPoint.imageUrl ? (
                 <img
-                  src={ponto.imagemPrincipal}
-                  alt={ponto.nome}
+                  src={touristPoint.imageUrl}
+                  alt={touristPoint.name}
                   className="h-[360px] w-full object-cover"
                 />
               ) : (
@@ -145,14 +146,14 @@ export function PontoTuristicoDetailsPage(): ReactElement {
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Categoria</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {ponto.categoria ?? "Não informado"}
+              {touristPoint.category ?? "Não informado"}
             </p>
           </Card>
 
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Cidade</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {ponto.cidadeSlug}
+              {touristPoint.citySlug}
             </p>
           </Card>
 
@@ -161,7 +162,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
               Funcionamento
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {ponto.horarioFuncionamento ?? "Não informado"}
+              {touristPoint.openingHours ?? "Não informado"}
             </p>
           </Card>
         </div>

@@ -1,7 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CityDetailsPage } from "../pages/CityDetailsPage";
+
+vi.mock("@/services/public-api/client", () => ({
+  publicApiClient: {
+    getPublishedCityBySlug: vi.fn(),
+  },
+}));
+
+import { publicApiClient } from "@/services/public-api/client";
 
 function renderWithRoute(initialEntry: string) {
   return render(
@@ -10,41 +18,88 @@ function renderWithRoute(initialEntry: string) {
         <Route path="/cidades/:slug" element={<CityDetailsPage />} />
         <Route path="/" element={<div>Home fallback</div>} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
 describe("CityDetailsPage", () => {
-  it("deve renderizar os dados da cidade quando o slug for válido", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("deve renderizar os dados da cidade quando o slug for válido", async () => {
+    vi.mocked(publicApiClient.getPublishedCityBySlug).mockResolvedValue({
+      id: "city-dourados",
+      name: "Dourados",
+      slug: "dourados",
+      state: "MS",
+      summary: "Centro regional com vida cultural.",
+      description: "Descrição da cidade.",
+      imageUrl: "/images/cidades/dourados.jpg",
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
     renderWithRoute("/cidades/dourados");
 
-    expect(screen.getByText("Dourados")).toBeInTheDocument();
+    expect(await screen.findByText("Dourados")).toBeInTheDocument();
     expect(screen.getByText("Cidade do Celeiro do MS")).toBeInTheDocument();
   });
 
-  it("deve renderizar os blocos institucionais da cidade", () => {
+  it("deve renderizar os blocos institucionais da cidade", async () => {
+    vi.mocked(publicApiClient.getPublishedCityBySlug).mockResolvedValue({
+      id: "city-dourados",
+      name: "Dourados",
+      slug: "dourados",
+      state: "MS",
+      summary: "Centro regional com vida cultural.",
+      description: "Descrição da cidade.",
+      imageUrl: "/images/cidades/dourados.jpg",
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
     renderWithRoute("/cidades/dourados");
 
-    expect(screen.getByText("Identidade local")).toBeInTheDocument();
+    expect(await screen.findByText("Identidade local")).toBeInTheDocument();
     expect(screen.getByText("Eventos e agenda")).toBeInTheDocument();
     expect(screen.getByText("Atrativos e descoberta")).toBeInTheDocument();
   });
 
-  it("deve renderizar os links para eventos e pontos turísticos da cidade", () => {
+  it("deve renderizar os links para eventos e pontos turísticos da cidade", async () => {
+    vi.mocked(publicApiClient.getPublishedCityBySlug).mockResolvedValue({
+      id: "city-dourados",
+      name: "Dourados",
+      slug: "dourados",
+      state: "MS",
+      summary: "Centro regional com vida cultural.",
+      description: "Descrição da cidade.",
+      imageUrl: "/images/cidades/dourados.jpg",
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
     renderWithRoute("/cidades/dourados");
 
     expect(
-      screen.getByRole("link", { name: "Ver eventos da cidade" })
+      await screen.findByRole("link", { name: "Ver eventos da cidade" }),
     ).toHaveAttribute("href", "/eventos?cidade=dourados");
 
     expect(
-      screen.getByRole("link", { name: "Ver pontos turísticos" })
+      screen.getByRole("link", { name: "Ver pontos turísticos" }),
     ).toHaveAttribute("href", "/pontos-turisticos?cidade=dourados");
   });
 
-  it("deve redirecionar para home quando o slug for inválido", () => {
+  it("deve redirecionar para home quando o slug for inválido", async () => {
+    vi.mocked(publicApiClient.getPublishedCityBySlug).mockResolvedValue(null);
+
     renderWithRoute("/cidades/cidade-inexistente");
 
-    expect(screen.getByText("Home fallback")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Home fallback")).toBeInTheDocument();
+    });
   });
 });

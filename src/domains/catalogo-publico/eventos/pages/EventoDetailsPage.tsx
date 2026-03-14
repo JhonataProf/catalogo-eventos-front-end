@@ -1,25 +1,31 @@
+import {
+  Button,
+  Card,
+  Container,
+  Section,
+  SectionHeader,
+} from "@/design-system/ui";
+import type { IEvent } from "@/entities/event/event.types";
+import { publicApiClient } from "@/services/public-api/client";
 import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import type { IEvento } from "@/entities/evento/evento.types";
-import { Button, Card, Container, Section, SectionHeader } from "@/design-system/ui";
-import { publicApiClient } from "@/services/public-api/client";
 
-interface IEventoRouteParams {
+interface IEventRouteParams {
   id?: string;
 }
 
 export function EventoDetailsPage(): ReactElement {
-  const params = useParams<keyof IEventoRouteParams>();
+  const params = useParams<keyof IEventRouteParams>();
   const id: string | undefined = params.id;
 
-  const [evento, setEvento] = useState<Partial<IEvento> | null>(null);
+  const [event, setEvent] = useState<IEvent | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
 
   useEffect(() => {
     let isActive: boolean = true;
 
-    async function loadEvento(): Promise<void> {
+    async function loadEvent(): Promise<void> {
       if (!id) {
         setNotFound(true);
         setIsLoading(false);
@@ -28,7 +34,9 @@ export function EventoDetailsPage(): ReactElement {
 
       try {
         setIsLoading(true);
-        const response: Partial<IEvento> | null = await publicApiClient.getPublishedEventById(id);
+
+        const response: IEvent | null =
+          await publicApiClient.getPublishedEventById(id);
 
         if (!isActive) {
           return;
@@ -39,7 +47,7 @@ export function EventoDetailsPage(): ReactElement {
           return;
         }
 
-        setEvento(response);
+        setEvent(response);
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -47,7 +55,7 @@ export function EventoDetailsPage(): ReactElement {
       }
     }
 
-    void loadEvento();
+    void loadEvent();
 
     return () => {
       isActive = false;
@@ -66,7 +74,7 @@ export function EventoDetailsPage(): ReactElement {
     );
   }
 
-  if (!evento) {
+  if (!event) {
     return <Navigate to="/eventos" replace />;
   }
 
@@ -77,34 +85,34 @@ export function EventoDetailsPage(): ReactElement {
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-5">
               <div className="space-y-2">
-                {evento.categoria ? (
+                {event.category ? (
                   <span className="inline-flex rounded-full bg-[var(--color-bg-light)] px-3 py-1 text-sm font-medium text-[var(--color-secondary)]">
-                    {evento.categoria}
+                    {event.category}
                   </span>
                 ) : null}
 
                 <h1 className="text-4xl font-bold leading-tight text-zinc-900 md:text-5xl">
-                  {evento.nome}
+                  {event.name}
                 </h1>
 
                 <div className="space-y-1 text-sm text-zinc-600">
-                  {evento.dataFormatada ? <p>{evento.dataFormatada}</p> : null}
-                  {evento.local ? <p>{evento.local}</p> : null}
+                  {event.formattedDate ? <p>{event.formattedDate}</p> : null}
+                  {event.location ? <p>{event.location}</p> : null}
                 </div>
               </div>
 
               <p className="max-w-2xl text-base leading-7 text-zinc-700">
-                {evento.descricao}
+                {event.description}
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link to={`/cidades/${evento.cidadeSlug}`}>
+                <Link to={`/cidades/${event.citySlug}`}>
                   <Button variant="secondary" size="lg">
                     Ver cidade
                   </Button>
                 </Link>
 
-                <Link to={`/eventos?cidade=${evento.cidadeSlug}`}>
+                <Link to={`/eventos?cidade=${event.citySlug}`}>
                   <Button variant="ghost" size="lg">
                     Voltar para eventos
                   </Button>
@@ -113,10 +121,10 @@ export function EventoDetailsPage(): ReactElement {
             </div>
 
             <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-soft">
-              {evento.imagemPrincipal ? (
+              {event.imageUrl ? (
                 <img
-                  src={evento.imagemPrincipal}
-                  alt={evento.nome}
+                  src={event.imageUrl}
+                  alt={event.name}
                   className="h-[360px] w-full object-cover"
                 />
               ) : (
@@ -128,9 +136,7 @@ export function EventoDetailsPage(): ReactElement {
       </section>
 
       <Section spacing="xl">
-        <SectionHeader
-          description="Estrutura inicial preparada para receber dados mais completos da API real."
-        >
+        <SectionHeader description="Estrutura inicial preparada para receber dados mais completos da API real.">
           Informações do evento
         </SectionHeader>
 
@@ -138,21 +144,21 @@ export function EventoDetailsPage(): ReactElement {
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Categoria</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {evento.categoria ?? "Não informado"}
+              {event.category ?? "Não informado"}
             </p>
           </Card>
 
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Cidade</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {evento.cidadeSlug}
+              {event.citySlug}
             </p>
           </Card>
 
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Local</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {evento.local ?? "Não informado"}
+              {event.location ?? "Não informado"}
             </p>
           </Card>
         </div>

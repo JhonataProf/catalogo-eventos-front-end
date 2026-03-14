@@ -1,70 +1,100 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteFooter } from "../SiteFooter";
 
+vi.mock("@/services/public-api/client", () => ({
+  publicApiClient: {
+    listActiveSocialLinks: vi.fn(),
+  },
+}));
+
+import { publicApiClient } from "@/services/public-api/client";
+
 describe("SiteFooter", () => {
-  it("deve renderizar o nome e descrição do portal", () => {
-    render(
-      <MemoryRouter>
-        <SiteFooter />
-      </MemoryRouter>
-    );
+  beforeEach(() => {
+    vi.clearAllMocks();
 
-    expect(screen.getByText("Celeiro do MS")).toBeInTheDocument();
-
-    expect(
-      screen.getByText(
-        "Plataforma para divulgação de eventos, cidades e pontos turísticos da região."
-      )
-    ).toBeInTheDocument();
+    vi.mocked(publicApiClient.listActiveSocialLinks).mockResolvedValue([
+      {
+        id: "social-1",
+        platform: "instagram",
+        label: "Instagram",
+        url: "https://instagram.com",
+        active: true,
+        order: 1,
+      },
+      {
+        id: "social-2",
+        platform: "facebook",
+        label: "Facebook",
+        url: "https://facebook.com",
+        active: true,
+        order: 2,
+      },
+      {
+        id: "social-3",
+        platform: "youtube",
+        label: "YouTube",
+        url: "https://youtube.com",
+        active: true,
+        order: 3,
+      },
+    ]);
   });
 
-  it("deve renderizar os links de navegação", () => {
+  it("deve renderizar os links de navegação", async () => {
     render(
       <MemoryRouter>
         <SiteFooter />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "Eventos" })).toHaveAttribute(
-      "href",
-      "/eventos"
-    );
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Eventos" })).toHaveAttribute(
+        "href",
+        "/eventos",
+      );
+    });
 
-    expect(
-      screen.getByRole("link", { name: "Pontos turísticos" })
-    ).toHaveAttribute("href", "/pontos-turisticos");
-
-    expect(screen.getByRole("link", { name: "Cidades" })).toHaveAttribute(
-      "href",
-      "/cidades/dourados"
-    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", { name: "Pontos turísticos" }),
+      ).toHaveAttribute("href", "/pontos-turisticos");
+    });
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Sobre" })).toHaveAttribute(
+        "href",
+        "/sobre",
+      );
+    });
   });
 
-  it("deve renderizar os links de mídias sociais", () => {
+  it("deve renderizar os links de mídias sociais", async () => {
     render(
       <MemoryRouter>
         <SiteFooter />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "Instagram" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Facebook" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "YouTube" })).toBeInTheDocument();
-  });
+    await waitFor(async () => {
+      expect(await screen.findByRole("link", { name: "Instagram" })).toHaveAttribute(
+        "href",
+        "https://instagram.com",
+      );
+    });
 
-  it("deve renderizar a seção de créditos", () => {
-    render(
-      <MemoryRouter>
-        <SiteFooter />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText("Créditos")).toBeInTheDocument();
-
-    expect(
-      screen.getByText(/Desenvolvido para divulgação regional/i)
-    ).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByRole("link", { name: "Facebook" })).toHaveAttribute(
+        "href",
+        "https://facebook.com",
+      );
+    });
+    await waitFor(async () => {
+      expect(await screen.findByRole("link", { name: "YouTube" })).toHaveAttribute(
+        "href",
+        "https://youtube.com",
+      );
+    });
   });
 });

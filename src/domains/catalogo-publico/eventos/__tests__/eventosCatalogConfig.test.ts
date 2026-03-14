@@ -1,14 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchEventosCatalogo } from "../config/eventosCatalogConfig";
-import { tourismApiClient } from "@/services/tourism-api/client";
-import type { IEvento } from "@/entities/evento/evento.types";
-import type { ITourismApiListResponse } from "@/services/tourism-api/tourismApi.types";
 
-vi.mock("@/services/tourism-api/client", () => ({
-  tourismApiClient: {
-    listEventosByCidade: vi.fn(),
+vi.mock("@/services/public-api/client", () => ({
+  publicApiClient: {
+    listPublishedEvents: vi.fn(),
   },
 }));
+
+import { publicApiClient } from "@/services/public-api/client";
 
 describe("fetchEventosCatalogo", () => {
   beforeEach(() => {
@@ -16,29 +15,30 @@ describe("fetchEventosCatalogo", () => {
   });
 
   it("deve mapear eventos para itens de catálogo", async () => {
-    const mockResponse: ITourismApiListResponse<IEvento> = {
+    vi.mocked(publicApiClient.listPublishedEvents).mockResolvedValue({
       items: [
         {
           id: "evt-1",
-          cidadeId: "dourados",
-          cidadeSlug: "dourados",
-          nome: "Festival Gastronômico",
-          descricao: "Sabores regionais",
-          categoria: "Gastronomia",
-          dataInicio: "2026-03-20",
-          dataFim: "2026-03-22",
-          dataFormatada: "20 a 22 de março de 2026",
-          local: "Parque dos Ipês",
-          imagemPrincipal: "/images/festival.jpg",
-          destaque: true,
+          cityId: "city-dourados",
+          citySlug: "dourados",
+          name: "Festival Gastronômico",
+          description: "Sabores regionais",
+          category: "Gastronomia",
+          formattedDate: "20 a 22 de março de 2026",
+          location: "Parque dos Ipês",
+          imageUrl: "/images/festival.jpg",
+          featured: true,
+          published: true,
+          startDate: "2026-03-20",
+          endDate: "2026-03-22",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ],
+      total: 1,
       page: 1,
       limit: 6,
-      total: 1,
-    };
-
-    vi.mocked(tourismApiClient.listEventosByCidade).mockResolvedValue(mockResponse);
+    });
 
     const result = await fetchEventosCatalogo({
       cidade: "dourados",
@@ -51,7 +51,7 @@ describe("fetchEventosCatalogo", () => {
         {
           id: "evt-1",
           kind: "evento",
-          cidadeId: "dourados",
+          cidadeId: "city-dourados",
           cidadeSlug: "dourados",
           titulo: "Festival Gastronômico",
           descricao: "Sabores regionais",
@@ -64,34 +64,34 @@ describe("fetchEventosCatalogo", () => {
           ctaLabel: "Ver evento",
         },
       ],
+      total: 1,
       page: 1,
       limit: 6,
-      total: 1,
     });
   });
 
   it("deve encaminhar filtros para o client", async () => {
-    vi.mocked(tourismApiClient.listEventosByCidade).mockResolvedValue({
+    vi.mocked(publicApiClient.listPublishedEvents).mockResolvedValue({
       items: [],
-      page: 1,
-      limit: 6,
       total: 0,
+      page: 1,
+      limit: 12,
     });
 
     await fetchEventosCatalogo({
       cidade: "dourados",
-      page: 2,
-      limit: 6,
       busca: "festival",
-      categoria: "Cultura",
+      categoria: "Gastronomia",
+      page: 1,
+      limit: 12,
     });
 
-    expect(tourismApiClient.listEventosByCidade).toHaveBeenCalledWith({
-      cidade: "dourados",
-      page: 2,
-      limit: 6,
-      busca: "festival",
-      categoria: "Cultura",
+    expect(publicApiClient.listPublishedEvents).toHaveBeenCalledWith({
+      citySlug: "dourados",
+      search: "festival",
+      category: "Gastronomia",
+      page: 1,
+      limit: 12,
     });
   });
 });

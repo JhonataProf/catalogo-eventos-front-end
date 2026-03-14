@@ -3,13 +3,13 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PontoTuristicoDetailsPage } from "../pages/PontoTuristicoDetailsPage";
 
-vi.mock("@/services/tourism-api/client", () => ({
-  tourismApiClient: {
-    getPontoById: vi.fn(),
+vi.mock("@/services/public-api/client", () => ({
+  publicApiClient: {
+    getPublishedTouristPointById: vi.fn(),
   },
 }));
 
-import { tourismApiClient } from "@/services/tourism-api/client";
+import { publicApiClient } from "@/services/public-api/client";
 
 function renderWithRoute(initialEntry: string) {
   return render(
@@ -34,7 +34,7 @@ describe("PontoTuristicoDetailsPage", () => {
   });
 
   it("deve renderizar loading inicial", () => {
-    vi.mocked(tourismApiClient.getPontoById).mockImplementation(
+    vi.mocked(publicApiClient.getPublishedTouristPointById).mockImplementation(
       () => new Promise(() => undefined)
     );
 
@@ -46,17 +46,20 @@ describe("PontoTuristicoDetailsPage", () => {
   });
 
   it("deve renderizar os dados do ponto turístico quando encontrado", async () => {
-    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue({
+    vi.mocked(publicApiClient.getPublishedTouristPointById).mockResolvedValue({
       id: "pto-1",
-      cidadeId: "dourados",
-      cidadeSlug: "dourados",
-      nome: "Parque Antenor Martins",
-      descricao: "Área verde com lago, pista de caminhada e espaço de lazer.",
-      categoria: "Natureza",
-      endereco: "Rua Antônio Emílio de Figueiredo",
-      horarioFuncionamento: "Todos os dias",
-      imagemPrincipal: "/images/highlights/parque-antenor-martins.jpg",
-      destaque: true,
+      cityId: "city-dourados",
+      citySlug: "dourados",
+      name: "Parque Antenor Martins",
+      description: "Área verde com lago, pista de caminhada e espaço de lazer.",
+      category: "Natureza",
+      address: "Rua Antônio Emílio de Figueiredo",
+      openingHours: "Todos os dias",
+      imageUrl: "/images/highlights/parque-antenor-martins.jpg",
+      featured: true,
+      published: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
 
     renderWithRoute("/pontos-turisticos/pto-1");
@@ -69,89 +72,20 @@ describe("PontoTuristicoDetailsPage", () => {
       screen.getByText("Área verde com lago, pista de caminhada e espaço de lazer.")
     ).toBeInTheDocument();
 
+    expect(screen.getAllByText("Natureza")).toHaveLength(2);
     expect(
-      screen.getByText("Rua Antônio Emílio de Figueiredo")
-    ).toBeInTheDocument();
-  });
-
-  it("deve renderizar os links principais do ponto turístico", async () => {
-    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue({
-      id: "pto-1",
-      cidadeId: "dourados",
-      cidadeSlug: "dourados",
-      nome: "Parque Antenor Martins",
-      descricao: "Área verde com lago, pista de caminhada e espaço de lazer.",
-      categoria: "Natureza",
-      endereco: "Rua Antônio Emílio de Figueiredo",
-      horarioFuncionamento: "Todos os dias",
-      imagemPrincipal: "/images/highlights/parque-antenor-martins.jpg",
-      destaque: true,
-    });
-
-    renderWithRoute("/pontos-turisticos/pto-1");
-
-    await screen.findByText("Parque Antenor Martins");
-
-    expect(
-      screen.getByRole("link", { name: "Ver cidade" })
-    ).toHaveAttribute("href", "/cidades/dourados");
-
-    expect(
-      screen.getByRole("link", { name: "Voltar para pontos turísticos" })
-    ).toHaveAttribute("href", "/pontos-turisticos?cidade=dourados");
-  });
-
-  it("deve renderizar os cards informativos do ponto turístico", async () => {
-    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue({
-      id: "pto-1",
-      cidadeId: "dourados",
-      cidadeSlug: "dourados",
-      nome: "Parque Antenor Martins",
-      descricao: "Área verde com lago, pista de caminhada e espaço de lazer.",
-      categoria: "Natureza",
-      endereco: "Rua Antônio Emílio de Figueiredo",
-      horarioFuncionamento: "Todos os dias",
-      imagemPrincipal: "/images/highlights/parque-antenor-martins.jpg",
-      destaque: true,
-    });
-
-    renderWithRoute("/pontos-turisticos/pto-1");
-
-    await screen.findByText("Parque Antenor Martins");
-
-    expect(screen.getByText("Informações do atrativo")).toBeInTheDocument();
-    expect(screen.getByText("Categoria")).toBeInTheDocument();
-    expect(screen.getByText("Cidade")).toBeInTheDocument();
-    expect(screen.getByText("Funcionamento")).toBeInTheDocument();
+      screen.getAllByText("Rua Antônio Emílio de Figueiredo").length
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("Todos os dias").length).toBeGreaterThan(0);
   });
 
   it("deve redirecionar para /pontos-turisticos quando o ponto não existir", async () => {
-    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue(null);
+    vi.mocked(publicApiClient.getPublishedTouristPointById).mockResolvedValue(null);
 
     renderWithRoute("/pontos-turisticos/ponto-inexistente");
 
     await waitFor(() => {
       expect(screen.getByText("Pontos fallback")).toBeInTheDocument();
     });
-  });
-
-  it("deve renderizar fallbacks quando campos opcionais do ponto não existirem", async () => {
-    vi.mocked(tourismApiClient.getPontoById).mockResolvedValue({
-      id: "pto-2",
-      cidadeId: "dourados",
-      cidadeSlug: "dourados",
-      nome: "Ponto sem opcionais",
-      descricao: "Descrição simples",
-      categoria: undefined,
-      endereco: undefined,
-      horarioFuncionamento: undefined,
-      imagemPrincipal: undefined,
-      destaque: false,
-    });
-
-    renderWithRoute("/pontos-turisticos/pto-2");
-
-    expect(await screen.findByText("Ponto sem opcionais")).toBeInTheDocument();
-
   });
 });

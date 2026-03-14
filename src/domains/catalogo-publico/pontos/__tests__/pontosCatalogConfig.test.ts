@@ -1,14 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fetchPontosCatalogo } from "../config/pontosCatalogConfig";
-import { tourismApiClient } from "@/services/tourism-api/client";
-import type { IPontoTuristico } from "@/entities/ponto-turistico/pontoTuristico.types";
-import type { ITourismApiListResponse } from "@/services/tourism-api/tourismApi.types";
 
-vi.mock("@/services/tourism-api/client", () => ({
-  tourismApiClient: {
-    listPontosByCidade: vi.fn(),
+vi.mock("@/services/public-api/client", () => ({
+  publicApiClient: {
+    listPublishedTouristPoints: vi.fn(),
   },
 }));
+
+import { publicApiClient } from "@/services/public-api/client";
 
 describe("fetchPontosCatalogo", () => {
   beforeEach(() => {
@@ -16,27 +15,28 @@ describe("fetchPontosCatalogo", () => {
   });
 
   it("deve mapear pontos turísticos para itens de catálogo", async () => {
-    const mockResponse: ITourismApiListResponse<IPontoTuristico> = {
+    vi.mocked(publicApiClient.listPublishedTouristPoints).mockResolvedValue({
       items: [
         {
           id: "pto-1",
-          cidadeId: "dourados",
-          cidadeSlug: "dourados",
-          nome: "Parque Antenor Martins",
-          descricao: "Área verde com espaço de lazer.",
-          categoria: "Natureza",
-          endereco: "Rua Antônio Emílio de Figueiredo",
-          horarioFuncionamento: "Todos os dias",
-          imagemPrincipal: "/images/parque.jpg",
-          destaque: true,
+          cityId: "city-dourados",
+          citySlug: "dourados",
+          name: "Parque Antenor Martins",
+          description: "Área verde com lazer",
+          category: "Natureza",
+          address: "Rua Antônio Emílio de Figueiredo",
+          imageUrl: "/images/parque.jpg",
+          featured: true,
+          published: true,
+          openingHours: "Todos os dias",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ],
+      total: 1,
       page: 1,
       limit: 6,
-      total: 1,
-    };
-
-    vi.mocked(tourismApiClient.listPontosByCidade).mockResolvedValue(mockResponse);
+    });
 
     const result = await fetchPontosCatalogo({
       cidade: "dourados",
@@ -49,10 +49,10 @@ describe("fetchPontosCatalogo", () => {
         {
           id: "pto-1",
           kind: "ponto-turistico",
-          cidadeId: "dourados",
+          cidadeId: "city-dourados",
           cidadeSlug: "dourados",
           titulo: "Parque Antenor Martins",
-          descricao: "Área verde com espaço de lazer.",
+          descricao: "Área verde com lazer",
           imagemUrl: "/images/parque.jpg",
           categoria: "Natureza",
           localLabel: "Rua Antônio Emílio de Figueiredo",
@@ -61,9 +61,9 @@ describe("fetchPontosCatalogo", () => {
           ctaLabel: "Ver local",
         },
       ],
+      total: 1,
       page: 1,
       limit: 6,
-      total: 1,
     });
   });
 });
