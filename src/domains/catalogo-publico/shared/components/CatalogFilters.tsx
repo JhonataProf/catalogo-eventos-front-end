@@ -5,7 +5,7 @@ import type {
   ICatalogoFiltersValue,
 } from "../model/catalogo.filters";
 
-export interface ICatalogFiltersProps {
+interface ICatalogFiltersProps {
   cidadeSlug: string;
   cidades: ICidade[];
   value: ICatalogoFiltersValue;

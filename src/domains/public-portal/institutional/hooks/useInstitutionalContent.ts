@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { IInstitutionalContent } from "@/entities/institutional/institutional.types";
 import { publicApiClient } from "@/services/public-api/client";
 
-export interface IUseInstitutionalContentResult {
+interface IUseInstitutionalContentResult {
   content: IInstitutionalContent | null;
   isLoading: boolean;
   error: string;

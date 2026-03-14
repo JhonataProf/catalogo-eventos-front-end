@@ -1,9 +1,9 @@
 import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { cn } from "@/design-system/utils/cn";
 
-export type CardPadding = "none" | "sm" | "md" | "lg";
+type CardPadding = "none" | "sm" | "md" | "lg";
 
-export interface ICardProps extends HTMLAttributes<HTMLDivElement> {
+interface ICardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   padding?: CardPadding;
   hoverable?: boolean;

@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import type { ICatalogoItem } from "../model/catalogo.types";
 
-export interface ICatalogCardProps {
+interface ICatalogCardProps {
   item: ICatalogoItem;
 }
 

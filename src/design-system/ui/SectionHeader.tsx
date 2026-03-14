@@ -1,9 +1,9 @@
 import type { PropsWithChildren, ReactElement, ReactNode } from "react";
 import { cn } from "@/design-system/utils/cn";
 
-export type SectionHeaderTone = "neutral" | "primary" | "success" | "warning";
+type SectionHeaderTone = "neutral" | "primary" | "success" | "warning";
 
-export interface ISectionHeaderProps extends PropsWithChildren {
+interface ISectionHeaderProps extends PropsWithChildren {
   kicker?: string;
   align?: "left" | "center";
   description?: ReactNode;

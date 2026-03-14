@@ -17,20 +17,3 @@ export interface ICity extends ICityBase {
 export type ICreateCityInput = ICityBase;
 
 export type IUpdateCityInput = Partial<ICityBase> & Pick<ICity, "id">;
-
-export type ICityPublicSummary = Pick<
-  ICity,
-  "id" | "name" | "slug" | "state" | "summary" | "imageUrl"
->;
-
-export type ICityPublicDetails = Pick<
-  ICity,
-  | "id"
-  | "name"
-  | "slug"
-  | "state"
-  | "summary"
-  | "description"
-  | "imageUrl"
-  | "published"
->;

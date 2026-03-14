@@ -1,4 +1,4 @@
-export interface ITouristPointBase {
+interface ITouristPointBase {
   cityId: string;
   citySlug: string;
   name: string;
@@ -24,18 +24,3 @@ export type ICreateTouristPointInput = Omit<
 
 export type IUpdateTouristPointInput = Partial<ICreateTouristPointInput> &
   Pick<ITouristPoint, "id">;
-
-export type ITouristPointPublicSummary = Pick<
-  ITouristPoint,
-  | "id"
-  | "cityId"
-  | "citySlug"
-  | "name"
-  | "description"
-  | "category"
-  | "address"
-  | "openingHours"
-  | "imageUrl"
-  | "featured"
-  | "published"
->;

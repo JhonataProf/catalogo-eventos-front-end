@@ -3,7 +3,7 @@ import { cn } from "@/design-system/utils/cn";
 
 export type ContainerSize = "md" | "lg" | "xl";
 
-export interface IContainerProps extends HTMLAttributes<HTMLDivElement> {
+interface IContainerProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   size?: ContainerSize;
 }

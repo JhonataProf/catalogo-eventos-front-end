@@ -5,7 +5,7 @@ import { CIDADES_PUBLICAS } from "@/entities/cidade/cidades.constants";
 
 const DEFAULT_CIDADE_SLUG = "dourados";
 
-export interface IUseCatalogoCidadeResult {
+interface IUseCatalogoCidadeResult {
   cidadeSlug: string;
   cidadeNome: string;
   cidades: ICidade[];

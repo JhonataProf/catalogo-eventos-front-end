@@ -1,4 +1,4 @@
-export interface IInstitutionalContentFields {
+interface IInstitutionalContentFields {
   aboutTitle: string;
   aboutText: string;
 
@@ -13,7 +13,7 @@ export interface IInstitutionalContentFields {
   values: string[];
 }
 
-export interface IInstitutionalContentMeta {
+interface IInstitutionalContentMeta {
   id: string;
   updatedAt: string;
 }
@@ -34,17 +34,3 @@ export type IUpdateInstitutionalContentInput = Pick<
   | "values"
 >;
 
-export type IInstitutionalContentPreview = Pick<
-  IInstitutionalContent,
-  | "aboutTitle"
-  | "aboutText"
-  | "whoWeAreTitle"
-  | "whoWeAreText"
-  | "purposeTitle"
-  | "purposeText"
->;
-
-export type IInstitutionalContentStatus = Pick<
-  IInstitutionalContent,
-  "updatedAt"
->;

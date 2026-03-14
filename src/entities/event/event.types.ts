@@ -1,4 +1,4 @@
-export interface IEventBase {
+interface IEventBase {
   cityId: string;
   citySlug: string;
   name: string;
@@ -26,18 +26,3 @@ export type ICreateEventInput = Omit<
 
 export type IUpdateEventInput = Partial<ICreateEventInput> &
   Pick<IEvent, "id">;
-
-export type IEventPublicSummary = Pick<
-  IEvent,
-  | "id"
-  | "cityId"
-  | "citySlug"
-  | "name"
-  | "description"
-  | "category"
-  | "formattedDate"
-  | "location"
-  | "imageUrl"
-  | "featured"
-  | "published"
->;

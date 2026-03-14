@@ -1,7 +1,7 @@
 import { Button } from "@/design-system/ui";
 import type { ReactElement } from "react";
 
-export interface ILoadMoreButtonProps {
+interface ILoadMoreButtonProps {
   isLoading: boolean;
   onClick: () => void | Promise<void>;
 }

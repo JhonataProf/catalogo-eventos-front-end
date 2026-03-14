@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { ICity } from "@/entities/city/city.types";
 import { publicApiClient } from "@/services/public-api/client";
 
-export interface IUsePublicCitiesResult {
+interface IUsePublicCitiesResult {
   cities: ICity[];
   isLoading: boolean;
   error: string;

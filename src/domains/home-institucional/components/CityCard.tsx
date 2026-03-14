@@ -5,7 +5,7 @@ import type { ICity } from "@/entities/city/city.types";
 
 const FALLBACK_CITY_IMG = "/images/fallbacks/cidade-card.jpg";
 
-export interface ICityCardProps {
+interface ICityCardProps {
   cidade: ICity;
 }
 

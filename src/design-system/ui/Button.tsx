@@ -1,10 +1,10 @@
 import type { ButtonHTMLAttributes, ReactElement, ReactNode } from "react";
 import { cn } from "@/design-system/utils/cn";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
-export type ButtonSize = "sm" | "md" | "lg";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
+type ButtonSize = "sm" | "md" | "lg";
 
-export interface IButtonProps
+interface IButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: ButtonVariant;

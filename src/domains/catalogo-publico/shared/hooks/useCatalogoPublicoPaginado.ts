@@ -5,13 +5,13 @@ import type {
   ICatalogoResult,
 } from "../model/catalogo.types";
 
-export interface IUseCatalogoPublicoPaginadoParams {
+interface IUseCatalogoPublicoPaginadoParams {
   baseQuery: Omit<ICatalogoQuery, "page">;
   fetcher: (query: ICatalogoQuery) => Promise<ICatalogoResult>;
   initialPage?: number;
 }
 
-export interface IUseCatalogoPublicoPaginadoResult {
+interface IUseCatalogoPublicoPaginadoResult {
   data: ICatalogoPaginatedState;
   isInitialLoading: boolean;
   isLoadingMore: boolean;

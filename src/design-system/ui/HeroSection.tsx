@@ -2,16 +2,16 @@ import type { ReactElement, ReactNode } from "react";
 import { Button } from "./Button";
 import { Card } from "./Card";
 
-export type HeroTone = "primary" | "success" | "warning" | "neutral";
+type HeroTone = "primary" | "success" | "warning" | "neutral";
 
-export interface IHeroAction {
+interface IHeroAction {
   label: string;
   onClick?: () => void;
   href?: string;
   variant?: "primary" | "secondary" | "ghost" | "accent";
 }
 
-export interface IHeroSectionProps {
+interface IHeroSectionProps {
   kicker?: string;
   title: ReactNode;
   subtitle?: ReactNode;

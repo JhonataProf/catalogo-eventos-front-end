@@ -2,9 +2,9 @@ import type { ElementType, ReactElement, ReactNode } from "react";
 import { cn } from "@/design-system/utils/cn";
 import { Container, type ContainerSize } from "./Container";
 
-export type SectionSpacing = "sm" | "md" | "lg" | "xl";
+type SectionSpacing = "sm" | "md" | "lg" | "xl";
 
-export interface ISectionProps {
+interface ISectionProps {
   children: ReactNode;
   className?: string;
   as?: ElementType;

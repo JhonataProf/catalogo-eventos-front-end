@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { CatalogCardSkeleton } from "./CatalogCardSkeleton";
 
-export interface ICatalogGridSkeletonProps {
+interface ICatalogGridSkeletonProps {
   count?: number;
 }
 

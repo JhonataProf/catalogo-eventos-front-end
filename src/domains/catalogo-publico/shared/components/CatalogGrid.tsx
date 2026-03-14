@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import type { ICatalogoItem } from "../model/catalogo.types";
 import { CatalogCard } from "./CatalogCard";
 
-export interface ICatalogGridProps {
+interface ICatalogGridProps {
   items: ICatalogoItem[];
 }
 

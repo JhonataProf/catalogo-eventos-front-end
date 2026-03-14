@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-export interface IEmptyStateProps {
+interface IEmptyStateProps {
   title: string;
   description: string;
 }
