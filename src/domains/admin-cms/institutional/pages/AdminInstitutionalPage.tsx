@@ -3,7 +3,7 @@ import {
   useMemo,
   useState,
   type ChangeEvent,
-  type FormEvent,
+  type SyntheticEvent,
   type ReactElement,
 } from "react";
 import {
@@ -161,7 +161,7 @@ export function AdminInstitutionalPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
 

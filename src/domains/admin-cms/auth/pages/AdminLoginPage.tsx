@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactElement } from "react";
+import { useState, type SyntheticEvent, type ReactElement } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card } from "@/design-system/ui";
 import { useAuth } from "../useAuth";
@@ -19,7 +19,7 @@ export function AdminLoginPage(): ReactElement {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmit(event: SyntheticEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
 
     try {

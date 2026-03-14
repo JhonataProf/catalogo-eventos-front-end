@@ -3,7 +3,7 @@ import {
   useMemo,
   useState,
   type ChangeEvent,
-  type FormEvent,
+  type SyntheticEvent,
   type ReactElement,
 } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -180,7 +180,7 @@ export function AdminEventFormPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
 

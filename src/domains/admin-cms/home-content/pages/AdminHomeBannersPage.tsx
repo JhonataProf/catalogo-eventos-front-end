@@ -3,7 +3,7 @@ import {
   useMemo,
   useState,
   type ChangeEvent,
-  type FormEvent,
+  type SyntheticEvent,
   type ReactElement,
 } from "react";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
@@ -87,7 +87,7 @@ export function AdminHomeBannersPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
 
