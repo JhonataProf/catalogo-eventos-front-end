@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+
+```bash
+npx serve -s dist
+```
