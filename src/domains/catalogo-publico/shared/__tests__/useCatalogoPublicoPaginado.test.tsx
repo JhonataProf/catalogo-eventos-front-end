@@ -242,4 +242,29 @@ describe("useCatalogoPublicoPaginado", () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
+
+  it("não deve chamar fetcher enquanto enabled for false", async () => {
+    const fetcher: (query: ICatalogoQuery) => Promise<ICatalogoResult> = vi
+      .fn()
+      .mockResolvedValue({
+        items: [],
+        page: 1,
+        limit: 6,
+        total: 0,
+      });
+
+    renderHook(() =>
+      useCatalogoPublicoPaginado({
+        baseQuery: { cidade: "dourados", limit: 6 },
+        fetcher,
+        enabled: false,
+      }),
+    );
+
+    await new Promise((r) => {
+      setTimeout(r, 50);
+    });
+
+    expect(fetcher).not.toHaveBeenCalled();
+  });
 });

@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 type AdminApiModule = typeof import("../client");
 
 async function loadAdminApiClient(): Promise<AdminApiModule["adminApiClient"]> {
+  vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
+  vi.stubEnv("VITE_ADMIN_BFF_BASE_URL", "");
   vi.resetModules();
   const module: AdminApiModule = await import("../client");
   return module.adminApiClient;
@@ -10,6 +12,7 @@ async function loadAdminApiClient(): Promise<AdminApiModule["adminApiClient"]> {
 
 describe("adminApiClient", () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -23,6 +26,7 @@ describe("adminApiClient", () => {
       expect(initialContent.aboutTitle).toBeTruthy();
 
       const updatedContent = await adminApiClient.updateInstitutionalContent({
+        id: initialContent.id,
         aboutTitle: "Novo título institucional",
         aboutText: "Novo texto institucional",
         whoWeAreTitle: "Quem somos atualizado",

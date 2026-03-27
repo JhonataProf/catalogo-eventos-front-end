@@ -69,9 +69,11 @@ function mapContentToFormState(
 }
 
 function mapFormStateToInput(
-  formState: IInstitutionalFormState
+  formState: IInstitutionalFormState,
+  id: number,
 ): IUpdateInstitutionalContentInput {
   return {
+    id,
     aboutTitle: formState.aboutTitle.trim(),
     aboutText: formState.aboutText.trim(),
 
@@ -170,8 +172,14 @@ export function AdminInstitutionalPage(): ReactElement {
       setError("");
       setSuccessMessage("");
 
-      const input: IUpdateInstitutionalContentInput =
-        mapFormStateToInput(formState);
+      if (!content) {
+        return;
+      }
+
+      const input: IUpdateInstitutionalContentInput = mapFormStateToInput(
+        formState,
+        content.id,
+      );
 
       const response: IInstitutionalContent =
         await adminApiClient.updateInstitutionalContent(input);

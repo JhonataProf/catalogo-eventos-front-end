@@ -1,8 +1,8 @@
-import { ICity } from "@/entities/city/city.types";
+import type { ICity } from "@/entities/city/city.types";
 import type { IInstitutionalContent } from "@/entities/institutional/institutional.types";
 import type { ISocialLink } from "@/entities/social-link/socialLink.types";
 import type { IEvent } from "@/entities/event/event.types";
-import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types"
+import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import type {
   IHomeBanner,
   IHomeHighlight,
@@ -66,6 +66,11 @@ let socialLinksMock: ISocialLink[] = [
   },
 ];
 
+const cityTimestamps = (): Pick<ICity, "createdAt" | "updatedAt"> => ({
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+});
+
 let citiesMock: ICity[] = [
   {
     id: 1,
@@ -78,8 +83,7 @@ let citiesMock: ICity[] = [
       "Dourados integra o território do Celeiro do MS e concentra atividades culturais, comerciais e turísticas relevantes para a região.",
     imageUrl: "/images/cidades/dourados.jpg",
     published: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    ...cityTimestamps(),
   },
   {
     id: 2,
@@ -91,8 +95,7 @@ let citiesMock: ICity[] = [
       "Itaporã compõe a área de atuação do Celeiro do MS e pode destacar cultura local, agenda e atrativos próprios.",
     imageUrl: "/images/cidades/itapora.jpg",
     published: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    ...cityTimestamps(),
   },
   {
     id: 3,
@@ -105,8 +108,114 @@ let citiesMock: ICity[] = [
       "Caarapó faz parte do território do Celeiro do MS e pode ser apresentado no portal com conteúdos institucionais, agenda e atrativos.",
     imageUrl: "/images/cidades/caarapo.jpg",
     published: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    ...cityTimestamps(),
+  },
+  {
+    id: 4,
+    name: "Fátima do Sul",
+    slug: "fatima-do-sul",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Fátima do Sul integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/fatima-do-sul.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 5,
+    name: "Jateí",
+    slug: "jatei",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Jateí integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/jatei.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 6,
+    name: "Deodápolis",
+    slug: "deodapolis",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Deodápolis integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/deodapolis.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 7,
+    name: "Douradina",
+    slug: "douradina",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Douradina integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/douradina.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 8,
+    name: "Vicentina",
+    slug: "vicentina",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Vicentina integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/vicentina.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 9,
+    name: "Juti",
+    slug: "juti",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description: "Juti integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/juti.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 10,
+    name: "Glória de Dourados",
+    slug: "gloria-de-dourados",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Glória de Dourados integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/gloria-de-dourados.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 11,
+    name: "Maracaju",
+    slug: "maracaju",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Maracaju integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/maracaju.jpg",
+    published: true,
+    ...cityTimestamps(),
+  },
+  {
+    id: 12,
+    name: "Rio Brilhante",
+    slug: "rio-brilhante",
+    state: "MS",
+    summary: "Município do território do Celeiro do MS.",
+    description:
+      "Rio Brilhante integra a rede de cidades atendidas pelo Celeiro do MS.",
+    imageUrl: "/images/cidades/rio-brilhante.jpg",
+    published: true,
+    ...cityTimestamps(),
   },
 ];
 
@@ -259,7 +368,7 @@ export function setCitiesMock(nextValue: ICity[]): void {
 
 export function getEventsMock(): IEvent[] {
   return [...eventsMock].sort((left, right) =>
-    left.name.localeCompare(right.name, "pt-BR")
+    left.name.localeCompare(right.name, "pt-BR"),
   );
 }
 
@@ -269,7 +378,7 @@ export function setEventsMock(nextValue: IEvent[]): void {
 
 export function getTouristPointsMock(): ITouristPoint[] {
   return [...touristPointsMock].sort((left, right) =>
-    left.name.localeCompare(right.name, "pt-BR")
+    left.name.localeCompare(right.name, "pt-BR"),
   );
 }
 
@@ -287,7 +396,7 @@ export function setHomeBannersMock(nextValue: IHomeBanner[]): void {
 
 export function getHomeHighlightsMock(): IHomeHighlight[] {
   return [...homeHighlightsMock].sort(
-    (left, right) => left.order - right.order
+    (left, right) => left.order - right.order,
   );
 }
 

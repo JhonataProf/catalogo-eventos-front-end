@@ -9,7 +9,10 @@ import type {
 } from "@/entities/home-content/homeContent.types";
 
 export interface IPublicListParams {
+  /** Filtro por slug da cidade (in-memory e BFF com `city` em pontos turísticos). */
   citySlug?: string;
+  /** Filtro nativo da API de eventos (`cityId`). */
+  cityId?: number;
   search?: string;
   category?: string;
   page?: number;

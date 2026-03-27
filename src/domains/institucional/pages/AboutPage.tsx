@@ -1,8 +1,16 @@
 import { Card, HeroSection, Section, SectionHeader } from "@/design-system/ui";
 import { useInstitutionalContent } from "@/domains/public-portal/institutional/hooks/useInstitutionalContent";
+import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import type { ReactElement } from "react";
 
 export function AboutPage(): ReactElement {
+  usePublicPageMetadata({
+    title: "Sobre | Celeiro do MS",
+    description:
+      "Conheça o propósito do Celeiro do MS e a valorização do território sul-mato-grossense.",
+    canonicalPath: "/sobre",
+  });
+
   const { content, isLoading, error } = useInstitutionalContent();
 
   return (

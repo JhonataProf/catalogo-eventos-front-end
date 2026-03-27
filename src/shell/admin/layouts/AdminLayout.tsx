@@ -2,8 +2,11 @@ import type { ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 import { AdminHeader } from "@/shell/admin/header/AdminHeader";
 import { AdminSidebar } from "@/shell/admin/sidebar/AdminSidebar";
+import { useAdminAreaSeo } from "@/shell/admin/hooks/useAdminAreaSeo";
 
 export function AdminLayout(): ReactElement {
+  useAdminAreaSeo();
+
   return (
     <div className="min-h-screen bg-zinc-50">
       <AdminHeader />

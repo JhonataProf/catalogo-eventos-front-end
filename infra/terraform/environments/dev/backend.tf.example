@@ -1,0 +1,12 @@
+# Copie para backend.tf (ou mescle em main.tf) depois de criar o bucket de state e a tabela de lock.
+# Não commite backend.tf se contiver nomes sensíveis da sua conta.
+#
+# terraform {
+#   backend "s3" {
+#     bucket         = "sua-org-terraform-state"
+#     key            = "celeiro-front/dev/terraform.tfstate"
+#     region         = "us-east-1"
+#     dynamodb_table = "terraform-locks"
+#     encrypt        = true
+#   }
+# }

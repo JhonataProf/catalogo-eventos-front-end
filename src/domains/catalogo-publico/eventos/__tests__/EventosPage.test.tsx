@@ -24,6 +24,9 @@ describe("EventosPage", () => {
     vi.mocked(useCatalogoCidade).mockReturnValue({
       cidadeSlug: "dourados",
       cidadeNome: "Dourados",
+      isLoadingCidades: false,
+      errorCidades: null,
+      isCitiesReady: true,
       cidades: [
         {
           id: 1,

@@ -60,7 +60,7 @@ describe("fetchEventosCatalogo", () => {
           dataLabel: "20 a 22 de março de 2026",
           localLabel: "Parque dos Ipês",
           destaque: true,
-          href: "/eventos/evt-1",
+          href: "/eventos/1",
           ctaLabel: "Ver evento",
         },
       ],

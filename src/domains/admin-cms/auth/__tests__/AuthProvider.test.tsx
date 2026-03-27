@@ -4,14 +4,18 @@ import { AuthProvider } from "../AuthProvider";
 import { useAuth } from "../useAuth";
 import {
   clearAdminUser,
-  loadAdminUser,
-  saveAdminUser,
+  loadAdminSession,
+  saveAdminSession,
 } from "../auth.storage";
 
 vi.mock("../auth.storage", () => ({
-  loadAdminUser: vi.fn(),
-  saveAdminUser: vi.fn(),
+  loadAdminSession: vi.fn(),
+  saveAdminSession: vi.fn(),
   clearAdminUser: vi.fn(),
+}));
+
+vi.mock("@/services/admin-api/adminBffConfig", () => ({
+  resolveAdminBffBaseUrl: () => "",
 }));
 
 describe("AuthProvider", () => {
@@ -20,7 +24,7 @@ describe("AuthProvider", () => {
   });
 
   it("deve iniciar deslogado quando não houver usuário salvo", () => {
-    vi.mocked(loadAdminUser).mockReturnValue(null);
+    vi.mocked(loadAdminSession).mockReturnValue(null);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AuthProvider>{children}</AuthProvider>
@@ -32,13 +36,17 @@ describe("AuthProvider", () => {
     expect(result.current.user).toBeNull();
   });
 
-  it("deve iniciar logado quando houver usuário salvo", () => {
-    vi.mocked(loadAdminUser).mockReturnValue({
-      id: 1,
-      name: "Admin",
-      email: "admin@teste.com",
-      token: "jwt-token",
-      role: "admin"
+  it("deve iniciar logado quando houver sessão salva", () => {
+    vi.mocked(loadAdminSession).mockReturnValue({
+      accessToken: "at",
+      refreshToken: "rt",
+      user: {
+        id: 1,
+        name: "Admin",
+        email: "admin@teste.com",
+        token: "at",
+        role: "Admin",
+      },
     });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -51,8 +59,8 @@ describe("AuthProvider", () => {
     expect(result.current.user?.email).toBe("admin@teste.com");
   });
 
-  it("deve efetuar login e persistir o usuário", async () => {
-    vi.mocked(loadAdminUser).mockReturnValue(null);
+  it("deve efetuar login mock e persistir a sessão (sem BFF)", async () => {
+    vi.mocked(loadAdminSession).mockReturnValue(null);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AuthProvider>{children}</AuthProvider>
@@ -64,17 +72,21 @@ describe("AuthProvider", () => {
       await result.current.login("admin@teste.com", "123456");
     });
 
-    expect(saveAdminUser).toHaveBeenCalled();
+    expect(saveAdminSession).toHaveBeenCalled();
     expect(result.current.isAuthenticated).toBe(true);
   });
 
   it("deve efetuar logout e limpar storage", () => {
-    vi.mocked(loadAdminUser).mockReturnValue({
-      id: 1,
-      name: "Admin",
-      email: "admin@teste.com",
-      token: "jwt-token",
-      role: "admin"
+    vi.mocked(loadAdminSession).mockReturnValue({
+      accessToken: "at",
+      refreshToken: "rt",
+      user: {
+        id: 1,
+        name: "Admin",
+        email: "admin@teste.com",
+        token: "at",
+        role: "Admin",
+      },
     });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
