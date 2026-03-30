@@ -149,8 +149,8 @@ Backend remoto: copie `backend.tf.example` → `backend.tf`. O repositório pode
 
 `.github/workflows/deploy-frontend.yml` (`workflow_dispatch`).
 
-- **Preferido:** secret `AWS_ROLE_ARN` (IAM role com trust para GitHub OIDC: `token.actions.githubusercontent.com`) + permissões `s3:*` no bucket alvo e `cloudfront:CreateInvalidation`. O job usa `id-token: write`.
-- **Legado:** sem `AWS_ROLE_ARN`, usa `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (evitar em produção).
+- **Preferido:** secret `AWS_ROLE_ARN` (IAM role com trust para GitHub OIDC: `token.actions.githubusercontent.com`) + permissões `s3:*` no bucket alvo e `cloudfront:CreateInvalidation`. O job usa `id-token: write`. Não defina a variável `AWS_AUTH_METHOD` (ou qualquer valor diferente de `access-key`).
+- **Legado:** variável de repositório `AWS_AUTH_METHOD` = `access-key` e secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (evitar em produção). Expressões `if:` no workflow não podem usar `secrets`; por isso o modo chave é selecionado por variável, não por “secret vazio”.
 
 Demais secrets: `S3_BUCKET`, `CLOUDFRONT_DISTRIBUTION_ID`, `VITE_PUBLIC_BFF_BASE_URL` (obrigatório para CRM real), `VITE_PUBLIC_SITE_URL` (robots/sitemap + canonical). Opcional: `VITE_ADMIN_BFF_BASE_URL`, `VITE_PUBLIC_GTM_ID`.
 
