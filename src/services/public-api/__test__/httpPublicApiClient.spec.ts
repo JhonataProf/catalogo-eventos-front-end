@@ -12,7 +12,7 @@ vi.mock("axios", async (importOriginal) => {
     ...actual,
     default: {
       ...actual.default,
-      create: (...args: unknown[]) => mockCreate(...args),
+      create: (...args: Parameters<typeof mockCreate>) => mockCreate(...args as Parameters<typeof mockCreate>),
     },
   };
 });
