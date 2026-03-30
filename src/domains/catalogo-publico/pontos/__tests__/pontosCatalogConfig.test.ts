@@ -19,7 +19,7 @@ describe("fetchPontosCatalogo", () => {
       items: [
         {
           id: 1,
-          cityId: 2,
+          cityId: 1,
           citySlug: "dourados",
           name: "Parque Antenor Martins",
           description: "Área verde com lazer",
@@ -47,9 +47,9 @@ describe("fetchPontosCatalogo", () => {
     expect(result).toEqual({
       items: [
         {
-          id: "pto-1",
+          id: 1,
           kind: "ponto-turistico",
-          cidadeId: "city-dourados",
+          cidadeId: 1,
           cidadeSlug: "dourados",
           titulo: "Parque Antenor Martins",
           descricao: "Área verde com lazer",
@@ -57,7 +57,7 @@ describe("fetchPontosCatalogo", () => {
           categoria: "Natureza",
           localLabel: "Rua Antônio Emílio de Figueiredo",
           destaque: true,
-          href: "/pontos-turisticos/pto-1",
+          href: "/pontos-turisticos/1",
           ctaLabel: "Ver local",
         },
       ],

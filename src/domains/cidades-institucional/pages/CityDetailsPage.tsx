@@ -9,6 +9,8 @@ import {
 } from "@/design-system/ui";
 import type { ICity } from "@/entities/city/city.types";
 import { publicApiClient } from "@/services/public-api/client";
+import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
+import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 
 interface ICityRouteParams {
   slug?: string;
@@ -21,6 +23,20 @@ export function CityDetailsPage(): ReactElement {
   const [cidade, setCidade] = useState<ICity | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
+
+  const canonicalCidadePath = slug ? `/cidades/${slug}` : "/";
+
+  usePublicPageMetadata({
+    title: cidade
+      ? `${cidade.name} | Cidades | Celeiro do MS`
+      : isLoading
+        ? "Carregando cidade… | Celeiro do MS"
+        : "Cidade | Celeiro do MS",
+    description: cidade
+      ? truncateMetaDescription(cidade.summary || cidade.description || cidade.name)
+      : undefined,
+    canonicalPath: canonicalCidadePath,
+  });
 
   useEffect(() => {
     let isActive: boolean = true;

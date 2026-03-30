@@ -1,25 +1,70 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
   type ReactElement,
 } from "react";
-import type { IAdminUser, IAuthContextValue } from "./auth.types";
+import type { IAdminAuthSession, IAuthContextValue } from "./auth.types";
 import {
   clearAdminUser,
-  loadAdminUser,
-  saveAdminUser,
+  loadAdminSession,
+  saveAdminSession,
 } from "./auth.storage";
 import { AuthContext } from "./auth.context";
+import { resolveAdminBffBaseUrl } from "@/services/admin-api/adminBffConfig";
+import { loginWithPassword } from "@/services/admin-api/adminAuth.api";
+import { ADMIN_AUTH_EXPIRED_EVENT } from "@/services/admin-api/adminAuthEvents";
+import {
+  isAdminMockLoginAllowed,
+  mustClearAdminSessionWithoutApiInProduction,
+} from "./adminAuthDevPolicy";
+
+function readInitialAdminSession(): IAdminAuthSession | null {
+  const baseURL = resolveAdminBffBaseUrl();
+  if (mustClearAdminSessionWithoutApiInProduction(baseURL === "")) {
+    clearAdminUser();
+    return null;
+  }
+  return loadAdminSession();
+}
 
 export function AuthProvider({
   children,
 }: PropsWithChildren): ReactElement {
-  const [user, setUser] = useState<IAdminUser | null>(() => loadAdminUser());
+  const [session, setSession] = useState<IAdminAuthSession | null>(
+    readInitialAdminSession,
+  );
 
-  const login = useCallback(async (email: string, password: string): Promise<void> => {
-    await new Promise<void>((resolve: () => void) => {
+  useEffect(() => {
+    const onExpired = (): void => {
+      setSession(null);
+      clearAdminUser();
+    };
+    window.addEventListener(ADMIN_AUTH_EXPIRED_EVENT, onExpired);
+    return () => {
+      window.removeEventListener(ADMIN_AUTH_EXPIRED_EVENT, onExpired);
+    };
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const baseURL = resolveAdminBffBaseUrl();
+
+    if (baseURL) {
+      const next = await loginWithPassword(baseURL, email, password);
+      setSession(next);
+      saveAdminSession(next);
+      return;
+    }
+
+    if (!isAdminMockLoginAllowed(true)) {
+      throw new Error(
+        "API administrativa não configurada. No build de produção defina VITE_PUBLIC_BFF_BASE_URL ou VITE_ADMIN_BFF_BASE_URL com HTTPS (ex.: https://api.seudominio.com/api).",
+      );
+    }
+
+    await new Promise<void>((resolve) => {
       window.setTimeout(resolve, 300);
     });
 
@@ -27,31 +72,34 @@ export function AuthProvider({
       throw new Error("Informe email e senha.");
     }
 
-    const nextUser: IAdminUser = {
-      id: 1,
-      name: "Administrador",
-      email,
-      role: "admin",
-      token: "user-123-admin"
+    const mockSession: IAdminAuthSession = {
+      accessToken: "dev-mock-access",
+      refreshToken: "dev-mock-refresh",
+      user: {
+        id: 1,
+        name: "Administrador (mock)",
+        email,
+        role: "Admin",
+        token: "dev-mock-access",
+      },
     };
-
-    setUser(nextUser);
-    saveAdminUser(nextUser);
+    setSession(mockSession);
+    saveAdminSession(mockSession);
   }, []);
 
   const logout = useCallback((): void => {
-    setUser(null);
+    setSession(null);
     clearAdminUser();
   }, []);
 
   const contextValue: IAuthContextValue = useMemo(
     () => ({
-      user,
-      isAuthenticated: Boolean(user),
+      user: session?.user ?? null,
+      isAuthenticated: Boolean(session),
       login,
       logout,
     }),
-    [login, logout, user]
+    [login, logout, session],
   );
 
   return (

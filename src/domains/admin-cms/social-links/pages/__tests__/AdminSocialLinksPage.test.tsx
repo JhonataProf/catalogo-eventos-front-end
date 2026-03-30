@@ -51,11 +51,10 @@ describe("AdminSocialLinksPage", () => {
 
     render(<AdminSocialLinksPage />);
 
-    expect(await screen.findByText("Instagram")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "https://instagram.com/celeiro" }),
+      await screen.findByRole("link", { name: "https://instagram.com/celeiro" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Ativo").length).greaterThanOrEqual(1);
+    expect(screen.getAllByText("Ativo").length).toBeGreaterThanOrEqual(1);
   });
 
   it("deve criar item com sucesso", async () => {

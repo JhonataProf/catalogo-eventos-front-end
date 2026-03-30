@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent, type ReactElement } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card } from "@/design-system/ui";
+import { resolveAdminBffBaseUrl } from "@/services/admin-api/adminBffConfig";
 import { useAuth } from "../useAuth";
 
 interface ILocationState {
@@ -14,8 +15,14 @@ export function AdminLoginPage(): ReactElement {
 
   const locationState: ILocationState | null = location.state as ILocationState | null;
 
-  const [email, setEmail] = useState<string>("admin@celeiroms.com");
-  const [password, setPassword] = useState<string>("123456");
+  const adminApiConfigured = resolveAdminBffBaseUrl() !== "";
+
+  const [email, setEmail] = useState<string>(
+    import.meta.env.DEV ? "admin@celeiroms.com" : "",
+  );
+  const [password, setPassword] = useState<string>(
+    import.meta.env.DEV ? "123456" : "",
+  );
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -53,6 +60,20 @@ export function AdminLoginPage(): ReactElement {
         <p className="mt-2 text-sm text-zinc-600">
           Acesse a área privada para gerenciar os conteúdos do portal.
         </p>
+
+        {import.meta.env.PROD && !adminApiConfigured ? (
+          <div
+            className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+            role="alert"
+          >
+            A API administrativa não está configurada neste build. Defina{" "}
+            <code className="rounded bg-amber-100 px-1">VITE_PUBLIC_BFF_BASE_URL</code>{" "}
+            ou{" "}
+            <code className="rounded bg-amber-100 px-1">VITE_ADMIN_BFF_BASE_URL</code>{" "}
+            (HTTPS, com <code className="rounded bg-amber-100 px-1">/api</code> se
+            aplicável), faça um novo build e publique novamente.
+          </div>
+        ) : null}
       </div>
 
       <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>

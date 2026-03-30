@@ -23,6 +23,7 @@ export interface IInstitutionalContent
 
 export type IUpdateInstitutionalContentInput = Pick<
   IInstitutionalContent,
+  | "id"
   | "aboutTitle"
   | "aboutText"
   | "whoWeAreTitle"

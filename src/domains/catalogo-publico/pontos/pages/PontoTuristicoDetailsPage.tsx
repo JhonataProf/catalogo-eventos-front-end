@@ -7,6 +7,8 @@ import {
 } from "@/design-system/ui";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { publicApiClient } from "@/services/public-api/client";
+import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
+import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
@@ -21,6 +23,23 @@ export function PontoTuristicoDetailsPage(): ReactElement {
   const [touristPoint, setTouristPoint] = useState<ITouristPoint | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
+
+  const canonicalPontoPath =
+    Number.isFinite(id) && id !== undefined && id > 0
+      ? `/pontos-turisticos/${id}`
+      : "/pontos-turisticos";
+
+  usePublicPageMetadata({
+    title: touristPoint
+      ? `${touristPoint.name} | Pontos turísticos | Celeiro do MS`
+      : isLoading
+        ? "Carregando… | Celeiro do MS"
+        : "Ponto turístico | Celeiro do MS",
+    description: touristPoint
+      ? truncateMetaDescription(touristPoint.description)
+      : undefined,
+    canonicalPath: canonicalPontoPath,
+  });
 
   useEffect(() => {
     let isActive: boolean = true;

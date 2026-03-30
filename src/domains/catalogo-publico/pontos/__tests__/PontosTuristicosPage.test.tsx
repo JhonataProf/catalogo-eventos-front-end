@@ -24,6 +24,9 @@ describe("PontosTuristicosPage", () => {
     vi.mocked(useCatalogoCidade).mockReturnValue({
       cidadeSlug: "dourados",
       cidadeNome: "Dourados",
+      isLoadingCidades: false,
+      errorCidades: null,
+      isCitiesReady: true,
       cidades: [
         { id: 1, name: "Dourados", slug: "dourados", state: "MS", published: true, summary: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
         { id: 2, name: "Itaporã", slug: "itapora", state: "MS", published: true, summary: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },

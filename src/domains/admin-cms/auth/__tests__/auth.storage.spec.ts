@@ -4,7 +4,7 @@ import {
   loadAdminUser,
   saveAdminUser,
 } from "../auth.storage";
-import { IAdminUser } from "../auth.types";
+import type { IAdminUser } from "../auth.types";
 
 describe("auth.storage", () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe("auth.storage", () => {
       id: 1,
       name: "Admin",
       email: "admin@teste.com",
-      role: "admin",
+      role: "Admin",
       token: "jwt-token",
     };
 
@@ -35,7 +35,7 @@ describe("auth.storage", () => {
       id: 1,
       name: "Admin",
       email: "admin@teste.com",
-      role: "admin",
+      role: "Admin",
       token: "jwt-token",
     };
 
@@ -46,7 +46,7 @@ describe("auth.storage", () => {
   });
 
   it("deve retornar null quando o JSON salvo estiver inválido", () => {
-    localStorage.setItem("admin_auth_user", "{json-invalido");
+    localStorage.setItem("celeiro-admin-auth", "{json-invalido");
 
     expect(loadAdminUser()).toBeNull();
   });

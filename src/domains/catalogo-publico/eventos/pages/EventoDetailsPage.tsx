@@ -7,6 +7,8 @@ import {
 } from "@/design-system/ui";
 import type { IEvent } from "@/entities/event/event.types";
 import { publicApiClient } from "@/services/public-api/client";
+import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
+import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
@@ -21,6 +23,23 @@ export function EventoDetailsPage(): ReactElement {
   const [event, setEvent] = useState<IEvent | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [notFound, setNotFound] = useState<boolean>(false);
+
+  const canonicalEventPath =
+    Number.isFinite(id) && id !== undefined && id > 0
+      ? `/eventos/${id}`
+      : "/eventos";
+
+  usePublicPageMetadata({
+    title: event
+      ? `${event.name} | Eventos | Celeiro do MS`
+      : isLoading
+        ? "Carregando evento… | Celeiro do MS"
+        : "Evento | Celeiro do MS",
+    description: event
+      ? truncateMetaDescription(event.description)
+      : undefined,
+    canonicalPath: canonicalEventPath,
+  });
 
   useEffect(() => {
     let isActive: boolean = true;

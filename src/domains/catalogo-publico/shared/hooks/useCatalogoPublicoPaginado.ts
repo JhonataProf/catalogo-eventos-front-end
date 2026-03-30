@@ -9,6 +9,8 @@ interface IUseCatalogoPublicoPaginadoParams {
   baseQuery: Omit<ICatalogoQuery, "page">;
   fetcher: (query: ICatalogoQuery) => Promise<ICatalogoResult>;
   initialPage?: number;
+  /** Quando `false`, não dispara fetch até estar pronto (ex.: cidades do catálogo carregadas). */
+  enabled?: boolean;
 }
 
 interface IUseCatalogoPublicoPaginadoResult {
@@ -36,6 +38,7 @@ export function useCatalogoPublicoPaginado({
   baseQuery,
   fetcher,
   initialPage = 1,
+  enabled = true,
 }: IUseCatalogoPublicoPaginadoParams): IUseCatalogoPublicoPaginadoResult {
   const cidade: string = baseQuery.cidade;
   const busca: string | undefined = baseQuery.busca;
@@ -89,6 +92,9 @@ export function useCatalogoPublicoPaginado({
   );
 
   const reload = useCallback(async (): Promise<void> => {
+    if (!enabled) {
+      return;
+    }
     try {
       setIsInitialLoading(true);
       setError(null);
@@ -99,10 +105,10 @@ export function useCatalogoPublicoPaginado({
     } finally {
       setIsInitialLoading(false);
     }
-  }, [executeFetch, initialPage, safeLimit]);
+  }, [enabled, executeFetch, initialPage, safeLimit]);
 
   const loadMore = useCallback(async (): Promise<void> => {
-    if (isLoadingMore || isInitialLoading || !data.hasMore) {
+    if (!enabled || isLoadingMore || isInitialLoading || !data.hasMore) {
       return;
     }
 
@@ -115,9 +121,23 @@ export function useCatalogoPublicoPaginado({
     } finally {
       setIsLoadingMore(false);
     }
-  }, [data.hasMore, data.page, executeFetch, isInitialLoading, isLoadingMore]);
+  }, [
+    data.hasMore,
+    data.page,
+    enabled,
+    executeFetch,
+    isInitialLoading,
+    isLoadingMore,
+  ]);
 
   useEffect(() => {
+    if (!enabled) {
+      setData(buildInitialState(safeLimit));
+      setIsInitialLoading(true);
+      setError(null);
+      return;
+    }
+
     let isActive: boolean = true;
 
     async function syncData(): Promise<void> {
@@ -162,7 +182,7 @@ export function useCatalogoPublicoPaginado({
     return () => {
       isActive = false;
     };
-  }, [fetcher, initialPage, safeLimit, stableBaseQuery]);
+  }, [enabled, fetcher, initialPage, safeLimit, stableBaseQuery]);
 
   return {
     data,

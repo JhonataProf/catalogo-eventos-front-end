@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 type PublicApiModule = typeof import("../client");
 
 async function loadPublicApiClient(): Promise<PublicApiModule["publicApiClient"]> {
+  vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
   vi.resetModules();
   const module: PublicApiModule = await import("../client");
   return module.publicApiClient;
@@ -10,6 +11,7 @@ async function loadPublicApiClient(): Promise<PublicApiModule["publicApiClient"]
 
 describe("publicApiClient", () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 

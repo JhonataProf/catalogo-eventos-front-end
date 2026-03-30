@@ -1,0 +1,80 @@
+# Deploy do build Vite para S3 + invalidação CloudFront.
+#
+# Autenticação AWS (escolha um modelo):
+#
+# A) Recomendado — OIDC (sem chaves de longa duração no GitHub)
+#    - Crie um IAM Role na conta AWS com trust policy para GitHub OIDC
+#      (token.actions.githubusercontent.com) restrita ao repositório/ref.
+#    - Permissões: s3:PutObject, s3:DeleteObject, s3:ListBucket no bucket;
+#      cloudfront:CreateInvalidation na distribuição.
+#    - Secret: AWS_ROLE_ARN = arn:aws:iam::ACCOUNT:role/ROLE_NAME
+#
+# B) Legado — chaves de acesso (evitar em produção)
+#    - Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+#    - Repository variable: AWS_AUTH_METHOD = access-key
+#      (em if: não se pode usar secrets; OIDC é o default quando a variável não existe ou != access-key)
+#
+# Demais secrets:
+#   S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
+#   VITE_PUBLIC_BFF_BASE_URL (HTTPS, ex. .../api) — obrigatório para CRM real em produção
+#   VITE_PUBLIC_SITE_URL (HTTPS, sem barra final) — robots/sitemap + canonical no bundle
+#
+# Opcional: VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID (Google Tag Manager)
+# Opcional: variable AWS_REGION (default us-east-1).
+
+name: Deploy frontend (S3 + CloudFront)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        env:
+          VITE_PUBLIC_BFF_BASE_URL: ${{ secrets.VITE_PUBLIC_BFF_BASE_URL }}
+          VITE_ADMIN_BFF_BASE_URL: ${{ secrets.VITE_ADMIN_BFF_BASE_URL }}
+          VITE_PUBLIC_SITE_URL: ${{ secrets.VITE_PUBLIC_SITE_URL }}
+          VITE_PUBLIC_GTM_ID: ${{ secrets.VITE_PUBLIC_GTM_ID }}
+        run: yarn build
+
+      - name: Configure AWS credentials (OIDC)
+        if: ${{ vars.AWS_AUTH_METHOD != 'access-key' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Configure AWS credentials (access keys — legado)
+        if: ${{ vars.AWS_AUTH_METHOD == 'access-key' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Sync to S3
+        run: aws s3 sync dist/ "s3://${{ secrets.S3_BUCKET }}/" --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"
