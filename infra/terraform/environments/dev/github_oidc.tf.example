@@ -1,0 +1,29 @@
+# Opcional: copie para github_oidc.tf e ajuste github_org / github_repo.
+# Aplica a role de deploy com trust restrito à branch main (padrão do módulo).
+#
+# Se o OIDC provider "token.actions.githubusercontent.com" JÁ existir na conta
+# (criação manual anterior), defina create_oidc_provider = false.
+#
+# Para permitir deploy a partir de qualquer branch (só laboratório):
+#   allow_all_branches = true
+#
+# Para outra branch fixa:
+#   allowed_ref_pattern = "repo:ORG/REPO:ref:refs/heads/nome-da-branch"
+
+# module "github_deploy" {
+#   source = "../../modules/github_oidc_frontend_deploy"
+#
+#   role_name                     = "${var.project_name}-${var.environment}-gha-deploy"
+#   github_org                    = "SUA_ORG_OU_USER"
+#   github_repo                   = "catalogo-eventos-front-end"
+#   s3_bucket_arn                 = module.spa.s3_bucket_arn
+#   cloudfront_distribution_arn   = module.spa.cloudfront_distribution_arn
+#   allow_all_branches            = false
+#   allowed_ref_pattern           = ""
+#   create_oidc_provider          = true
+# }
+#
+# output "github_deploy_role_arn" {
+#   value       = module.github_deploy.role_arn
+#   description = "Secret AWS_ROLE_ARN no GitHub"
+# }

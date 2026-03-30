@@ -154,6 +154,10 @@ Backend remoto: copie `backend.tf.example` → `backend.tf`. O repositório pode
 
 Demais secrets: `S3_BUCKET`, `CLOUDFRONT_DISTRIBUTION_ID`, `VITE_PUBLIC_BFF_BASE_URL` (obrigatório para CRM real), `VITE_PUBLIC_SITE_URL` (robots/sitemap + canonical). Opcional: `VITE_ADMIN_BFF_BASE_URL`, `VITE_PUBLIC_GTM_ID`.
 
+Variáveis de repositório úteis: `DEPLOY_S3_BUCKET_PREFIX` (prefixo obrigatório do nome do bucket), `REQUIRE_VITE_PUBLIC_SITE_URL=true` em go-live, `DEPLOY_GITHUB_ENVIRONMENT` (padrão `frontend-deploy`). Role OIDC gerível pelo módulo `infra/terraform/modules/github_oidc_frontend_deploy` (ver `environments/dev/github_oidc.tf.example`). A política do módulo **não** inclui `s3:PutObjectAcl` (desnecessário com buckets modernos); alinhe políticas IAM manuais ao mesmo princípio.
+
+Atualizações de dependências: `.github/dependabot.yml` (ativar Dependabot no repositório se ainda não estiver).
+
 **Fase 3 (SEO técnico mínimo no bundle):** ver `docs/operations/fase3-public-delivery-hardening.md`.
 
 ## Gate de produção

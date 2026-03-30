@@ -5,11 +5,10 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
-import type { IEvent } from "@/entities/event/event.types";
-import { publicApiClient } from "@/services/public-api/client";
+import { usePublishedEventById } from "@/domains/catalogo-publico/eventos/hooks/usePublishedEventById";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
-import { useEffect, useState, type ReactElement } from "react";
+import { type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
 interface IEventRouteParams {
@@ -18,11 +17,11 @@ interface IEventRouteParams {
 
 export function EventoDetailsPage(): ReactElement {
   const params = useParams<keyof IEventRouteParams>();
-  const id: number | undefined = Number(params.id);
+  const rawId = Number(params.id);
+  const id: number | undefined =
+    Number.isFinite(rawId) && rawId > 0 ? rawId : undefined;
 
-  const [event, setEvent] = useState<IEvent | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [notFound, setNotFound] = useState<boolean>(false);
+  const { event, isLoading, notFound } = usePublishedEventById(id);
 
   const canonicalEventPath =
     Number.isFinite(id) && id !== undefined && id > 0
@@ -40,46 +39,6 @@ export function EventoDetailsPage(): ReactElement {
       : undefined,
     canonicalPath: canonicalEventPath,
   });
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadEvent(): Promise<void> {
-      if (!id) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        const response: IEvent | null =
-          await publicApiClient.getPublishedEventById(id);
-
-        if (!isActive) {
-          return;
-        }
-
-        if (!response) {
-          setNotFound(true);
-          return;
-        }
-
-        setEvent(response);
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadEvent();
-
-    return () => {
-      isActive = false;
-    };
-  }, [id]);
 
   if (notFound) {
     return <Navigate to="/eventos" replace />;

@@ -1,9 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Outlet } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AppRoutes } from "../routes";
 
-import { AuthProvider } from "@/domains/admin-cms/auth/AuthProvider";
 import { publicApiClient } from "@/services/public-api/client";
 
 vi.mock("@/services/public-api/client", () => ({
@@ -123,9 +122,7 @@ vi.mock("@/domains/admin-cms/auth/guards/AdminRouteGuard", () => ({
 function renderRoutes(initialEntry: string) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <AppRoutes />
     </MemoryRouter>,
   );
 }
@@ -253,41 +250,54 @@ describe("AppRoutes", () => {
     expect(screen.getByText("Cidade Details mock")).toBeInTheDocument();
   });
 
-  it("deve redirecionar rota desconhecida para home", () => {
+  it("deve renderizar 404 público com noindex para rota desconhecida", async () => {
     render(
       <MemoryRouter initialEntries={["/rota-inexistente"]}>
         <AppRoutes />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("Home mock")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /página não encontrada/i }),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        document.querySelector('meta[name="robots"]')?.getAttribute("content"),
+      ).toBe("noindex, nofollow");
+    });
   });
 
-  it("deve renderizar a rota de login admin", () => {
+  it("deve renderizar a rota de login admin", async () => {
     render(
       <MemoryRouter initialEntries={["/admin/login"]}>
         <AppRoutes />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("Admin Login mock")).toBeInTheDocument();
+    expect(await screen.findByText("Admin Login mock")).toBeInTheDocument();
   });
 
-  it("deve renderizar a rota admin institucional", () => {
+  it("deve renderizar a rota admin institucional", async () => {
     renderRoutes("/admin/institucional");
 
-    expect(screen.getByText("Admin Institucional mock")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Admin Institucional mock"),
+    ).toBeInTheDocument();
   });
 
-  it("deve renderizar a rota admin home banners", () => {
+  it("deve renderizar a rota admin home banners", async () => {
     renderRoutes("/admin/home");
 
-    expect(screen.getByText("Admin Home Banners mock")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Admin Home Banners mock"),
+    ).toBeInTheDocument();
   });
 
-  it("deve renderizar a rota admin home destaques", () => {
+  it("deve renderizar a rota admin home destaques", async () => {
     renderRoutes("/admin/home/destaques");
 
-    expect(screen.getByText("Admin Home Highlights mock")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Admin Home Highlights mock"),
+    ).toBeInTheDocument();
   });
 });

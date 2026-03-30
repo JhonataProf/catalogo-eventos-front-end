@@ -1,7 +1,22 @@
 import type { ReactElement } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 
+import {
+  AdminCitiesListPageLazy,
+  AdminCityFormPageLazy,
+  AdminDashboardPageLazy,
+  AdminEventFormPageLazy,
+  AdminEventsListPageLazy,
+  AdminHomeBannersPageLazy,
+  AdminHomeHighlightsPageLazy,
+  AdminInstitutionalPageLazy,
+  AdminLoginPageLazy,
+  AdminSocialLinksPageLazy,
+  AdminTouristPointFormPageLazy,
+  AdminTouristPointsListPageLazy,
+} from "@/app/adminLazyPages";
 import { PublicLayout } from "@/shell/public/layouts/PublicLayout";
+import { AdminAuthBoundary } from "@/shell/admin/AdminAuthBoundary";
 import { AdminAuthLayout } from "@/shell/admin/layouts/AdminAuthLayout";
 import { AdminLayout } from "@/shell/admin/layouts/AdminLayout";
 
@@ -13,34 +28,8 @@ import { PontoTuristicoDetailsPage } from "@/domains/catalogo-publico/pontos/pag
 import { CityDetailsPage } from "@/domains/cidades-institucional/pages/CityDetailsPage";
 import { AboutPage } from "@/domains/institucional/pages/AboutPage";
 
-import { AdminLoginPage } from "@/domains/admin-cms/auth/pages/AdminLoginPage";
-import { AdminDashboardPage } from "@/domains/admin-cms/dashboard/pages/AdminDashboardPage";
 import { AdminRouteGuard } from "@/domains/admin-cms/auth/guards/AdminRouteGuard";
-
-import { AdminInstitutionalPage } from "@/domains/admin-cms/institutional/pages/AdminInstitutionalPage";
-import { AdminSocialLinksPage } from "@/domains/admin-cms/social-links/pages/AdminSocialLinksPage";
-
-import { AdminCitiesListPage } from "@/domains/admin-cms/cities/pages/AdminCitiesListPage";
-import { AdminCityFormPage } from "@/domains/admin-cms/cities/pages/AdminCityFormPage";
-
-import { AdminEventsListPage } from "@/domains/admin-cms/events/pages/AdminEventsListPage";
-import { AdminEventFormPage } from "@/domains/admin-cms/events/pages/AdminEventFormPage";
-import { AdminTouristPointsListPage } from "@/domains/admin-cms/tourist-points/pages/AdminTouristPointsListPage";
-import { AdminTouristPointFormPage } from "@/domains/admin-cms/tourist-points/pages/AdminTouristPointFormPage";
-
-import { AdminHomeBannersPage } from "@/domains/admin-cms/home-content/pages/AdminHomeBannersPage";
-import { AdminHomeHighlightsPage } from "@/domains/admin-cms/home-content/pages/AdminHomeHighlightsPage";
-
-// function PlaceholderPage({ title }: { title: string }): ReactElement {
-//   return (
-//     <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-//       <h1 className="text-2xl font-bold text-zinc-900">{title}</h1>
-//       <p className="mt-2 text-sm text-zinc-600">
-//         Esta tela será implementada na próxima etapa.
-//       </p>
-//     </div>
-//   );
-// }
+import { PublicNotFoundPage } from "@/shell/public/pages/PublicNotFoundPage";
 
 export function AppRoutes(): ReactElement | null {
   return useRoutes([
@@ -62,10 +51,11 @@ export function AppRoutes(): ReactElement | null {
     },
     {
       path: "/admin",
+      element: <AdminAuthBoundary />,
       children: [
         {
           element: <AdminAuthLayout />,
-          children: [{ path: "login", element: <AdminLoginPage /> }],
+          children: [{ path: "login", element: <AdminLoginPageLazy /> }],
         },
         {
           element: <AdminRouteGuard />,
@@ -73,10 +63,10 @@ export function AppRoutes(): ReactElement | null {
             {
               element: <AdminLayout />,
               children: [
-                { index: true, element: <AdminDashboardPage /> },
+                { index: true, element: <AdminDashboardPageLazy /> },
                 {
                   path: "institucional",
-                  element: <AdminInstitutionalPage />,
+                  element: <AdminInstitutionalPageLazy />,
                 },
                 {
                   path: "home",
@@ -84,52 +74,52 @@ export function AppRoutes(): ReactElement | null {
                 },
                 {
                   path: "home/banners",
-                  element: <AdminHomeBannersPage />,
+                  element: <AdminHomeBannersPageLazy />,
                 },
                 {
                   path: "home/destaques",
-                  element: <AdminHomeHighlightsPage />,
+                  element: <AdminHomeHighlightsPageLazy />,
                 },
                 {
                   path: "midias-sociais",
-                  element: <AdminSocialLinksPage />,
+                  element: <AdminSocialLinksPageLazy />,
                 },
                 {
                   path: "cidades",
-                  element: <AdminCitiesListPage />,
+                  element: <AdminCitiesListPageLazy />,
                 },
                 {
                   path: "cidades/nova",
-                  element: <AdminCityFormPage />,
+                  element: <AdminCityFormPageLazy />,
                 },
                 {
                   path: "cidades/:id/editar",
-                  element: <AdminCityFormPage />,
+                  element: <AdminCityFormPageLazy />,
                 },
                 {
                   path: "eventos",
-                  element: <AdminEventsListPage />,
+                  element: <AdminEventsListPageLazy />,
                 },
                 {
                   path: "eventos/novo",
-                  element: <AdminEventFormPage />,
+                  element: <AdminEventFormPageLazy />,
                 },
                 {
                   path: "eventos/:id/editar",
-                  element: <AdminEventFormPage />,
+                  element: <AdminEventFormPageLazy />,
                 },
                 {
                   path: "pontos-turisticos",
-                  element: <AdminTouristPointsListPage />,
+                  element: <AdminTouristPointsListPageLazy />,
                 },
                 {
                   path: "pontos-turisticos/novo",
-                  element: <AdminTouristPointFormPage />,
+                  element: <AdminTouristPointFormPageLazy />,
                 },
                 {
                   path: "pontos-turisticos/:id/editar",
-                  element: <AdminTouristPointFormPage />,
-                }
+                  element: <AdminTouristPointFormPageLazy />,
+                },
               ],
             },
           ],
@@ -138,7 +128,8 @@ export function AppRoutes(): ReactElement | null {
     },
     {
       path: "*",
-      element: <Navigate to="/" replace />,
+      element: <PublicLayout />,
+      children: [{ path: "*", element: <PublicNotFoundPage /> }],
     },
   ]);
 }

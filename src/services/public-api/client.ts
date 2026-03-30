@@ -1,3 +1,4 @@
+import { isApiMocksForced } from "@/services/api/apiClientMode";
 import type { IPublicApiClient } from "./publicApi.types";
 import { createHttpPublicApiClient } from "./httpPublicApiClient";
 import { createInMemoryPublicApiClient } from "./inMemoryPublicApiClient";
@@ -10,9 +11,10 @@ function resolvePublicBffBaseUrl(): string {
 const bffBaseUrl: string = resolvePublicBffBaseUrl();
 
 /**
- * Cliente da API pública. Com `VITE_PUBLIC_BFF_BASE_URL` definido, usa HTTP ao BFF;
- * caso contrário, usa o store em memória (desenvolvimento / fallback).
+ * Cliente da API pública. HTTP ao BFF quando há `VITE_PUBLIC_BFF_BASE_URL` e
+ * `VITE_USE_API_MOCKS` não é `"true"`. Caso contrário, dados in-memory.
  */
-export const publicApiClient: IPublicApiClient = bffBaseUrl
-  ? createHttpPublicApiClient(bffBaseUrl)
-  : createInMemoryPublicApiClient();
+export const publicApiClient: IPublicApiClient =
+  isApiMocksForced() || !bffBaseUrl
+    ? createInMemoryPublicApiClient()
+    : createHttpPublicApiClient(bffBaseUrl);

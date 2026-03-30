@@ -5,6 +5,7 @@ type AdminApiModule = typeof import("../client");
 async function loadAdminApiClient(): Promise<AdminApiModule["adminApiClient"]> {
   vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
   vi.stubEnv("VITE_ADMIN_BFF_BASE_URL", "");
+  vi.stubEnv("VITE_USE_API_MOCKS", "");
   vi.resetModules();
   const module: AdminApiModule = await import("../client");
   return module.adminApiClient;

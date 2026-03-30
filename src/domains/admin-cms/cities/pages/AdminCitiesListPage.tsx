@@ -1,48 +1,13 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { ICity } from "@/entities/city/city.types";
+import { useAdminCitiesList } from "@/domains/admin-cms/cities/hooks/useAdminCitiesList";
 import { adminApiClient } from "@/services/admin-api/client";
 
 export function AdminCitiesListPage(): ReactElement {
-  const [items, setItems] = useState<ICity[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { items, setItems, isLoading, error: loadError } = useAdminCitiesList();
   const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadCities(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: ICity[] = await adminApiClient.listCities();
-
-        if (!isActive) {
-          return;
-        }
-
-        setItems(response);
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar as cidades.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadCities();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   async function handleDelete(id: number): Promise<void> {
     try {
@@ -74,9 +39,11 @@ export function AdminCitiesListPage(): ReactElement {
         </Link>
       </div>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

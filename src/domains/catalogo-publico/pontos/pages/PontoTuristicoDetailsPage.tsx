@@ -5,11 +5,10 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
-import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
-import { publicApiClient } from "@/services/public-api/client";
+import { usePublishedTouristPointById } from "@/domains/catalogo-publico/pontos/hooks/usePublishedTouristPointById";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
-import { useEffect, useState, type ReactElement } from "react";
+import { type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
 interface ITouristPointRouteParams {
@@ -18,11 +17,11 @@ interface ITouristPointRouteParams {
 
 export function PontoTuristicoDetailsPage(): ReactElement {
   const params = useParams<keyof ITouristPointRouteParams>();
-  const id: number | undefined = Number(params.id);
+  const rawId = Number(params.id);
+  const id: number | undefined =
+    Number.isFinite(rawId) && rawId > 0 ? rawId : undefined;
 
-  const [touristPoint, setTouristPoint] = useState<ITouristPoint | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [notFound, setNotFound] = useState<boolean>(false);
+  const { touristPoint, isLoading, notFound } = usePublishedTouristPointById(id);
 
   const canonicalPontoPath =
     Number.isFinite(id) && id !== undefined && id > 0
@@ -40,46 +39,6 @@ export function PontoTuristicoDetailsPage(): ReactElement {
       : undefined,
     canonicalPath: canonicalPontoPath,
   });
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadTouristPoint(): Promise<void> {
-      if (!id) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        const response: ITouristPoint | null =
-          await publicApiClient.getPublishedTouristPointById(id);
-
-        if (!isActive) {
-          return;
-        }
-
-        if (!response) {
-          setNotFound(true);
-          return;
-        }
-
-        setTouristPoint(response);
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadTouristPoint();
-
-    return () => {
-      isActive = false;
-    };
-  }, [id]);
 
   if (notFound) {
     return <Navigate to="/pontos-turisticos" replace />;

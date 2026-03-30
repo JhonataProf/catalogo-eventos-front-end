@@ -41,6 +41,11 @@ Este documento registra restrições e decisões práticas sobre analytics, tag 
 
 ---
 
+## Integração no código (ponto único)
+
+- **Fachada pública:** `src/analytics/publicAnalytics.ts` — `trackPublicEvent(name, payload?)` envia para `window.dataLayer` quando existir. Não usar `dataLayer.push` direto em páginas ou domínios.
+- Ver uso de exemplo em `PublicNotFoundPage` (`public_404`).
+
 ## Fase 3 — Tag Manager no build
 
 - **Integração:** variável de build opcional `VITE_PUBLIC_GTM_ID`. Quando definida, o Vite injeta o snippet padrão do Google Tag Manager no `index.html` (head + noscript no body).

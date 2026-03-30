@@ -16,6 +16,7 @@ vi.mock("../auth.storage", () => ({
 
 vi.mock("@/services/admin-api/adminBffConfig", () => ({
   resolveAdminBffBaseUrl: () => "",
+  resolveAdminUsesRealHttp: () => false,
 }));
 
 describe("AuthProvider", () => {

@@ -1,49 +1,14 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
+import { useAdminTouristPointsList } from "@/domains/admin-cms/tourist-points/hooks/useAdminTouristPointsList";
 import { adminApiClient } from "@/services/admin-api/client";
 
 export function AdminTouristPointsListPage(): ReactElement {
-  const [items, setItems] = useState<ITouristPoint[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { items, setItems, isLoading, error: loadError } =
+    useAdminTouristPointsList();
   const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadTouristPoints(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: ITouristPoint[] =
-          await adminApiClient.listTouristPoints();
-
-        if (!isActive) {
-          return;
-        }
-
-        setItems(response);
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar os pontos turísticos.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadTouristPoints();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   async function handleDelete(id: number): Promise<void> {
     try {
@@ -75,9 +40,11 @@ export function AdminTouristPointsListPage(): ReactElement {
         </Link>
       </div>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

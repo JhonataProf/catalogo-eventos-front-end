@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { type ReactElement } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -7,8 +7,7 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
-import type { ICity } from "@/entities/city/city.types";
-import { publicApiClient } from "@/services/public-api/client";
+import { usePublishedCityBySlug } from "@/domains/cidades-institucional/hooks/usePublishedCityBySlug";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 
@@ -20,9 +19,7 @@ export function CityDetailsPage(): ReactElement {
   const params = useParams<keyof ICityRouteParams>();
   const slug: string | undefined = params.slug;
 
-  const [cidade, setCidade] = useState<ICity | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [notFound, setNotFound] = useState<boolean>(false);
+  const { city: cidade, isLoading, notFound } = usePublishedCityBySlug(slug);
 
   const canonicalCidadePath = slug ? `/cidades/${slug}` : "/";
 
@@ -37,46 +34,6 @@ export function CityDetailsPage(): ReactElement {
       : undefined,
     canonicalPath: canonicalCidadePath,
   });
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadCity(): Promise<void> {
-      if (!slug) {
-        setNotFound(true);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        const response: ICity | null =
-          await publicApiClient.getPublishedCityBySlug(slug);
-
-        if (!isActive) {
-          return;
-        }
-
-        if (!response || !response.published) {
-          setNotFound(true);
-          return;
-        }
-
-        setCidade(response);
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadCity();
-
-    return () => {
-      isActive = false;
-    };
-  }, [slug]);
 
   if (notFound) {
     return <Navigate to="/" replace />;

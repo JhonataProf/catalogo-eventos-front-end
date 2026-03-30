@@ -1,28 +1,27 @@
 /**
- * Cliente HTTP alinhado ao catalogo-eventos-api (envelope `{ data, links, meta }`).
- *
+ * Cliente HTTP alinhado ao BFF (envelope `{ data, links, meta }`).
  * Base URL deve incluir o prefixo da API (ex.: `https://host/api`).
  *
- * Rotas públicas usadas:
- * - GET /public/cities
- * - GET /public/cities/:slug
- * - GET /public/cities/by-id/:id
- * - GET /public/events
- * - GET /public/events/:id
- * - GET /public/tourist-points
- * - GET /public/tourist-points/:id
- * - GET /public/institutional-content
- * - GET /public/social-links
- * - GET /public/home-content
+ * Rotas públicas: ver `docs/architecture/frontend-api-integration.md`.
  */
 import type { ICity } from "@/entities/city/city.types";
 import type { IEvent } from "@/entities/event/event.types";
 import type { IInstitutionalContent } from "@/entities/institutional/institutional.types";
 import type { ISocialLink } from "@/entities/social-link/socialLink.types";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
+import { mapCityFromApi } from "@/services/api/mappers/cityFromApi";
+import { mapEventFromApi } from "@/services/api/mappers/eventFromApi";
+import { mapInstitutionalFromApi } from "@/services/api/mappers/institutionalFromApi";
+import { mapSocialLinkFromApi } from "@/services/api/mappers/socialLinkFromApi";
+import { mapTouristPointFromApi } from "@/services/api/mappers/touristPointFromApi";
+import { mapPublicHomeContentFromResource } from "@/services/public-api/mappers/mapPublicHomeContent";
+import {
+  buildEventQuery,
+  buildTouristPointQuery,
+  resolveEventCityId,
+} from "@/services/public-api/publicHttpHelpers";
 import axios, { type AxiosInstance, isAxiosError } from "axios";
 import { unwrapCollection, unwrapResource } from "./httpPublicApiEnvelope";
-import type { HomeHighlightType } from "@/entities/home-content/homeContent.types";
 import type {
   IPublicApiClient,
   IPublicHomeContentResponse,
@@ -33,182 +32,6 @@ import type {
 
 function trimBaseUrl(baseURL: string): string {
   return baseURL.replace(/\/+$/, "");
-}
-
-function toIsoString(value: unknown, fallback: string): string {
-  if (value === null || value === undefined) {
-    return fallback;
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  return String(value);
-}
-
-function mapEventFromApi(raw: Record<string, unknown>): IEvent {
-  return {
-    id: Number(raw.id),
-    cityId: Number(raw.cityId),
-    citySlug: String(raw.citySlug ?? ""),
-    name: String(raw.name ?? ""),
-    description: String(raw.description ?? ""),
-    category: raw.category !== undefined ? String(raw.category) : undefined,
-    startDate:
-      raw.startDate !== undefined ? toIsoString(raw.startDate, "") : undefined,
-    endDate:
-      raw.endDate !== undefined ? toIsoString(raw.endDate, "") : undefined,
-    formattedDate:
-      raw.formattedDate !== undefined
-        ? String(raw.formattedDate)
-        : undefined,
-    location: raw.location !== undefined ? String(raw.location) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    featured: Boolean(raw.featured),
-    published: Boolean(raw.published),
-    createdAt: toIsoString(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIsoString(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapTouristPointFromApi(raw: Record<string, unknown>): ITouristPoint {
-  return {
-    id: Number(raw.id),
-    cityId: Number(raw.cityId),
-    citySlug: String(raw.citySlug ?? ""),
-    name: String(raw.name ?? ""),
-    description: String(raw.description ?? ""),
-    category: raw.category !== undefined ? String(raw.category) : undefined,
-    address: raw.address !== undefined ? String(raw.address) : undefined,
-    openingHours:
-      raw.openingHours !== undefined ? String(raw.openingHours) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    featured: Boolean(raw.featured),
-    published: Boolean(raw.published),
-    createdAt: toIsoString(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIsoString(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function parseValuesFromInstitutionalApi(
-  valuesJson: unknown,
-): string[] {
-  if (typeof valuesJson !== "string" || valuesJson.trim() === "") {
-    return [];
-  }
-  try {
-    const parsed: unknown = JSON.parse(valuesJson);
-    if (Array.isArray(parsed)) {
-      return parsed.map((v) => String(v));
-    }
-  } catch {
-    /* ignore */
-  }
-  return [];
-}
-
-function mapInstitutionalFromApi(
-  raw: Record<string, unknown>,
-): IInstitutionalContent {
-  return {
-    id: Number(raw.id),
-    aboutTitle: String(raw.aboutTitle ?? ""),
-    aboutText: String(raw.aboutText ?? ""),
-    whoWeAreTitle: String(raw.whoWeAreTitle ?? ""),
-    whoWeAreText: String(raw.whoWeAreText ?? ""),
-    purposeTitle: String(raw.purposeTitle ?? ""),
-    purposeText: String(raw.purposeText ?? ""),
-    mission: String(raw.mission ?? ""),
-    vision: String(raw.vision ?? ""),
-    values: parseValuesFromInstitutionalApi(raw.valuesJson),
-    updatedAt: toIsoString(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapCityFromApi(raw: Record<string, unknown>): ICity {
-  return {
-    id: Number(raw.id),
-    name: String(raw.name ?? ""),
-    state: String(raw.state ?? ""),
-    slug: String(raw.slug ?? ""),
-    summary: String(raw.summary ?? ""),
-    description:
-      raw.description !== undefined ? String(raw.description) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    published: Boolean(raw.published),
-    createdAt: toIsoString(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIsoString(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapSocialLinkFromApi(raw: Record<string, unknown>): ISocialLink {
-  return {
-    id: Number(raw.id),
-    platform: raw.platform as ISocialLink["platform"],
-    label: String(raw.label ?? ""),
-    url: String(raw.url ?? ""),
-    active: Boolean(raw.active),
-    order: Number(raw.order ?? 0),
-  };
-}
-
-async function resolveEventCityId(
-  http: AxiosInstance,
-  params: IPublicListParams,
-): Promise<number | undefined> {
-  if (params.cityId !== undefined) {
-    return params.cityId;
-  }
-  if (!params.citySlug) {
-    return undefined;
-  }
-  try {
-    const { data } = await http.get<unknown>(
-      `/public/cities/${encodeURIComponent(params.citySlug)}`,
-    );
-    const city = unwrapResource<Record<string, unknown>>(data);
-    if (!city?.published) {
-      return undefined;
-    }
-    return Number(city.id);
-  } catch {
-    return undefined;
-  }
-}
-
-function buildEventQuery(params: IPublicListParams, cityId?: number) {
-  const query: Record<string, string | number> = {
-    page: String(params.page ?? 1),
-    limit: String(params.limit ?? 12),
-    sortDir: "asc",
-  };
-  if (params.search?.trim()) {
-    query.name = params.search.trim();
-  }
-  if (params.category?.trim()) {
-    query.category = params.category.trim();
-  }
-  if (cityId !== undefined) {
-    query.cityId = cityId;
-  }
-  return query;
-}
-
-function buildTouristPointQuery(params: IPublicListParams) {
-  const query: Record<string, string | number> = {
-    page: String(params.page ?? 1),
-    limit: String(params.limit ?? 12),
-    published: "true",
-  };
-  if (params.search?.trim()) {
-    query.name = params.search.trim();
-  }
-  if (params.citySlug?.trim()) {
-    query.city = params.citySlug.trim();
-  }
-  return query;
 }
 
 const MAX_BY_CITY_PAGES = 50;
@@ -225,7 +48,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       const { data } = await http.get<unknown>("/public/cities");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
       return items
-        .map(mapCityFromApi)
+        .map((row) => mapCityFromApi(row))
         .filter((city: ICity) => city.published);
     },
 
@@ -265,7 +88,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       });
       const parsed = unwrapCollection<Record<string, unknown>>(data);
       const items = parsed.items
-        .map(mapEventFromApi)
+        .map((row) => mapEventFromApi(row))
         .filter((e) => e.published);
       return {
         items,
@@ -303,7 +126,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
         });
         const parsed = unwrapCollection<Record<string, unknown>>(data);
         const batch = parsed.items
-          .map(mapEventFromApi)
+          .map((row) => mapEventFromApi(row))
           .filter((e) => e.published);
         all.push(...batch);
         if (page >= parsed.totalPages || batch.length === 0) {
@@ -323,7 +146,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       });
       const parsed = unwrapCollection<Record<string, unknown>>(data);
       let items = parsed.items
-        .map(mapTouristPointFromApi)
+        .map((row) => mapTouristPointFromApi(row))
         .filter((p) => p.published);
 
       if (params.category?.trim()) {
@@ -385,7 +208,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
           });
           const parsed = unwrapCollection<Record<string, unknown>>(data);
           const batch = parsed.items
-            .map(mapTouristPointFromApi)
+            .map((row) => mapTouristPointFromApi(row))
             .filter((p) => p.published && p.cityId === cityId);
           all.push(...batch);
           if (page >= parsed.totalPages || parsed.items.length === 0) {
@@ -425,7 +248,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       const { data } = await http.get<unknown>("/public/social-links");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
       return items
-        .map(mapSocialLinkFromApi)
+        .map((row) => mapSocialLinkFromApi(row))
         .filter((link) => link.active)
         .sort((a, b) => a.order - b.order);
     },
@@ -471,44 +294,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
         banners: Array<Record<string, unknown>>;
         highlights: Array<Record<string, unknown>>;
       }>(data);
-
-      const banners = (payload.banners ?? [])
-        .filter((b) => Boolean(b.active))
-        .map((b) => ({
-          id: Number(b.id),
-          title: String(b.title ?? ""),
-          subtitle:
-            b.subtitle !== undefined ? String(b.subtitle) : undefined,
-          imageUrl: String(b.imageUrl ?? ""),
-          ctaLabel: b.ctaLabel !== undefined ? String(b.ctaLabel) : undefined,
-          ctaUrl: b.ctaUrl !== undefined ? String(b.ctaUrl) : undefined,
-          active: Boolean(b.active),
-          order: Number(b.order ?? 0),
-        }))
-        .sort((a, b) => a.order - b.order);
-
-      const highlights = (payload.highlights ?? [])
-        .filter((h) => Boolean(h.active))
-        .map((h) => ({
-          id: Number(h.id),
-          type: h.type as HomeHighlightType,
-          referenceId:
-            h.referenceId !== undefined && h.referenceId !== null
-              ? String(h.referenceId)
-              : undefined,
-          title: String(h.title ?? ""),
-          description: String(h.description ?? ""),
-          cityName:
-            h.cityName !== undefined ? String(h.cityName) : undefined,
-          imageUrl:
-            h.imageUrl !== undefined ? String(h.imageUrl) : undefined,
-          ctaUrl: h.ctaUrl !== undefined ? String(h.ctaUrl) : undefined,
-          active: Boolean(h.active),
-          order: Number(h.order ?? 0),
-        }))
-        .sort((a, b) => a.order - b.order);
-
-      return { banners, highlights };
+      return mapPublicHomeContentFromResource(payload);
     },
   };
 

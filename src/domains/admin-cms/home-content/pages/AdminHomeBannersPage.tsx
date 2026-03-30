@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -12,6 +11,7 @@ import type {
   IHomeBanner,
   IHomeBannerBase,
 } from "@/entities/home-content/homeContent.types";
+import { useAdminHomeBanners } from "@/domains/admin-cms/home-content/hooks/useAdminHomeBanners";
 import { adminApiClient } from "@/services/admin-api/client";
 
 type IHomeBannerFormState = IHomeBannerBase;
@@ -29,41 +29,13 @@ function buildInitialFormState(): IHomeBannerFormState {
 }
 
 export function AdminHomeBannersPage(): ReactElement {
-  const [items, setItems] = useState<IHomeBanner[]>([]);
+  const { items, setItems, isLoading, error: loadError } = useAdminHomeBanners();
   const [formState, setFormState] = useState<IHomeBannerFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadData(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: IHomeBanner[] = await adminApiClient.listHomeBanners();
-
-        if (!isActive) return;
-        setItems(response);
-      } catch {
-        if (!isActive) return;
-        setError("Não foi possível carregar os banners.");
-      } finally {
-        if (isActive) setIsLoading(false);
-      }
-    }
-
-    void loadData();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   const nextOrder: number = useMemo(() => {
     if (items.length === 0) return 1;
@@ -153,9 +125,11 @@ export function AdminHomeBannersPage(): ReactElement {
         Banners da Home
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

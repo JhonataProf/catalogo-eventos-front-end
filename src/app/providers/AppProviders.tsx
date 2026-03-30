@@ -1,13 +1,11 @@
-import { AuthProvider } from "@/domains/admin-cms/auth/AuthProvider";
 import type { PropsWithChildren, ReactElement } from "react";
 import { BrowserRouter } from "react-router-dom";
 
+/**
+ * Raiz da app: sem Auth CRM — sessão admin só sob `/admin` (`AdminAuthBoundary`).
+ */
 export function AppProviders({
   children,
 }: PropsWithChildren): ReactElement {
-  return (
-    <BrowserRouter>
-      <AuthProvider>{children}</AuthProvider>
-    </BrowserRouter>
-  );
+  return <BrowserRouter>{children}</BrowserRouter>;
 }

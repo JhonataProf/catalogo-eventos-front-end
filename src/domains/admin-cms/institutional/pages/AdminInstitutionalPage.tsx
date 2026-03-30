@@ -15,6 +15,7 @@ import type {
   IInstitutionalContent,
   IUpdateInstitutionalContentInput,
 } from "@/entities/institutional/institutional.types";
+import { useAdminInstitutionalContent } from "@/domains/admin-cms/institutional/hooks/useAdminInstitutionalContent";
 import { adminApiClient } from "@/services/admin-api/client";
 
 interface IInstitutionalFormState {
@@ -93,51 +94,22 @@ function mapFormStateToInput(
 }
 
 export function AdminInstitutionalPage(): ReactElement {
-  const [content, setContent] = useState<IInstitutionalContent | null>(null);
+  const { content, setContent, isLoading, error: loadError } =
+    useAdminInstitutionalContent();
   const [formState, setFormState] = useState<IInstitutionalFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadInstitutionalContent(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: IInstitutionalContent =
-          await adminApiClient.getInstitutionalContent();
-
-        if (!isActive) {
-          return;
-        }
-
-        setContent(response);
-        setFormState(mapContentToFormState(response));
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar o conteúdo institucional.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
+    if (!content) {
+      return;
     }
 
-    void loadInstitutionalContent();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
+    setFormState(mapContentToFormState(content));
+  }, [content]);
 
   const lastUpdatedLabel: string = useMemo(() => {
     if (!content?.updatedAt) {
@@ -185,7 +157,6 @@ export function AdminInstitutionalPage(): ReactElement {
         await adminApiClient.updateInstitutionalContent(input);
 
       setContent(response);
-      setFormState(mapContentToFormState(response));
       setSuccessMessage("Conteúdo institucional salvo com sucesso.");
     } catch {
       setError("Não foi possível salvar o conteúdo institucional.");
@@ -228,9 +199,11 @@ export function AdminInstitutionalPage(): ReactElement {
         </p>
       ) : null}
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

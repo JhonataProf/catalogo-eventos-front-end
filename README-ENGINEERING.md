@@ -1,5 +1,13 @@
 # README-ENGINEERING
 
+## Organização da aplicação (SPA)
+
+- **Área pública** e **CRM** partilham o mesmo deploy, mas a sessão admin (`AuthProvider`) monta **apenas** sob `/admin` (`AdminAuthBoundary`), com code-splitting das páginas admin.
+- Mapa pastas ↔ rotas: `docs/architecture/frontend-domain-route-map.md`.
+- Eventos analytics no público: `src/analytics/publicAnalytics.ts`.
+
+---
+
 ## Observabilidade e mensuração
 
 O projeto deve considerar observabilidade e mensuração desde cedo.

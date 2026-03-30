@@ -41,7 +41,7 @@ Fichas dinâmicas (`/eventos/:id`, `/pontos-turisticos/:id`, `/cidades/:slug`) t
 ### Roteamento SPA
 
 1. Refresh em `/eventos`, `/sobre`, `/pontos-turisticos/1` — deve servir a app (CloudFront custom errors → `index.html`).
-2. URL inexistente ainda retorna SPA (soft 404) — conhecido; monitorar cobertura no Search Console.
+2. URL pública inexistente continua com **HTTP 200** no edge (SPA), mas a app mostra página 404 com **`meta robots: noindex`**; monitorar cobertura no Search Console.
 
 ## 4. Checklist final de go-live (Fase 3)
 

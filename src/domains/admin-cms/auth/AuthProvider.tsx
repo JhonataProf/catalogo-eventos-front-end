@@ -13,7 +13,10 @@ import {
   saveAdminSession,
 } from "./auth.storage";
 import { AuthContext } from "./auth.context";
-import { resolveAdminBffBaseUrl } from "@/services/admin-api/adminBffConfig";
+import {
+  resolveAdminBffBaseUrl,
+  resolveAdminUsesRealHttp,
+} from "@/services/admin-api/adminBffConfig";
 import { loginWithPassword } from "@/services/admin-api/adminAuth.api";
 import { ADMIN_AUTH_EXPIRED_EVENT } from "@/services/admin-api/adminAuthEvents";
 import {
@@ -22,8 +25,8 @@ import {
 } from "./adminAuthDevPolicy";
 
 function readInitialAdminSession(): IAdminAuthSession | null {
-  const baseURL = resolveAdminBffBaseUrl();
-  if (mustClearAdminSessionWithoutApiInProduction(baseURL === "")) {
+  const usesRealHttp = resolveAdminUsesRealHttp();
+  if (mustClearAdminSessionWithoutApiInProduction(!usesRealHttp)) {
     clearAdminUser();
     return null;
   }
@@ -49,9 +52,8 @@ export function AuthProvider({
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const baseURL = resolveAdminBffBaseUrl();
-
-    if (baseURL) {
+    if (resolveAdminUsesRealHttp()) {
+      const baseURL = resolveAdminBffBaseUrl();
       const next = await loginWithPassword(baseURL, email, password);
       setSession(next);
       saveAdminSession(next);

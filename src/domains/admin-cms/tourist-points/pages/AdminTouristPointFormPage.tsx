@@ -14,6 +14,7 @@ import type {
   ITouristPoint,
   IUpdateTouristPointInput,
 } from "@/entities/tourist-point/touristPoint.types";
+import { useAdminTouristPointFormSource } from "@/domains/admin-cms/tourist-points/hooks/useAdminTouristPointFormSource";
 import { adminApiClient } from "@/services/admin-api/client";
 
 interface ITouristPointFormRouteParams {
@@ -68,80 +69,52 @@ function mapTouristPointToFormState(
 export function AdminTouristPointFormPage(): ReactElement {
   const navigate = useNavigate();
   const params = useParams<keyof ITouristPointFormRouteParams>();
-  const touristPointId: number | undefined = Number(params.id);
+  const rawTouristPointId = Number(params.id);
+  const touristPointId: number | undefined =
+    Number.isFinite(rawTouristPointId) && rawTouristPointId > 0
+      ? rawTouristPointId
+      : undefined;
 
   const isEditMode: boolean = Boolean(touristPointId);
 
-  const [cities, setCities] = useState<ICity[]>([]);
+  const {
+    cities,
+    touristPoint: loadedTouristPoint,
+    isLoading,
+    error: loadError,
+    notFound,
+  } = useAdminTouristPointFormSource(touristPointId);
+
   const [formState, setFormState] = useState<ITouristPointFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [notFound, setNotFound] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadData(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const [citiesResponse, touristPointResponse] = await Promise.all([
-          adminApiClient.listCities(),
-          touristPointId
-            ? adminApiClient.getTouristPointById(touristPointId)
-            : Promise.resolve(null),
-        ]);
-
-        if (!isActive) {
-          return;
-        }
-
-        setCities(citiesResponse);
-
-        if (!touristPointId) {
-          const firstCity: ICity | undefined = citiesResponse[0];
-
-          if (firstCity) {
-            setFormState((currentState: ITouristPointFormState) => ({
-              ...currentState,
-              cityId: firstCity.id,
-              citySlug: firstCity.slug,
-            }));
-          }
-
-          return;
-        }
-
-        if (!touristPointResponse) {
-          setNotFound(true);
-          return;
-        }
-
-        setFormState(mapTouristPointToFormState(touristPointResponse));
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar os dados do formulário.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
+    if (touristPointId || isLoading || loadedTouristPoint) {
+      return;
     }
 
-    void loadData();
+    const firstCity: ICity | undefined = cities[0];
 
-    return () => {
-      isActive = false;
-    };
-  }, [touristPointId]);
+    if (firstCity) {
+      setFormState((currentState: ITouristPointFormState) => ({
+        ...currentState,
+        cityId: firstCity.id,
+        citySlug: firstCity.slug,
+      }));
+    }
+  }, [touristPointId, isLoading, loadedTouristPoint, cities]);
+
+  useEffect(() => {
+    if (!loadedTouristPoint || !touristPointId) {
+      return;
+    }
+
+    setFormState(mapTouristPointToFormState(loadedTouristPoint));
+  }, [loadedTouristPoint, touristPointId]);
 
   const pageTitle: string = useMemo(() => {
     return isEditMode ? "Editar ponto turístico" : "Novo ponto turístico";
@@ -261,9 +234,11 @@ export function AdminTouristPointFormPage(): ReactElement {
         {pageTitle}
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

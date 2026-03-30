@@ -14,6 +14,7 @@ import type {
   IEvent,
   IUpdateEventInput,
 } from "@/entities/event/event.types";
+import { useAdminEventFormSource } from "@/domains/admin-cms/events/hooks/useAdminEventFormSource";
 import { adminApiClient } from "@/services/admin-api/client";
 
 interface IEventFormRouteParams {
@@ -72,78 +73,45 @@ function mapEventToFormState(event: IEvent): IEventFormState {
 export function AdminEventFormPage(): ReactElement {
   const navigate = useNavigate();
   const params = useParams<keyof IEventFormRouteParams>();
-  const eventId: number | undefined = Number(params.id);
+  const rawEventId = Number(params.id);
+  const eventId: number | undefined =
+    Number.isFinite(rawEventId) && rawEventId > 0 ? rawEventId : undefined;
 
   const isEditMode: boolean = Boolean(eventId);
 
-  const [cities, setCities] = useState<ICity[]>([]);
+  const { cities, event: loadedEvent, isLoading, error: loadError, notFound } =
+    useAdminEventFormSource(eventId);
+
   const [formState, setFormState] = useState<IEventFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [notFound, setNotFound] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadData(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const [citiesResponse, eventResponse] = await Promise.all([
-          adminApiClient.listCities(),
-          eventId ? adminApiClient.getEventById(eventId) : Promise.resolve(null),
-        ]);
-
-        if (!isActive) {
-          return;
-        }
-
-        setCities(citiesResponse);
-
-        if (!eventId) {
-          const firstCity: ICity | undefined = citiesResponse[0];
-
-          if (firstCity) {
-            setFormState((currentState: IEventFormState) => ({
-              ...currentState,
-              cityId: firstCity.id,
-              citySlug: firstCity.slug,
-            }));
-          }
-
-          return;
-        }
-
-        if (!eventResponse) {
-          setNotFound(true);
-          return;
-        }
-
-        setFormState(mapEventToFormState(eventResponse));
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar os dados do formulário.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
+    if (eventId || isLoading || loadedEvent) {
+      return;
     }
 
-    void loadData();
+    const firstCity: ICity | undefined = cities[0];
 
-    return () => {
-      isActive = false;
-    };
-  }, [eventId]);
+    if (firstCity) {
+      setFormState((currentState: IEventFormState) => ({
+        ...currentState,
+        cityId: firstCity.id,
+        citySlug: firstCity.slug,
+      }));
+    }
+  }, [eventId, isLoading, loadedEvent, cities]);
+
+  useEffect(() => {
+    if (!loadedEvent || !eventId) {
+      return;
+    }
+
+    setFormState(mapEventToFormState(loadedEvent));
+  }, [loadedEvent, eventId]);
 
   const pageTitle: string = useMemo(() => {
     return isEditMode ? "Editar evento" : "Novo evento";
@@ -267,9 +235,11 @@ export function AdminEventFormPage(): ReactElement {
         {pageTitle}
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

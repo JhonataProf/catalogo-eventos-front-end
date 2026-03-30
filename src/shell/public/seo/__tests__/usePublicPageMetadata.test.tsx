@@ -15,6 +15,7 @@ function SeoConsumer(props: {
   title: string;
   description?: string;
   canonicalPath?: string;
+  noIndex?: boolean;
 }): null {
   usePublicPageMetadata(props);
   return null;
@@ -25,6 +26,7 @@ describe("usePublicPageMetadata", () => {
     document.title = "";
     document.querySelector('meta[name="description"]')?.remove();
     document.querySelector('link[rel="canonical"]')?.remove();
+    document.querySelector('meta[name="robots"]')?.remove();
     mockBaseUrl.mockReturnValue("");
   });
 
@@ -54,6 +56,16 @@ describe("usePublicPageMetadata", () => {
       expect(
         document.querySelector('link[rel="canonical"]')?.getAttribute("href"),
       ).toBe("https://portal.exemplo.com/eventos");
+    });
+  });
+
+  it("define meta robots noindex quando noIndex é true", async () => {
+    render(<SeoConsumer title="404" noIndex />);
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('meta[name="robots"]')?.getAttribute("content"),
+      ).toBe("noindex, nofollow");
     });
   });
 });

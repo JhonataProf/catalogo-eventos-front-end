@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Container } from "@/design-system/ui";
-import { publicApiClient } from "@/services/public-api/client";
 import { IHomeHighlight } from "@/entities/home-content/homeContent.types";
+import { usePublicHomeContent } from "@/domains/home-institucional/hooks/usePublicHomeContent";
 
 interface IHomeHighlightItem {
   id: number;
@@ -29,52 +29,38 @@ function getTagClassName(kind: IHomeHighlightItem["kind"]): string {
     : "bg-white/90 text-zinc-900";
 }
 
+function mapHighlightsToItems(
+  highlights: IHomeHighlight[],
+): IHomeHighlightItem[] {
+  return highlights.map((item: IHomeHighlight) => ({
+    id: item.id,
+    kind:
+      item.type === "event"
+        ? "evento"
+        : item.type === "tourist-point"
+          ? "ponto-turistico"
+          : "custom",
+    titulo: item.title,
+    descricao: item.description,
+    cidadeNome: item.cityName,
+    imageUrl: item.imageUrl,
+    href: item.ctaUrl || "/",
+  }));
+}
+
 export function HomeHeroCarousel(): ReactElement | null {
   const navigate = useNavigate();
+  const { content, isLoading } = usePublicHomeContent();
   const [index, setIndex] = useState<number>(0);
   const [items, setItems] = useState<IHomeHighlightItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadHighlights(): Promise<void> {
-      try {
-        setIsLoading(true);
-
-        const response = await publicApiClient.getHomeContent();
-
-        const nextItems: IHomeHighlightItem[] = response.highlights.map(
-          (item: IHomeHighlight) => ({
-            id: item.id,
-            kind:
-              item.type === "event"
-                ? "evento"
-                : item.type === "tourist-point"
-                  ? "ponto-turistico"
-                  : "custom",
-            titulo: item.title,
-            descricao: item.description,
-            cidadeNome: item.cityName,
-            imageUrl: item.imageUrl,
-            href: item.ctaUrl || "/",
-          }),
-        );
-
-        setItems(nextItems);
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
+    if (!content) {
+      return;
     }
 
-    void loadHighlights();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
+    setItems(mapHighlightsToItems(content.highlights));
+  }, [content]);
 
   useEffect(() => {
     if (items.length <= 1) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ICity } from "@/entities/city/city.types";
+import { getOrCreateSessionPromise } from "@/domains/public-portal/cache/sessionFetchCache";
 import { publicApiClient } from "@/services/public-api/client";
 
 interface IUsePublicCitiesResult {
@@ -7,6 +8,8 @@ interface IUsePublicCitiesResult {
   isLoading: boolean;
   error: string;
 }
+
+const CACHE_KEY = "public:published-cities";
 
 export function usePublicCities(): IUsePublicCitiesResult {
   const [cities, setCities] = useState<ICity[]>([]);
@@ -21,8 +24,10 @@ export function usePublicCities(): IUsePublicCitiesResult {
         setIsLoading(true);
         setError("");
 
-        const response: ICity[] = await publicApiClient.listPublishedCities();
-        setCities(response);
+        const response: ICity[] = await getOrCreateSessionPromise(
+          CACHE_KEY,
+          () => publicApiClient.listPublishedCities(),
+        );
 
         if (!isActive) {
           return;

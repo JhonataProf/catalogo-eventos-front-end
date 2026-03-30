@@ -4,6 +4,7 @@ type PublicApiModule = typeof import("../client");
 
 async function loadPublicApiClient(): Promise<PublicApiModule["publicApiClient"]> {
   vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
+  vi.stubEnv("VITE_USE_API_MOCKS", "");
   vi.resetModules();
   const module: PublicApiModule = await import("../client");
   return module.publicApiClient;

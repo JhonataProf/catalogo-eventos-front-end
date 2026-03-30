@@ -1,48 +1,13 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { IEvent } from "@/entities/event/event.types";
+import { useAdminEventsList } from "@/domains/admin-cms/events/hooks/useAdminEventsList";
 import { adminApiClient } from "@/services/admin-api/client";
 
 export function AdminEventsListPage(): ReactElement {
-  const [items, setItems] = useState<IEvent[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { items, setItems, isLoading, error: loadError } = useAdminEventsList();
   const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadEvents(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: IEvent[] = await adminApiClient.listEvents();
-
-        if (!isActive) {
-          return;
-        }
-
-        setItems(response);
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar os eventos.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadEvents();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   async function handleDelete(id: number): Promise<void> {
     try {
@@ -74,9 +39,11 @@ export function AdminEventsListPage(): ReactElement {
         </Link>
       </div>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

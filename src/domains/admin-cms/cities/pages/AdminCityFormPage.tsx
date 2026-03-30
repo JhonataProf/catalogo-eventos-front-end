@@ -13,6 +13,7 @@ import type {
   ICreateCityInput,
   IUpdateCityInput,
 } from "@/entities/city/city.types";
+import { useAdminCityById } from "@/domains/admin-cms/cities/hooks/useAdminCityById";
 import { adminApiClient } from "@/services/admin-api/client";
 
 interface ICityFormRouteParams {
@@ -65,62 +66,34 @@ function slugifyCityName(value: string): string {
 export function AdminCityFormPage(): ReactElement {
   const navigate = useNavigate();
   const params = useParams<keyof ICityFormRouteParams>();
-  const cityId: number | undefined = Number(params.id);
+  const rawCityId = Number(params.id);
+  const cityId: number | undefined =
+    Number.isFinite(rawCityId) && rawCityId > 0 ? rawCityId : undefined;
 
   const isEditMode: boolean = Boolean(cityId);
+
+  const {
+    city,
+    isLoading: cityLoading,
+    error: loadError,
+    notFound,
+  } = useAdminCityById(cityId);
 
   const [formState, setFormState] = useState<ICityFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(isEditMode);
+  const isLoading: boolean = isEditMode ? cityLoading : false;
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [notFound, setNotFound] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadCity(): Promise<void> {
-      if (!cityId) {
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: ICity | null = await adminApiClient.getCityById(cityId);
-
-        if (!isActive) {
-          return;
-        }
-
-        if (!response) {
-          setNotFound(true);
-          return;
-        }
-
-        setFormState(mapCityToFormState(response));
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar a cidade.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
+    if (!city) {
+      return;
     }
 
-    void loadCity();
-
-    return () => {
-      isActive = false;
-    };
-  }, [cityId]);
+    setFormState(mapCityToFormState(city));
+  }, [city]);
 
   const pageTitle: string = useMemo(() => {
     return isEditMode ? "Editar cidade" : "Nova cidade";
@@ -230,9 +203,11 @@ export function AdminCityFormPage(): ReactElement {
         {pageTitle}
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

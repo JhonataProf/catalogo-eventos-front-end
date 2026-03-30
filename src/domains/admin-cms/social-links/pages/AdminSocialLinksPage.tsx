@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -13,6 +12,7 @@ import type {
   ISocialLinkBase,
   SocialPlatform,
 } from "@/entities/social-link/socialLink.types";
+import { useAdminSocialLinksList } from "@/domains/admin-cms/social-links/hooks/useAdminSocialLinksList";
 import { adminApiClient } from "@/services/admin-api/client";
 
 type ISocialLinkFormState = ISocialLinkBase;
@@ -39,49 +39,14 @@ const PLATFORM_OPTIONS: Array<{
 ];
 
 export function AdminSocialLinksPage(): ReactElement {
-  const [items, setItems] = useState<ISocialLink[]>([]);
+  const { items, setItems, isLoading, error: loadError } =
+    useAdminSocialLinksList();
   const [formState, setFormState] = useState<ISocialLinkFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadSocialLinks(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: ISocialLink[] = await adminApiClient.listSocialLinks();
-
-        if (!isActive) {
-          return;
-        }
-
-        setItems(response);
-      } catch {
-        if (!isActive) {
-          return;
-        }
-
-        setError("Não foi possível carregar as mídias sociais.");
-      } finally {
-        if (isActive) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadSocialLinks();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   const nextOrder: number = useMemo(() => {
     if (items.length === 0) {
@@ -199,9 +164,11 @@ export function AdminSocialLinksPage(): ReactElement {
         Mídias sociais
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

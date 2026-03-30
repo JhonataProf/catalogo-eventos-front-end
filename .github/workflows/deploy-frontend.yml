@@ -3,29 +3,31 @@
 # Autenticação AWS (escolha um modelo):
 #
 # A) Recomendado — OIDC (sem chaves de longa duração no GitHub)
-#    - Crie um IAM Role na conta AWS com trust policy para GitHub OIDC
-#      (token.actions.githubusercontent.com) restrita ao repositório/ref.
-#    - Permissões: s3:PutObject, s3:DeleteObject, s3:ListBucket no bucket;
-#      cloudfront:CreateInvalidation na distribuição.
-#    - Secret: AWS_ROLE_ARN = arn:aws:iam::ACCOUNT:role/ROLE_NAME
+#    - IAM Role com trust policy para GitHub OIDC (token.actions.githubusercontent.com).
+#    - Permissões: s3 no bucket alvo + cloudfront:CreateInvalidation na distribuição.
+#    - Secret: AWS_ROLE_ARN
+#    - Módulo Terraform: infra/terraform/modules/github_oidc_frontend_deploy (ex.: dev/github_oidc.tf.example)
 #
 # B) Legado — chaves de acesso (evitar em produção)
-#    - Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 #    - Repository variable: AWS_AUTH_METHOD = access-key
-#      (em if: não se pode usar secrets; OIDC é o default quando a variável não existe ou != access-key)
+#    - Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 #
-# Demais secrets:
-#   S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
-#   VITE_PUBLIC_BFF_BASE_URL (HTTPS, ex. .../api) — obrigatório para CRM real em produção
-#   VITE_PUBLIC_SITE_URL (HTTPS, sem barra final) — robots/sitemap + canonical no bundle
+# Variáveis de repositório (mitigação de deploy no bucket errado / go-live):
+#   DEPLOY_S3_BUCKET_PREFIX — se definida, o secret S3_BUCKET deve começar com esse prefixo.
+#   REQUIRE_VITE_PUBLIC_SITE_URL — "true" exige secret VITE_PUBLIC_SITE_URL (HTTPS) no build.
+#   DEPLOY_GITHUB_ENVIRONMENT — nome do Environment GitHub (opcional); padrão: frontend-deploy
 #
-# Opcional: VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID (Google Tag Manager)
-# Opcional: variable AWS_REGION (default us-east-1).
+# Demais secrets: S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID, VITE_PUBLIC_BFF_BASE_URL,
+# VITE_PUBLIC_SITE_URL (opcional), VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID.
 
 name: Deploy frontend (S3 + CloudFront)
 
 on:
   workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend-${{ github.repository }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -34,9 +36,84 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ vars.DEPLOY_GITHUB_ENVIRONMENT || 'frontend-deploy' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate deploy secrets (bucket, HTTPS, SEO opcional)
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          CF_DIST_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AUTH_METHOD: ${{ vars.AWS_AUTH_METHOD }}
+          BFF_URL: ${{ secrets.VITE_PUBLIC_BFF_BASE_URL }}
+          ADMIN_BFF: ${{ secrets.VITE_ADMIN_BFF_BASE_URL }}
+          SITE_URL: ${{ secrets.VITE_PUBLIC_SITE_URL }}
+          BUCKET_PREFIX: ${{ vars.DEPLOY_S3_BUCKET_PREFIX }}
+          REQUIRE_SITE_URL: ${{ vars.REQUIRE_VITE_PUBLIC_SITE_URL }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+
+          if [[ -z "${CF_DIST_ID// }" ]]; then
+            fail "Secret CLOUDFRONT_DISTRIBUTION_ID vazio."
+          fi
+          if [[ ! "$CF_DIST_ID" =~ ^E[A-Z0-9]+$ ]] || (( ${#CF_DIST_ID} < 10 || ${#CF_DIST_ID} > 32 )); then
+            fail "CLOUDFRONT_DISTRIBUTION_ID com formato inválido (ID CloudFront, ex.: E1234567890ABC)."
+          fi
+
+          if [[ "$AUTH_METHOD" != "access-key" ]]; then
+            if [[ -z "${ROLE_ARN// }" ]]; then
+              fail "Secret AWS_ROLE_ARN vazio (necessário para OIDC; ou defina AWS_AUTH_METHOD=access-key para legado)."
+            fi
+            if [[ ! "$ROLE_ARN" =~ ^arn:aws:iam::[0-9]{12}:role/ ]] || [[ "$ROLE_ARN" =~ [[:space:]] ]]; then
+              fail "AWS_ROLE_ARN não parece um ARN de role IAM válido (arn:aws:iam::CONTA:role/...)."
+            fi
+          fi
+
+          if [[ -z "${S3_BUCKET// }" ]]; then
+            fail "Secret S3_BUCKET vazio."
+          fi
+          if [[ "$S3_BUCKET" == *' '* ]]; then
+            fail "S3_BUCKET não pode conter espaços."
+          fi
+          if [[ "$S3_BUCKET" == *'/'* || "$S3_BUCKET" == s3:* || "$S3_BUCKET" == *:* ]]; then
+            fail "S3_BUCKET deve ser só o nome do bucket (sem s3://, sem barras, sem : )."
+          fi
+          len=${#S3_BUCKET}
+          if (( len < 3 || len > 63 )); then
+            fail "S3_BUCKET deve ter entre 3 e 63 caracteres."
+          fi
+          if [[ "$S3_BUCKET" =~ [A-Z] ]]; then
+            fail "S3_BUCKET não deve conter letras maiúsculas."
+          fi
+          if [[ ! "$S3_BUCKET" =~ ^[a-z0-9][a-z0-9.-]*[a-z0-9]$ ]] && [[ ! "$S3_BUCKET" =~ ^[a-z0-9]{3,63}$ ]]; then
+            fail "S3_BUCKET com formato inválido (use minúsculas, números, ponto e hífen; regras S3)."
+          fi
+          if [[ -n "${BUCKET_PREFIX:-}" && "$S3_BUCKET" != "$BUCKET_PREFIX"* ]]; then
+            fail "S3_BUCKET deve começar com o prefixo DEPLOY_S3_BUCKET_PREFIX ($BUCKET_PREFIX)."
+          fi
+
+          check_https() {
+            local n="$1"
+            local u="$2"
+            [[ -z "$u" ]] && return 0
+            if [[ "$u" != https://* ]]; then
+              fail "$n deve ser HTTPS (começar com https://) quando definido."
+            fi
+          }
+          check_https "VITE_PUBLIC_BFF_BASE_URL" "$BFF_URL"
+          check_https "VITE_ADMIN_BFF_BASE_URL" "$ADMIN_BFF"
+
+          if [[ -n "$SITE_URL" && "$SITE_URL" != https://* ]]; then
+            fail "VITE_PUBLIC_SITE_URL deve ser HTTPS (https://...) quando definido."
+          fi
+          if [[ "$REQUIRE_SITE_URL" == "true" || "$REQUIRE_SITE_URL" == "True" ]]; then
+            if [[ -z "${SITE_URL:-}" ]]; then
+              fail "REQUIRE_VITE_PUBLIC_SITE_URL está ativo mas VITE_PUBLIC_SITE_URL está vazio."
+            fi
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4

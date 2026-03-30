@@ -36,7 +36,15 @@ import axios, {
   type InternalAxiosRequestConfig,
   isAxiosError,
 } from "axios";
+import { toApiError } from "@/services/api/apiError";
 import { unwrapCollection, unwrapResource } from "@/services/api/httpEnvelope";
+import { mapCityFromApi } from "@/services/api/mappers/cityFromApi";
+import { mapEventFromApi } from "@/services/api/mappers/eventFromApi";
+import { mapHomeBannerFromApi } from "@/services/api/mappers/homeBannerFromApi";
+import { mapHomeHighlightFromApi } from "@/services/api/mappers/homeHighlightFromApi";
+import { mapInstitutionalFromApi } from "@/services/api/mappers/institutionalFromApi";
+import { mapSocialLinkFromApi } from "@/services/api/mappers/socialLinkFromApi";
+import { mapTouristPointFromApi } from "@/services/api/mappers/touristPointFromApi";
 import { loadAdminSession, updateAdminAccessToken } from "@/domains/admin-cms/auth/auth.storage";
 import { refreshAccessToken } from "./adminAuth.api";
 import { notifyAdminAuthExpired } from "./adminAuthEvents";
@@ -44,148 +52,6 @@ import { webImagePayloadFromImageUrlField } from "./adminWebImage";
 
 function trimBaseUrl(baseURL: string): string {
   return baseURL.replace(/\/+$/, "");
-}
-
-function toIso(value: unknown, fallback: string): string {
-  if (value === null || value === undefined) {
-    return fallback;
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  return String(value);
-}
-
-function mapCity(raw: Record<string, unknown>): ICity {
-  return {
-    id: Number(raw.id),
-    name: String(raw.name ?? ""),
-    state: String(raw.state ?? ""),
-    slug: String(raw.slug ?? ""),
-    summary: String(raw.summary ?? ""),
-    description:
-      raw.description !== undefined ? String(raw.description) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    published: Boolean(raw.published),
-    createdAt: toIso(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIso(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapEvent(raw: Record<string, unknown>): IEvent {
-  return {
-    id: Number(raw.id),
-    cityId: Number(raw.cityId),
-    citySlug: String(raw.citySlug ?? ""),
-    name: String(raw.name ?? ""),
-    description: String(raw.description ?? ""),
-    category: raw.category !== undefined ? String(raw.category) : undefined,
-    startDate:
-      raw.startDate !== undefined ? toIso(raw.startDate, "") : undefined,
-    endDate: raw.endDate !== undefined ? toIso(raw.endDate, "") : undefined,
-    formattedDate:
-      raw.formattedDate !== undefined ? String(raw.formattedDate) : undefined,
-    location: raw.location !== undefined ? String(raw.location) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    featured: Boolean(raw.featured),
-    published: Boolean(raw.published),
-    createdAt: toIso(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIso(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapTouristPoint(raw: Record<string, unknown>): ITouristPoint {
-  return {
-    id: Number(raw.id),
-    cityId: Number(raw.cityId),
-    citySlug: String(raw.citySlug ?? ""),
-    name: String(raw.name ?? ""),
-    description: String(raw.description ?? ""),
-    category: raw.category !== undefined ? String(raw.category) : undefined,
-    address: raw.address !== undefined ? String(raw.address) : undefined,
-    openingHours:
-      raw.openingHours !== undefined ? String(raw.openingHours) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    featured: Boolean(raw.featured),
-    published: Boolean(raw.published),
-    createdAt: toIso(raw.createdAt, new Date(0).toISOString()),
-    updatedAt: toIso(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapSocialLink(raw: Record<string, unknown>): ISocialLink {
-  return {
-    id: Number(raw.id),
-    platform: raw.platform as ISocialLink["platform"],
-    label: String(raw.label ?? ""),
-    url: String(raw.url ?? ""),
-    active: Boolean(raw.active),
-    order: Number(raw.order ?? 0),
-  };
-}
-
-function parseInstitutionalValues(valuesJson: unknown): string[] {
-  if (typeof valuesJson !== "string" || !valuesJson.trim()) {
-    return [];
-  }
-  try {
-    const parsed: unknown = JSON.parse(valuesJson);
-    if (Array.isArray(parsed)) {
-      return parsed.map((v) => String(v));
-    }
-  } catch {
-    /* ignore */
-  }
-  return [];
-}
-
-function mapInstitutional(raw: Record<string, unknown>): IInstitutionalContent {
-  return {
-    id: Number(raw.id),
-    aboutTitle: String(raw.aboutTitle ?? ""),
-    aboutText: String(raw.aboutText ?? ""),
-    whoWeAreTitle: String(raw.whoWeAreTitle ?? ""),
-    whoWeAreText: String(raw.whoWeAreText ?? ""),
-    purposeTitle: String(raw.purposeTitle ?? ""),
-    purposeText: String(raw.purposeText ?? ""),
-    mission: String(raw.mission ?? ""),
-    vision: String(raw.vision ?? ""),
-    values: parseInstitutionalValues(raw.valuesJson),
-    updatedAt: toIso(raw.updatedAt, new Date(0).toISOString()),
-  };
-}
-
-function mapBanner(raw: Record<string, unknown>): IHomeBanner {
-  return {
-    id: Number(raw.id),
-    title: String(raw.title ?? ""),
-    subtitle: raw.subtitle !== undefined ? String(raw.subtitle) : undefined,
-    imageUrl: String(raw.imageUrl ?? ""),
-    ctaLabel: raw.ctaLabel !== undefined ? String(raw.ctaLabel) : undefined,
-    ctaUrl: raw.ctaUrl !== undefined ? String(raw.ctaUrl) : undefined,
-    active: Boolean(raw.active),
-    order: Number(raw.order ?? 0),
-  };
-}
-
-function mapHighlight(raw: Record<string, unknown>): IHomeHighlight {
-  const ref = raw.referenceId;
-  return {
-    id: Number(raw.id),
-    type: raw.type as IHomeHighlight["type"],
-    referenceId:
-      ref !== undefined && ref !== null ? String(ref) : undefined,
-    title: String(raw.title ?? ""),
-    description: String(raw.description ?? ""),
-    cityName: raw.cityName !== undefined ? String(raw.cityName) : undefined,
-    imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
-    ctaUrl: raw.ctaUrl !== undefined ? String(raw.ctaUrl) : undefined,
-    active: Boolean(raw.active),
-    order: Number(raw.order ?? 0),
-  };
 }
 
 function createAdminAxios(baseURL: string): AxiosInstance {
@@ -264,7 +130,7 @@ async function pickInstitutional(
     const tb = new Date(String(b.updatedAt ?? 0)).getTime();
     return tb - ta;
   });
-  return mapInstitutional(sorted[0] as Record<string, unknown>);
+  return mapInstitutionalFromApi(sorted[0] as Record<string, unknown>);
 }
 
 export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
@@ -312,20 +178,20 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         body,
       );
       const raw = unwrapResource<Record<string, unknown>>(data);
-      return mapInstitutional(raw);
+      return mapInstitutionalFromApi(raw);
     },
 
     async listSocialLinks(): Promise<ISocialLink[]> {
       const { data } = await http.get<unknown>("/admin/social-links");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapSocialLink(row as Record<string, unknown>));
+      return items.map((row) => mapSocialLinkFromApi(row as Record<string, unknown>));
     },
 
     async createSocialLink(
       input: ICreateSocialLinkInput,
     ): Promise<ISocialLink> {
       const { data } = await http.post<unknown>("/admin/social-links", input);
-      return mapSocialLink(
+      return mapSocialLinkFromApi(
         unwrapResource<Record<string, unknown>>(data),
       );
     },
@@ -338,7 +204,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/social-links/${id}`,
         rest,
       );
-      return mapSocialLink(
+      return mapSocialLinkFromApi(
         unwrapResource<Record<string, unknown>>(data),
       );
     },
@@ -350,18 +216,18 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listCities(): Promise<ICity[]> {
       const { data } = await http.get<unknown>("/admin/cities");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapCity(row as Record<string, unknown>));
+      return items.map((row) => mapCityFromApi(row as Record<string, unknown>));
     },
 
     async getCityById(id: number): Promise<ICity | null> {
       try {
         const { data } = await http.get<unknown>(`/admin/cities/${id}`);
-        return mapCity(unwrapResource<Record<string, unknown>>(data));
+        return mapCityFromApi(unwrapResource<Record<string, unknown>>(data));
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        throw error;
+        throw toApiError(error);
       }
     },
 
@@ -370,12 +236,12 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         const { data } = await http.get<unknown>(
           `/public/cities/${encodeURIComponent(slug)}`,
         );
-        return mapCity(unwrapResource<Record<string, unknown>>(data));
+        return mapCityFromApi(unwrapResource<Record<string, unknown>>(data));
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        throw error;
+        throw toApiError(error);
       }
     },
 
@@ -393,7 +259,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         published: input.published,
         image,
       });
-      return mapCity(unwrapResource<Record<string, unknown>>(data));
+      return mapCityFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async updateCity(input: IUpdateCityInput): Promise<ICity> {
@@ -427,7 +293,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/cities/${input.id}`,
         body,
       );
-      return mapCity(unwrapResource<Record<string, unknown>>(data));
+      return mapCityFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async deleteCity(id: number): Promise<void> {
@@ -439,18 +305,18 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         params: { page: 1, limit: 100, sortDir: "asc" },
       });
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapEvent(row as Record<string, unknown>));
+      return items.map((row) => mapEventFromApi(row as Record<string, unknown>));
     },
 
     async getEventById(id: number): Promise<IEvent | null> {
       try {
         const { data } = await http.get<unknown>(`/admin/events/${id}`);
-        return mapEvent(unwrapResource<Record<string, unknown>>(data));
+        return mapEventFromApi(unwrapResource<Record<string, unknown>>(data));
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        throw error;
+        throw toApiError(error);
       }
     },
 
@@ -473,7 +339,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         published: input.published,
         image,
       });
-      return mapEvent(unwrapResource<Record<string, unknown>>(data));
+      return mapEventFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async updateEvent(input: IUpdateEventInput): Promise<IEvent> {
@@ -487,7 +353,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         delete body.imageUrl;
       }
       const { data } = await http.patch<unknown>(`/admin/events/${id}`, body);
-      return mapEvent(unwrapResource<Record<string, unknown>>(data));
+      return mapEventFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async deleteEvent(id: number): Promise<void> {
@@ -502,7 +368,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         });
         const parsed = unwrapCollection<Record<string, unknown>>(data);
         const batch = parsed.items.map((row) =>
-          mapTouristPoint(row as Record<string, unknown>),
+          mapTouristPointFromApi(row as Record<string, unknown>),
         );
         all.push(...batch);
         if (page >= parsed.totalPages || batch.length === 0) {
@@ -515,14 +381,14 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async getTouristPointById(id: number): Promise<ITouristPoint | null> {
       try {
         const { data } = await http.get<unknown>(`/admin/tourist-points/${id}`);
-        return mapTouristPoint(
+        return mapTouristPointFromApi(
           unwrapResource<Record<string, unknown>>(data),
         );
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        throw error;
+        throw toApiError(error);
       }
     },
 
@@ -545,7 +411,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         published: input.published,
         image,
       });
-      return mapTouristPoint(
+      return mapTouristPointFromApi(
         unwrapResource<Record<string, unknown>>(data),
       );
     },
@@ -566,7 +432,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/tourist-points/${id}`,
         body,
       );
-      return mapTouristPoint(
+      return mapTouristPointFromApi(
         unwrapResource<Record<string, unknown>>(data),
       );
     },
@@ -578,7 +444,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listHomeBanners(): Promise<IHomeBanner[]> {
       const { data } = await http.get<unknown>("/admin/home-banners");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapBanner(row as Record<string, unknown>));
+      return items.map((row) => mapHomeBannerFromApi(row as Record<string, unknown>));
     },
 
     async createHomeBanner(
@@ -601,7 +467,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         active: input.active,
         order: input.order,
       });
-      return mapBanner(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeBannerFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async updateHomeBanner(
@@ -620,7 +486,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/home-banners/${id}`,
         body,
       );
-      return mapBanner(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeBannerFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async deleteHomeBanner(id: number): Promise<void> {
@@ -630,7 +496,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listHomeHighlights(): Promise<IHomeHighlight[]> {
       const { data } = await http.get<unknown>("/admin/home-highlights");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapHighlight(row as Record<string, unknown>));
+      return items.map((row) => mapHomeHighlightFromApi(row as Record<string, unknown>));
     },
 
     async createHomeHighlight(
@@ -655,7 +521,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         active: input.active,
         order: input.order,
       });
-      return mapHighlight(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeHighlightFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async updateHomeHighlight(
@@ -677,7 +543,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/home-highlights/${id}`,
         body,
       );
-      return mapHighlight(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeHighlightFromApi(unwrapResource<Record<string, unknown>>(data));
     },
 
     async deleteHomeHighlight(id: number): Promise<void> {

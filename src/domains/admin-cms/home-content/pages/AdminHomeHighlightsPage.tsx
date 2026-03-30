@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -13,6 +12,7 @@ import type {
   IHomeHighlight,
   IHomeHighlightBase,
 } from "@/entities/home-content/homeContent.types";
+import { useAdminHomeHighlights } from "@/domains/admin-cms/home-content/hooks/useAdminHomeHighlights";
 import { adminApiClient } from "@/services/admin-api/client";
 
 type IHomeHighlightFormState = IHomeHighlightBase;
@@ -41,42 +41,14 @@ function buildInitialFormState(): IHomeHighlightFormState {
 }
 
 export function AdminHomeHighlightsPage(): ReactElement {
-  const [items, setItems] = useState<IHomeHighlight[]>([]);
+  const { items, setItems, isLoading, error: loadError } =
+    useAdminHomeHighlights();
   const [formState, setFormState] = useState<IHomeHighlightFormState>(
     buildInitialFormState()
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-
-  useEffect(() => {
-    let isActive: boolean = true;
-
-    async function loadData(): Promise<void> {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        const response: IHomeHighlight[] =
-          await adminApiClient.listHomeHighlights();
-
-        if (!isActive) return;
-        setItems(response);
-      } catch {
-        if (!isActive) return;
-        setError("Não foi possível carregar os destaques.");
-      } finally {
-        if (isActive) setIsLoading(false);
-      }
-    }
-
-    void loadData();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   const nextOrder: number = useMemo(() => {
     if (items.length === 0) return 1;
@@ -168,9 +140,11 @@ export function AdminHomeHighlightsPage(): ReactElement {
         Destaques da Home
       </SectionHeader>
 
-      {error ? (
+      {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">{error}</p>
+          <p className="text-sm font-medium text-red-700">
+            {error || loadError}
+          </p>
         </Card>
       ) : null}
 

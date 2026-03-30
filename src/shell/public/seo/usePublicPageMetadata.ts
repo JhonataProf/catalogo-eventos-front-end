@@ -6,6 +6,8 @@ export interface IPublicPageMetadataOptions {
   description?: string;
   /** Path absoluto da app, ex. "/eventos" ou "/eventos/42" — gera canonical se houver site base. */
   canonicalPath?: string;
+  /** Evita indexação (ex.: 404 público); remove a meta ao desmontar. */
+  noIndex?: boolean;
 }
 
 const DEFAULT_DESCRIPTION =
@@ -35,12 +37,26 @@ function removeCanonical(): void {
   document.querySelector('link[rel="canonical"]')?.remove();
 }
 
+function upsertRobots(content: string): void {
+  let el = document.querySelector('meta[name="robots"]');
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", "robots");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function removeRobotsMeta(): void {
+  document.querySelector('meta[name="robots"]')?.remove();
+}
+
 /**
  * Atualiza title, meta description e (opcional) canonical para rotas públicas.
  * Restaura o título anterior ao desmontar; description volta ao default do index.
  */
 export function usePublicPageMetadata(options: IPublicPageMetadataOptions): void {
-  const { title, description, canonicalPath } = options;
+  const { title, description, canonicalPath, noIndex } = options;
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -61,10 +77,17 @@ export function usePublicPageMetadata(options: IPublicPageMetadataOptions): void
       removeCanonical();
     }
 
+    if (noIndex) {
+      upsertRobots("noindex, nofollow");
+    }
+
     return () => {
       document.title = previousTitle;
       upsertMetaDescription(previousDescription);
       removeCanonical();
+      if (noIndex) {
+        removeRobotsMeta();
+      }
     };
-  }, [title, description, canonicalPath]);
+  }, [title, description, canonicalPath, noIndex]);
 }

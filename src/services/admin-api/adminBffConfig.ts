@@ -1,3 +1,5 @@
+import { isApiMocksForced } from "@/services/api/apiClientMode";
+
 /**
  * Base URL da API admin (mesmo host que o BFF público na maioria dos deploys).
  * Prioridade: VITE_ADMIN_BFF_BASE_URL → VITE_PUBLIC_BFF_BASE_URL.
@@ -18,5 +20,10 @@ export function resolveAdminBffBaseUrl(): string {
 }
 
 export function isAdminHttpEnabled(): boolean {
-  return resolveAdminBffBaseUrl() !== "";
+  return resolveAdminUsesRealHttp();
+}
+
+/** HTTP real (login + cliente admin) só quando há URL e mocks não estão forçados. */
+export function resolveAdminUsesRealHttp(): boolean {
+  return resolveAdminBffBaseUrl() !== "" && !isApiMocksForced();
 }
