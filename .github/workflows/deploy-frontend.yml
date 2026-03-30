@@ -11,7 +11,8 @@
 #
 # B) Legado — chaves de acesso (evitar em produção)
 #    - Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-#    - Deixe AWS_ROLE_ARN vazio ou não defina.
+#    - Repository variable: AWS_AUTH_METHOD = access-key
+#      (em if: não se pode usar secrets; OIDC é o default quando a variável não existe ou != access-key)
 #
 # Demais secrets:
 #   S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
@@ -55,14 +56,14 @@ jobs:
         run: yarn build
 
       - name: Configure AWS credentials (OIDC)
-        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        if: ${{ vars.AWS_AUTH_METHOD != 'access-key' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Configure AWS credentials (access keys — legado)
-        if: ${{ secrets.AWS_ROLE_ARN == '' }}
+        if: ${{ vars.AWS_AUTH_METHOD == 'access-key' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
