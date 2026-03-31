@@ -52,4 +52,21 @@ describe("toApiError", () => {
     expect(out.message).toBe("falha local");
     expect(out.status).toBeUndefined();
   });
+
+  it("lê mensagem em error.message e correlationId em meta", () => {
+    const err = new AxiosError("bad");
+    err.response = {
+      status: 400,
+      data: {
+        error: { code: "X", message: "Credenciais inválidas" },
+        meta: { correlationId: "corr-123" },
+      },
+      headers: {},
+      statusText: "",
+      config: {} as InternalAxiosRequestConfig,
+    };
+    const out = toApiError(err);
+    expect(out.message).toBe("Credenciais inválidas");
+    expect(out.requestId).toBe("corr-123");
+  });
 });

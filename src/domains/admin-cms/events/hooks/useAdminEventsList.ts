@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { IEvent } from "@/entities/event/event.types";
-import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
+import { listAdminEvents } from "@/services/admin-api/adminEvents.api";
 
 export interface IUseAdminEventsListResult {
   items: IEvent[];
@@ -20,10 +21,10 @@ export function useAdminEventsList(): IUseAdminEventsListResult {
       setIsLoading(true);
       setError("");
 
-      const response: IEvent[] = await adminApiClient.listEvents();
+      const response: IEvent[] = await listAdminEvents();
       setItems(response);
-    } catch {
-      setError("Não foi possível carregar os eventos.");
+    } catch (caught) {
+      setError(toApiError(caught).message);
     } finally {
       setIsLoading(false);
     }

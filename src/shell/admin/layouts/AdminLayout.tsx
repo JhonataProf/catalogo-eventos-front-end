@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { Outlet } from "react-router-dom";
+import { AdminForbiddenBanner } from "@/shell/admin/components/AdminForbiddenBanner";
 import { AdminHeader } from "@/shell/admin/header/AdminHeader";
 import { AdminSidebar } from "@/shell/admin/sidebar/AdminSidebar";
 import { useAdminAreaSeo } from "@/shell/admin/hooks/useAdminAreaSeo";
@@ -9,6 +10,7 @@ export function AdminLayout(): ReactElement {
 
   return (
     <div className="min-h-screen bg-zinc-50">
+      <AdminForbiddenBanner />
       <AdminHeader />
 
       <div className="flex min-h-[calc(100vh-81px)] flex-col md:flex-row">

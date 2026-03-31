@@ -1,13 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fetchPontosCatalogo } from "../config/pontosCatalogConfig";
 
-vi.mock("@/services/public-api/client", () => ({
-  publicApiClient: {
-    listPublishedTouristPoints: vi.fn(),
-  },
+vi.mock("@/services/public-api/publicTouristPoints.api", () => ({
+  loadPublishedTouristPointsCatalog: vi.fn(),
 }));
 
-import { publicApiClient } from "@/services/public-api/client";
+import { loadPublishedTouristPointsCatalog } from "@/services/public-api/publicTouristPoints.api";
 
 describe("fetchPontosCatalogo", () => {
   beforeEach(() => {
@@ -15,7 +13,7 @@ describe("fetchPontosCatalogo", () => {
   });
 
   it("deve mapear pontos turísticos para itens de catálogo", async () => {
-    vi.mocked(publicApiClient.listPublishedTouristPoints).mockResolvedValue({
+    vi.mocked(loadPublishedTouristPointsCatalog).mockResolvedValue({
       items: [
         {
           id: 1,

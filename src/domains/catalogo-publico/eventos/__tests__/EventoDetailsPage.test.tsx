@@ -74,10 +74,26 @@ describe("EventoDetailsPage", () => {
   it("deve redirecionar para /eventos quando o evento não existir", async () => {
     vi.mocked(publicApiClient.getPublishedEventById).mockResolvedValue(null);
 
-    renderWithRoute("/eventos/evento-inexistente");
+    renderWithRoute("/eventos/999999");
 
     await waitFor(() => {
       expect(screen.getByText("Eventos fallback")).toBeInTheDocument();
     });
+  });
+
+  it("deve exibir estado de erro quando a API falhar", async () => {
+    vi.mocked(publicApiClient.getPublishedEventById).mockRejectedValue(
+      new Error("falha de rede")
+    );
+
+    renderWithRoute("/eventos/1");
+
+    expect(
+      await screen.findByText("Erro ao carregar o evento")
+    ).toBeInTheDocument();
+    expect(screen.getByText("falha de rede")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Voltar para eventos" })
+    ).toHaveAttribute("href", "/eventos");
   });
 });

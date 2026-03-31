@@ -15,7 +15,11 @@ import type {
   IUpdateEventInput,
 } from "@/entities/event/event.types";
 import { useAdminEventFormSource } from "@/domains/admin-cms/events/hooks/useAdminEventFormSource";
-import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
+import {
+  createAdminEvent,
+  updateAdminEvent,
+} from "@/services/admin-api/adminEvents.api";
 
 interface IEventFormRouteParams {
   id?: number;
@@ -174,7 +178,7 @@ export function AdminEventFormPage(): ReactElement {
           published: formState.published,
         };
 
-        await adminApiClient.updateEvent(input);
+        await updateAdminEvent(input);
         setSuccessMessage("Evento atualizado com sucesso.");
       } else {
         const input: ICreateEventInput = {
@@ -192,12 +196,12 @@ export function AdminEventFormPage(): ReactElement {
           published: formState.published,
         };
 
-        await adminApiClient.createEvent(input);
+        await createAdminEvent(input);
         navigate("/admin/eventos", { replace: true });
         return;
       }
-    } catch {
-      setError("Não foi possível salvar o evento.");
+    } catch (caught) {
+      setError(toApiError(caught).message);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,5 @@
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
-import { publicApiClient } from "@/services/public-api/client";
+import { loadPublishedTouristPointsCatalog } from "@/services/public-api/publicTouristPoints.api";
 import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
 
 function mapTouristPointToCatalogItem(
@@ -24,7 +24,7 @@ function mapTouristPointToCatalogItem(
 export async function fetchPontosCatalogo(
   query: ICatalogoQuery
 ): Promise<ICatalogoResult> {
-  const response = await publicApiClient.listPublishedTouristPoints({
+  const response = await loadPublishedTouristPointsCatalog({
     citySlug: query.cidade,
     search: query.busca,
     category: query.categoria,

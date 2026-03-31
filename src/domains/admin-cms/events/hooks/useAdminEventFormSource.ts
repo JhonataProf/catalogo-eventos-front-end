@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ICity } from "@/entities/city/city.types";
 import type { IEvent } from "@/entities/event/event.types";
+import { toApiError } from "@/services/api/apiError";
+import { getAdminEventById } from "@/services/admin-api/adminEvents.api";
 import { adminApiClient } from "@/services/admin-api/client";
 
 export interface IUseAdminEventFormSourceResult {
@@ -33,7 +35,7 @@ export function useAdminEventFormSource(
 
         const [citiesResponse, eventResponse] = await Promise.all([
           adminApiClient.listCities(),
-          eventId ? adminApiClient.getEventById(eventId) : Promise.resolve(null),
+          eventId ? getAdminEventById(eventId) : Promise.resolve(null),
         ]);
 
         if (!isActive) {
@@ -52,12 +54,12 @@ export function useAdminEventFormSource(
         }
 
         setEvent(eventResponse);
-      } catch {
+      } catch (caught) {
         if (!isActive) {
           return;
         }
 
-        setError("Não foi possível carregar os dados do formulário.");
+        setError(toApiError(caught).message);
       } finally {
         if (isActive) {
           setIsLoading(false);

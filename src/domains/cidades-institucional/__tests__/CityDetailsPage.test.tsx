@@ -15,6 +15,7 @@ function renderWithRoute(initialEntry: string) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
+        <Route path="/cidades" element={<div>Cidades índice</div>} />
         <Route path="/cidades/:slug" element={<CityDetailsPage />} />
         <Route path="/" element={<div>Home fallback</div>} />
       </Routes>
@@ -93,13 +94,29 @@ describe("CityDetailsPage", () => {
     ).toHaveAttribute("href", "/pontos-turisticos?cidade=dourados");
   });
 
-  it("deve redirecionar para home quando o slug for inválido", async () => {
+  it("deve redirecionar para a listagem quando a cidade não existir", async () => {
     vi.mocked(publicApiClient.getPublishedCityBySlug).mockResolvedValue(null);
 
     renderWithRoute("/cidades/cidade-inexistente");
 
     await waitFor(() => {
-      expect(screen.getByText("Home fallback")).toBeInTheDocument();
+      expect(screen.getByText("Cidades índice")).toBeInTheDocument();
     });
+  });
+
+  it("deve exibir estado de erro quando a API falhar", async () => {
+    vi.mocked(publicApiClient.getPublishedCityBySlug).mockRejectedValue(
+      new Error("timeout"),
+    );
+
+    renderWithRoute("/cidades/dourados");
+
+    expect(
+      await screen.findByText("Erro ao carregar a cidade"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("timeout")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Voltar para cidades" }),
+    ).toHaveAttribute("href", "/cidades");
   });
 });

@@ -127,7 +127,7 @@ describe("useCatalogoPublicoPaginado", () => {
       expect(result.current.isInitialLoading).toBe(false);
     });
 
-    expect(result.current.error).toBe("Não foi possível carregar os dados.");
+    expect(result.current.error).toBe("falha");
     expect(result.current.data.items).toHaveLength(0);
   });
 
@@ -212,7 +212,7 @@ describe("useCatalogoPublicoPaginado", () => {
       await result.current.loadMore();
     });
 
-    expect(result.current.error).toBe("Não foi possível carregar mais os dados.");
+    expect(result.current.error).toBe("falha no load more");
   });
 
   it("deve recarregar os dados com reload", async () => {

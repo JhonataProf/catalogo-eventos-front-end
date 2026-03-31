@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
-import { Card, Section, SectionHeader } from "@/design-system/ui";
+import { Button, Card, Section, SectionHeader } from "@/design-system/ui";
 import { usePublicCities } from "@/domains/public-portal/cities/hooks/usePublicCities";
+import { Link } from "react-router-dom";
 import { CityCard } from "./CityCard";
 
 export function CitiesGridSection(): ReactElement {
@@ -8,13 +9,23 @@ export function CitiesGridSection(): ReactElement {
 
   return (
     <Section spacing="xl">
-      <SectionHeader
-        kicker="Área de atuação"
-        tone="primary"
-        description="Cidades que compõem a região atendida pelo Celeiro do MS."
-      >
-        Cidades do Celeiro do MS
-      </SectionHeader>
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <SectionHeader
+          kicker="Área de atuação"
+          tone="primary"
+          description="Cidades que compõem a região atendida pelo Celeiro do MS."
+        >
+          Cidades do Celeiro do MS
+        </SectionHeader>
+
+        {!isLoading && !error ? (
+          <Link to="/cidades" className="shrink-0">
+            <Button variant="ghost" size="sm">
+              Ver todas as cidades
+            </Button>
+          </Link>
+        ) : null}
+      </div>
 
       {isLoading ? (
         <div className="mt-8">

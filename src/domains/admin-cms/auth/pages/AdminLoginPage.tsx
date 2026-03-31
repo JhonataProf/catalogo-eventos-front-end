@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent, type ReactElement } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card } from "@/design-system/ui";
+import { ApiError } from "@/services/api/apiError";
 import { resolveAdminBffBaseUrl } from "@/services/admin-api/adminBffConfig";
 import { useAuth } from "../useAuth";
 
@@ -37,10 +38,18 @@ export function AdminLoginPage(): ReactElement {
 
       navigate(locationState?.from ?? "/admin", { replace: true });
     } catch (submitError) {
-      const message: string =
+      let message: string =
         submitError instanceof Error
           ? submitError.message
           : "Não foi possível entrar.";
+
+      if (
+        import.meta.env.DEV &&
+        ApiError.isApiError(submitError) &&
+        submitError.requestId
+      ) {
+        message = `${message} · ${submitError.requestId}`;
+      }
 
       setError(message);
     } finally {

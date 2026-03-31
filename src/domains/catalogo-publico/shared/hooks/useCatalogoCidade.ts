@@ -1,4 +1,3 @@
-import { publicApiClient } from "@/services/public-api/client";
 import type { ICity } from "@/entities/city/city.types";
 import {
   useCallback,
@@ -8,6 +7,8 @@ import {
   type ChangeEvent,
 } from "react";
 import { useSearchParams } from "react-router-dom";
+import { toApiError } from "@/services/api/apiError";
+import { loadPublishedCitiesCatalog } from "@/services/public-api/publicCities.api";
 
 const DEFAULT_SLUG_FALLBACK = "dourados";
 
@@ -46,16 +47,16 @@ export function useCatalogoCidade(): IUseCatalogoCidadeResult {
       try {
         setIsLoadingCidades(true);
         setErrorCidades(null);
-        const response: ICity[] = await publicApiClient.listPublishedCities();
+        const response: ICity[] = await loadPublishedCitiesCatalog();
         if (!isActive) {
           return;
         }
         setCidades(response);
-      } catch {
+      } catch (caught) {
         if (!isActive) {
           return;
         }
-        setErrorCidades("Não foi possível carregar as cidades.");
+        setErrorCidades(toApiError(caught).message);
         setCidades([]);
       } finally {
         if (isActive) {

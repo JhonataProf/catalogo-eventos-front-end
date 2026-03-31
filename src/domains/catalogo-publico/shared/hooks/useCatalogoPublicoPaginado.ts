@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toApiError } from "@/services/api/apiError";
 import type {
   ICatalogoPaginatedState,
   ICatalogoQuery,
@@ -99,8 +100,8 @@ export function useCatalogoPublicoPaginado({
       setIsInitialLoading(true);
       setError(null);
       await executeFetch(initialPage, false);
-    } catch {
-      setError("Não foi possível carregar os dados.");
+    } catch (caught) {
+      setError(toApiError(caught).message);
       setData(buildInitialState(safeLimit));
     } finally {
       setIsInitialLoading(false);
@@ -116,8 +117,8 @@ export function useCatalogoPublicoPaginado({
       setIsLoadingMore(true);
       setError(null);
       await executeFetch(data.page + 1, true);
-    } catch {
-      setError("Não foi possível carregar mais os dados.");
+    } catch (caught) {
+      setError(toApiError(caught).message);
     } finally {
       setIsLoadingMore(false);
     }
@@ -163,12 +164,12 @@ export function useCatalogoPublicoPaginado({
           limit: response.limit,
           hasMore: response.items.length < response.total,
         });
-      } catch {
+      } catch (caught) {
         if (!isActive) {
           return;
         }
 
-        setError("Não foi possível carregar os dados.");
+        setError(toApiError(caught).message);
         setData(buildInitialState(safeLimit));
       } finally {
         if (isActive) {

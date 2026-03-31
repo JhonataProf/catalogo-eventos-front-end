@@ -45,9 +45,12 @@ import { mapHomeHighlightFromApi } from "@/services/api/mappers/homeHighlightFro
 import { mapInstitutionalFromApi } from "@/services/api/mappers/institutionalFromApi";
 import { mapSocialLinkFromApi } from "@/services/api/mappers/socialLinkFromApi";
 import { mapTouristPointFromApi } from "@/services/api/mappers/touristPointFromApi";
-import { loadAdminSession, updateAdminAccessToken } from "@/domains/admin-cms/auth/auth.storage";
-import { refreshAccessToken } from "./adminAuth.api";
-import { notifyAdminAuthExpired } from "./adminAuthEvents";
+import {
+  assertAdminHttpSessionBridgeRegistered,
+  readAdminHttpSession,
+} from "./adminHttpSessionBridge";
+import { refreshAdminAccessTokenSingleFlight } from "./adminAccessTokenRefreshCoordinator";
+import { notifyAdminAuthForbidden } from "./adminAuthEvents";
 import { webImagePayloadFromImageUrlField } from "./adminWebImage";
 
 function trimBaseUrl(baseURL: string): string {
@@ -62,7 +65,7 @@ function createAdminAxios(baseURL: string): AxiosInstance {
   });
 
   http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const session = loadAdminSession();
+    const session = readAdminHttpSession();
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
     }
@@ -73,6 +76,11 @@ function createAdminAxios(baseURL: string): AxiosInstance {
     (response) => response,
     async (error: unknown) => {
       if (!isAxiosError(error) || !error.config) {
+        return Promise.reject(error);
+      }
+
+      if (error.response?.status === 403) {
+        notifyAdminAuthForbidden();
         return Promise.reject(error);
       }
 
@@ -93,22 +101,12 @@ function createAdminAxios(baseURL: string): AxiosInstance {
       }
 
       original._retry = true;
-      const session = loadAdminSession();
-      if (!session?.refreshToken) {
-        notifyAdminAuthExpired();
-        return Promise.reject(error);
-      }
 
       try {
-        const nextAccess = await refreshAccessToken(
-          trimBaseUrl(baseURL),
-          session.refreshToken,
-        );
-        updateAdminAccessToken(nextAccess);
+        const nextAccess = await refreshAdminAccessTokenSingleFlight(baseURL);
         original.headers.Authorization = `Bearer ${nextAccess}`;
         return http.request(original);
       } catch {
-        notifyAdminAuthExpired();
         return Promise.reject(error);
       }
     },
@@ -134,6 +132,7 @@ async function pickInstitutional(
 }
 
 export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
+  assertAdminHttpSessionBridgeRegistered();
   const http = createAdminAxios(baseURL);
 
   return {

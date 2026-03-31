@@ -15,6 +15,8 @@ interface ImportMetaEnv {
   readonly VITE_PUBLIC_SITE_URL?: string;
   /** Google Tag Manager container ID (ex.: GTM-XXXX). Opcional; só injeta script no build. */
   readonly VITE_PUBLIC_GTM_ID?: string;
+  /** Sentry browser DSN (opcional). Com valor, `initPublicSentry` envia erros públicos capturados. */
+  readonly VITE_PUBLIC_SENTRY_DSN?: string;
   /**
    * `"true"` força clientes público e admin in-memory e login mock em dev,
    * mesmo com URL do BFF definida. Produção: use `false` com URL HTTPS.

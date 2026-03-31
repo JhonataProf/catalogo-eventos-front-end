@@ -6,6 +6,7 @@ import {
   SectionHeader,
 } from "@/design-system/ui";
 import { usePublishedEventById } from "@/domains/catalogo-publico/eventos/hooks/usePublishedEventById";
+import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import { type ReactElement } from "react";
@@ -21,7 +22,7 @@ export function EventoDetailsPage(): ReactElement {
   const id: number | undefined =
     Number.isFinite(rawId) && rawId > 0 ? rawId : undefined;
 
-  const { event, isLoading, notFound } = usePublishedEventById(id);
+  const { event, isLoading, notFound, error } = usePublishedEventById(id);
 
   const canonicalEventPath =
     Number.isFinite(id) && id !== undefined && id > 0
@@ -31,18 +32,16 @@ export function EventoDetailsPage(): ReactElement {
   usePublicPageMetadata({
     title: event
       ? `${event.name} | Eventos | Celeiro do MS`
-      : isLoading
-        ? "Carregando evento… | Celeiro do MS"
-        : "Evento | Celeiro do MS",
+      : error
+        ? "Erro ao carregar evento | Celeiro do MS"
+        : isLoading
+          ? "Carregando evento… | Celeiro do MS"
+          : "Evento | Celeiro do MS",
     description: event
       ? truncateMetaDescription(event.description)
       : undefined,
     canonicalPath: canonicalEventPath,
   });
-
-  if (notFound) {
-    return <Navigate to="/eventos" replace />;
-  }
 
   if (isLoading) {
     return (
@@ -50,6 +49,29 @@ export function EventoDetailsPage(): ReactElement {
         <p className="text-sm text-zinc-600">Carregando evento...</p>
       </Section>
     );
+  }
+
+  if (error) {
+    return (
+      <Section spacing="xl">
+        <EmptyState
+          title="Erro ao carregar o evento"
+          description={error}
+        />
+        <div className="mt-6">
+          <Link
+            to="/eventos"
+            className="text-sm font-medium text-[var(--color-secondary)] underline-offset-4 hover:underline"
+          >
+            Voltar para eventos
+          </Link>
+        </div>
+      </Section>
+    );
+  }
+
+  if (notFound) {
+    return <Navigate to="/eventos" replace />;
   }
 
   if (!event) {
