@@ -1,7 +1,10 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** URL base do BFF público (ex.: https://api.exemplo.com/api). Vazio = cliente in-memory. */
+  /**
+   * Raiz do BFF (ex.: https://api.exemplo.com/api), sem `/public` ou `/admin` no final.
+   * Vazio = cliente in-memory.
+   */
   readonly VITE_PUBLIC_BFF_BASE_URL?: string;
   /**
    * URL base só para rotas admin (sobrepõe o público quando definida).
