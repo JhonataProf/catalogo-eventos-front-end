@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ICity } from "@/entities/city/city.types";
 import { getOrCreateSessionPromise } from "@/domains/public-portal/cache/sessionFetchCache";
-import { publicApiClient } from "@/services/public-api/client";
+import { toApiError } from "@/services/api/apiError";
+import { loadPublishedCitiesCatalog } from "@/services/public-api/publicCities.api";
 
 interface IUsePublicCitiesResult {
   cities: ICity[];
@@ -26,7 +27,7 @@ export function usePublicCities(): IUsePublicCitiesResult {
 
         const response: ICity[] = await getOrCreateSessionPromise(
           CACHE_KEY,
-          () => publicApiClient.listPublishedCities(),
+          () => loadPublishedCitiesCatalog(),
         );
 
         if (!isActive) {
@@ -34,12 +35,12 @@ export function usePublicCities(): IUsePublicCitiesResult {
         }
 
         setCities(response.filter((item: ICity) => item.published));
-      } catch {
+      } catch (caught) {
         if (!isActive) {
           return;
         }
 
-        setError("Não foi possível carregar as cidades.");
+        setError(toApiError(caught).message);
       } finally {
         if (isActive) {
           setIsLoading(false);

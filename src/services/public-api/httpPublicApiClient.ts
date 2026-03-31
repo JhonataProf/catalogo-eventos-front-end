@@ -14,6 +14,7 @@ import { mapEventFromApi } from "@/services/api/mappers/eventFromApi";
 import { mapInstitutionalFromApi } from "@/services/api/mappers/institutionalFromApi";
 import { mapSocialLinkFromApi } from "@/services/api/mappers/socialLinkFromApi";
 import { mapTouristPointFromApi } from "@/services/api/mappers/touristPointFromApi";
+import { toApiError } from "@/services/api/apiError";
 import { mapPublicHomeContentFromResource } from "@/services/public-api/mappers/mapPublicHomeContent";
 import {
   buildEventQuery,
@@ -67,7 +68,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        return null;
+        throw toApiError(error);
       }
     },
 
@@ -111,7 +112,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        return null;
+        throw toApiError(error);
       }
     },
 
@@ -176,7 +177,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
         if (isAxiosError(error) && error.response?.status === 404) {
           return null;
         }
-        return null;
+        throw toApiError(error);
       }
     },
 
@@ -275,13 +276,25 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
 
       const events = (
         await Promise.all(
-          [...eventIds].map((id) => client.getPublishedEventById(id)),
+          [...eventIds].map(async (id) => {
+            try {
+              return await client.getPublishedEventById(id);
+            } catch {
+              return null;
+            }
+          }),
         )
       ).filter((e): e is IEvent => e !== null);
 
       const touristPoints = (
         await Promise.all(
-          [...touristIds].map((id) => client.getPublishedTouristPointById(id)),
+          [...touristIds].map(async (id) => {
+            try {
+              return await client.getPublishedTouristPointById(id);
+            } catch {
+              return null;
+            }
+          }),
         )
       ).filter((p): p is ITouristPoint => p !== null);
 

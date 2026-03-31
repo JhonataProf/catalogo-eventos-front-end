@@ -59,6 +59,15 @@ export function TopNav(): ReactElement {
           </NavLink>
 
           <NavLink
+            to="/cidades"
+            className={({ isActive }: { isActive: boolean }) =>
+              `${linkBase} ${isActive ? linkActive : linkIdle}`
+            }
+          >
+            Cidades
+          </NavLink>
+
+          <NavLink
             to="/sobre"
             className={({ isActive }: { isActive: boolean }) =>
               `${linkBase} ${isActive ? linkActive : linkIdle}`

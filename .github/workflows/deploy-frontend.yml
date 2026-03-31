@@ -17,8 +17,9 @@
 #   REQUIRE_VITE_PUBLIC_SITE_URL — "true" exige secret VITE_PUBLIC_SITE_URL (HTTPS) no build.
 #   DEPLOY_GITHUB_ENVIRONMENT — nome do Environment GitHub (opcional); padrão: frontend-deploy
 #
-# Demais secrets: S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID, VITE_PUBLIC_BFF_BASE_URL,
-# VITE_PUBLIC_SITE_URL (opcional), VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID.
+# Obrigatório no build de produção: VITE_PUBLIC_BFF_BASE_URL (HTTPS).
+# Opcionais: VITE_PUBLIC_SITE_URL, VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID, VITE_PUBLIC_SENTRY_DSN.
+# S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID, AWS_ROLE_ARN (ou access keys).
 
 name: Deploy frontend (S3 + CloudFront)
 
@@ -95,6 +96,13 @@ jobs:
             fail "S3_BUCKET deve começar com o prefixo DEPLOY_S3_BUCKET_PREFIX ($BUCKET_PREFIX)."
           fi
 
+          if [[ -z "${BFF_URL// }" ]]; then
+            fail "Secret VITE_PUBLIC_BFF_BASE_URL é obrigatório para deploy de produção (URL HTTPS do BFF)."
+          fi
+          if [[ "$BFF_URL" != https://* ]]; then
+            fail "VITE_PUBLIC_BFF_BASE_URL deve ser HTTPS (https://...)."
+          fi
+
           check_https() {
             local n="$1"
             local u="$2"
@@ -103,7 +111,6 @@ jobs:
               fail "$n deve ser HTTPS (começar com https://) quando definido."
             fi
           }
-          check_https "VITE_PUBLIC_BFF_BASE_URL" "$BFF_URL"
           check_https "VITE_ADMIN_BFF_BASE_URL" "$ADMIN_BFF"
 
           if [[ -n "$SITE_URL" && "$SITE_URL" != https://* ]]; then
@@ -126,10 +133,12 @@ jobs:
 
       - name: Build
         env:
+          VITE_USE_API_MOCKS: "false"
           VITE_PUBLIC_BFF_BASE_URL: ${{ secrets.VITE_PUBLIC_BFF_BASE_URL }}
           VITE_ADMIN_BFF_BASE_URL: ${{ secrets.VITE_ADMIN_BFF_BASE_URL }}
           VITE_PUBLIC_SITE_URL: ${{ secrets.VITE_PUBLIC_SITE_URL }}
           VITE_PUBLIC_GTM_ID: ${{ secrets.VITE_PUBLIC_GTM_ID }}
+          VITE_PUBLIC_SENTRY_DSN: ${{ secrets.VITE_PUBLIC_SENTRY_DSN }}
         run: yarn build
 
       - name: Configure AWS credentials (OIDC)

@@ -1,19 +1,11 @@
 import axios from "axios";
 import { unwrapResource } from "@/services/api/httpEnvelope";
+import { toApiError } from "@/services/api/apiError";
 import type { IAdminAuthSession } from "@/domains/admin-cms/auth/auth.types";
-
-type LoginPayload = {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-  };
-};
-
-const ADMIN_ROLE = "Admin";
+import {
+  mapLoginDataToSession,
+  mapRefreshDataToAccessToken,
+} from "./mapAdminAuthFromApi";
 
 export async function loginWithPassword(
   baseURL: string,
@@ -26,24 +18,16 @@ export async function loginWithPassword(
     timeout: 30_000,
   });
 
-  const { data } = await http.post<unknown>("/auth/login", { email, password });
-  const payload = unwrapResource<LoginPayload>(data);
-
-  if (payload.user.role !== ADMIN_ROLE) {
-    throw new Error("Acesso negado: perfil não é administrador.");
+  try {
+    const { data } = await http.post<unknown>("/auth/login", {
+      email,
+      password,
+    });
+    const inner = unwrapResource<unknown>(data);
+    return mapLoginDataToSession(inner);
+  } catch (error: unknown) {
+    throw toApiError(error, "Falha no login. Verifique credenciais e tente novamente.");
   }
-
-  return {
-    accessToken: payload.accessToken,
-    refreshToken: payload.refreshToken,
-    user: {
-      id: payload.user.id,
-      name: payload.user.name,
-      email: payload.user.email,
-      role: ADMIN_ROLE,
-      token: payload.accessToken,
-    },
-  };
 }
 
 export async function refreshAccessToken(
@@ -55,9 +39,13 @@ export async function refreshAccessToken(
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     timeout: 30_000,
   });
-  const { data } = await http.post<unknown>("/auth/refresh-token", {
-    refreshToken,
-  });
-  const payload = unwrapResource<{ accessToken: string }>(data);
-  return payload.accessToken;
+  try {
+    const { data } = await http.post<unknown>("/auth/refresh-token", {
+      refreshToken,
+    });
+    const inner = unwrapResource<unknown>(data);
+    return mapRefreshDataToAccessToken(inner);
+  } catch (error: unknown) {
+    throw toApiError(error, "Não foi possível renovar a sessão.");
+  }
 }

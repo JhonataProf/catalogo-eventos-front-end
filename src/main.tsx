@@ -1,8 +1,12 @@
+import "@/domains/admin-cms/auth/installAdminHttpSessionBridge";
 import App from "@/app/App";
 import "@/index.css";
 import { reportPublicError } from "@/observability/publicErrorReporting";
+import { initPublicSentry } from "@/observability/sentryPublic";
 import React from "react";
 import ReactDOM from "react-dom/client";
+
+initPublicSentry();
 
 if (import.meta.env.PROD) {
   window.addEventListener("unhandledrejection", (event) => {

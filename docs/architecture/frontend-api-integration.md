@@ -12,6 +12,21 @@
 - Para testar contra o BFF real: em `.env.local` use `VITE_USE_API_MOCKS=false` e a URL HTTPS do BFF.
 - **Produção:** definir `VITE_USE_API_MOCKS=false` (ou omitir) e injetar a URL do BFF no build; nunca publicar com mocks forçados.
 
+## Base URL (`VITE_PUBLIC_BFF_BASE_URL`)
+
+- Deve apontar para o **prefixo da API** (ex.: `https://host/api` ou, só em dev local, `http://host/api`).
+- O cliente público concatena `/public/...`; o admin concatena `/admin/...`; login e refresh usam `/auth/login` e `/auth/refresh-token` na mesma base.
+- Exemplo dev (ALB): `http://celeiro-api-dev-alb-….elb.amazonaws.com/api` — **produção** exige HTTPS no deploy (validação no workflow).
+
+## Autenticação admin (contrato `data`)
+
+- **POST** `{baseURL}/auth/login` — corpo `{ email, password }`.
+- Resposta no envelope padrão: `data` com **`token`** (ou `accessToken`) + **`refreshToken`** + **`user`** (`id`, `name`, `email`, `role`).
+- O front normaliza para `IAdminAuthSession` (`accessToken` interno + Bearer) em `mapAdminAuthFromApi.ts`.
+- Perfis aceites como admin: `admin`, `administrator`, `administrador` (case-insensitive).
+- **POST** `{baseURL}/auth/refresh-token` — corpo `{ refreshToken }`; `data` deve trazer **`token`** ou **`accessToken`**.
+- Erros no formato `{ error: { message }, meta: { correlationId } }` são mapeados para `ApiError` (mensagem + `requestId` quando existir `correlationId`).
+
 ## Exceções (importar de `services` ou nativo com critério)
 
 - **Auth / sessão admin**: tokens e persistência em `src/domains/admin-cms/auth/*` permanecem no domínio; o refresh e login usam `adminAuth.api` na camada `services`.

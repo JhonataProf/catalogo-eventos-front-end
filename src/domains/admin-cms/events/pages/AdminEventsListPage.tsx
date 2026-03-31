@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { IEvent } from "@/entities/event/event.types";
 import { useAdminEventsList } from "@/domains/admin-cms/events/hooks/useAdminEventsList";
-import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
+import { deleteAdminEvent } from "@/services/admin-api/adminEvents.api";
 
 export function AdminEventsListPage(): ReactElement {
   const { items, setItems, isLoading, error: loadError } = useAdminEventsList();
@@ -13,13 +14,13 @@ export function AdminEventsListPage(): ReactElement {
     try {
       setError("");
 
-      await adminApiClient.deleteEvent(id);
+      await deleteAdminEvent(id);
 
       setItems((currentItems: IEvent[]) =>
         currentItems.filter((item: IEvent) => item.id !== id)
       );
-    } catch {
-      setError("Não foi possível remover o evento.");
+    } catch (caught) {
+      setError(toApiError(caught).message);
     }
   }
 

@@ -6,6 +6,7 @@ import {
   SectionHeader,
 } from "@/design-system/ui";
 import { usePublishedTouristPointById } from "@/domains/catalogo-publico/pontos/hooks/usePublishedTouristPointById";
+import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import { type ReactElement } from "react";
@@ -21,7 +22,8 @@ export function PontoTuristicoDetailsPage(): ReactElement {
   const id: number | undefined =
     Number.isFinite(rawId) && rawId > 0 ? rawId : undefined;
 
-  const { touristPoint, isLoading, notFound } = usePublishedTouristPointById(id);
+  const { touristPoint, isLoading, notFound, error } =
+    usePublishedTouristPointById(id);
 
   const canonicalPontoPath =
     Number.isFinite(id) && id !== undefined && id > 0
@@ -31,18 +33,16 @@ export function PontoTuristicoDetailsPage(): ReactElement {
   usePublicPageMetadata({
     title: touristPoint
       ? `${touristPoint.name} | Pontos turísticos | Celeiro do MS`
-      : isLoading
-        ? "Carregando… | Celeiro do MS"
-        : "Ponto turístico | Celeiro do MS",
+      : error
+        ? "Erro ao carregar ponto turístico | Celeiro do MS"
+        : isLoading
+          ? "Carregando… | Celeiro do MS"
+          : "Ponto turístico | Celeiro do MS",
     description: touristPoint
       ? truncateMetaDescription(touristPoint.description)
       : undefined,
     canonicalPath: canonicalPontoPath,
   });
-
-  if (notFound) {
-    return <Navigate to="/pontos-turisticos" replace />;
-  }
 
   if (isLoading) {
     return (
@@ -50,6 +50,29 @@ export function PontoTuristicoDetailsPage(): ReactElement {
         <p className="text-sm text-zinc-600">Carregando ponto turístico...</p>
       </Section>
     );
+  }
+
+  if (error) {
+    return (
+      <Section spacing="xl">
+        <EmptyState
+          title="Erro ao carregar o ponto turístico"
+          description={error}
+        />
+        <div className="mt-6">
+          <Link
+            to="/pontos-turisticos"
+            className="text-sm font-medium text-[var(--color-secondary)] underline-offset-4 hover:underline"
+          >
+            Voltar para pontos turísticos
+          </Link>
+        </div>
+      </Section>
+    );
+  }
+
+  if (notFound) {
+    return <Navigate to="/pontos-turisticos" replace />;
   }
 
   if (!touristPoint) {

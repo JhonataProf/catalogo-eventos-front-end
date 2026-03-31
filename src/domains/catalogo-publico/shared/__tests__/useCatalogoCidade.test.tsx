@@ -4,13 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ICity } from "@/entities/city/city.types";
 import { useCatalogoCidade } from "../hooks/useCatalogoCidade";
 
-vi.mock("@/services/public-api/client", () => ({
-  publicApiClient: {
-    listPublishedCities: vi.fn(),
-  },
+vi.mock("@/services/public-api/publicCities.api", () => ({
+  loadPublishedCitiesCatalog: vi.fn(),
 }));
 
-import { publicApiClient } from "@/services/public-api/client";
+import { loadPublishedCitiesCatalog } from "@/services/public-api/publicCities.api";
 
 const citiesFixture: ICity[] = [
   {
@@ -55,9 +53,7 @@ function createWrapper(initialEntry: string = "/eventos") {
 
 describe("useCatalogoCidade", () => {
   beforeEach(() => {
-    vi.mocked(publicApiClient.listPublishedCities).mockResolvedValue(
-      citiesFixture,
-    );
+    vi.mocked(loadPublishedCitiesCatalog).mockResolvedValue(citiesFixture);
   });
 
   it("deve usar dourados como fallback quando não houver cidade na url", async () => {

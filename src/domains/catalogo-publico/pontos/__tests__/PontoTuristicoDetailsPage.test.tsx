@@ -88,4 +88,20 @@ describe("PontoTuristicoDetailsPage", () => {
       expect(screen.getByText("Pontos fallback")).toBeInTheDocument();
     });
   });
+
+  it("deve exibir estado de erro quando a API falhar", async () => {
+    vi.mocked(publicApiClient.getPublishedTouristPointById).mockRejectedValue(
+      new Error("timeout")
+    );
+
+    renderWithRoute("/pontos-turisticos/1");
+
+    expect(
+      await screen.findByText("Erro ao carregar o ponto turístico")
+    ).toBeInTheDocument();
+    expect(screen.getByText("timeout")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Voltar para pontos turísticos" })
+    ).toHaveAttribute("href", "/pontos-turisticos");
+  });
 });

@@ -1,3 +1,5 @@
+import { ApiError } from "@/services/api/apiError";
+import { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockGet, mockCreate } = vi.hoisted(() => {
@@ -126,6 +128,22 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
     ).resolves.toBeNull();
   });
 
+  it("getPublishedCityBySlug propaga falha que não é 404", async () => {
+    const axiosErr = new AxiosError("falha");
+    axiosErr.response = {
+      status: 503,
+      data: {},
+      statusText: "",
+      headers: {},
+      config: {} as InternalAxiosRequestConfig,
+    };
+    mockGet.mockRejectedValueOnce(axiosErr);
+    const client = createHttpPublicApiClient("https://x/api");
+    await expect(client.getPublishedCityBySlug("x")).rejects.toSatisfy(
+      (e: unknown) => ApiError.isApiError(e) && e.status === 503,
+    );
+  });
+
   it("listPublishedEvents envia cityId e resolve citySlug via GET cidade", async () => {
     const client = createHttpPublicApiClient("https://x/api");
 
@@ -235,6 +253,63 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
       response: { status: 404 },
     });
     await expect(client.getPublishedEventById(999)).resolves.toBeNull();
+  });
+
+  it("getPublishedEventById propaga falha que não é 404", async () => {
+    const axiosErr = new AxiosError("falha");
+    axiosErr.response = {
+      status: 500,
+      data: {},
+      statusText: "",
+      headers: {},
+      config: {} as InternalAxiosRequestConfig,
+    };
+    mockGet.mockRejectedValueOnce(axiosErr);
+    const client = createHttpPublicApiClient("https://x/api");
+    await expect(client.getPublishedEventById(1)).rejects.toSatisfy(
+      (e: unknown) => ApiError.isApiError(e) && e.status === 500,
+    );
+  });
+
+  it("getPublishedTouristPointById retorna null para não publicado e 404", async () => {
+    const client = createHttpPublicApiClient("https://x/api");
+
+    mockGet.mockResolvedValueOnce({
+      data: resourceBody({
+        id: 1,
+        cityId: 1,
+        citySlug: "a",
+        name: "P",
+        description: "",
+        published: false,
+        featured: false,
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
+      }),
+    });
+    await expect(client.getPublishedTouristPointById(1)).resolves.toBeNull();
+
+    mockGet.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { status: 404 },
+    });
+    await expect(client.getPublishedTouristPointById(999)).resolves.toBeNull();
+  });
+
+  it("getPublishedTouristPointById propaga falha que não é 404", async () => {
+    const axiosErr = new AxiosError("falha");
+    axiosErr.response = {
+      status: 502,
+      data: {},
+      statusText: "",
+      headers: {},
+      config: {} as InternalAxiosRequestConfig,
+    };
+    mockGet.mockRejectedValueOnce(axiosErr);
+    const client = createHttpPublicApiClient("https://x/api");
+    await expect(client.getPublishedTouristPointById(1)).rejects.toSatisfy(
+      (e: unknown) => ApiError.isApiError(e) && e.status === 502,
+    );
   });
 
   it("listPublishedEventByCityId agrega páginas até totalPages", async () => {
@@ -588,5 +663,62 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
     expect(mockGet).toHaveBeenCalledWith("/public/home-content");
     expect(mockGet).toHaveBeenCalledWith("/public/events/50");
     expect(mockGet).toHaveBeenCalledWith("/public/tourist-points/60");
+  });
+
+  it("getHomeHighlights ignora destaque cujo GET por id falha e mantém os demais", async () => {
+    mockGet.mockResolvedValueOnce({
+      data: resourceBody({
+        banners: [],
+        highlights: [
+          {
+            id: 1,
+            type: "event",
+            referenceId: 50,
+            title: "E",
+            description: "",
+            active: true,
+            order: 1,
+          },
+          {
+            id: 2,
+            type: "tourist-point",
+            referenceId: 60,
+            title: "T",
+            description: "",
+            active: true,
+            order: 2,
+          },
+        ],
+      }),
+    });
+    const axiosErr = new AxiosError("down");
+    axiosErr.response = {
+      status: 503,
+      data: {},
+      statusText: "",
+      headers: {},
+      config: {} as InternalAxiosRequestConfig,
+    };
+    mockGet.mockRejectedValueOnce(axiosErr);
+    mockGet.mockResolvedValueOnce({
+      data: resourceBody({
+        id: 60,
+        cityId: 1,
+        citySlug: "a",
+        name: "Tp",
+        description: "",
+        category: "parque",
+        published: true,
+        featured: false,
+        createdAt: "2024-01-01T00:00:00.000Z",
+        updatedAt: "2024-01-01T00:00:00.000Z",
+      }),
+    });
+
+    const client = createHttpPublicApiClient("https://x/api");
+    const hi = await client.getHomeHighlights();
+    expect(hi.events).toHaveLength(0);
+    expect(hi.touristPoints).toHaveLength(1);
+    expect(hi.touristPoints[0]?.id).toBe(60);
   });
 });

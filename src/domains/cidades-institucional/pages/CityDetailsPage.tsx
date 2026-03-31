@@ -8,6 +8,7 @@ import {
   SectionHeader,
 } from "@/design-system/ui";
 import { usePublishedCityBySlug } from "@/domains/cidades-institucional/hooks/usePublishedCityBySlug";
+import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 
@@ -19,25 +20,24 @@ export function CityDetailsPage(): ReactElement {
   const params = useParams<keyof ICityRouteParams>();
   const slug: string | undefined = params.slug;
 
-  const { city: cidade, isLoading, notFound } = usePublishedCityBySlug(slug);
+  const { city: cidade, isLoading, notFound, error } =
+    usePublishedCityBySlug(slug);
 
-  const canonicalCidadePath = slug ? `/cidades/${slug}` : "/";
+  const canonicalCidadePath = slug ? `/cidades/${slug}` : "/cidades";
 
   usePublicPageMetadata({
     title: cidade
       ? `${cidade.name} | Cidades | Celeiro do MS`
-      : isLoading
-        ? "Carregando cidade… | Celeiro do MS"
-        : "Cidade | Celeiro do MS",
+      : error
+        ? "Erro ao carregar cidade | Celeiro do MS"
+        : isLoading
+          ? "Carregando cidade… | Celeiro do MS"
+          : "Cidade | Celeiro do MS",
     description: cidade
       ? truncateMetaDescription(cidade.summary || cidade.description || cidade.name)
       : undefined,
     canonicalPath: canonicalCidadePath,
   });
-
-  if (notFound) {
-    return <Navigate to="/" replace />;
-  }
 
   if (isLoading) {
     return (
@@ -47,8 +47,31 @@ export function CityDetailsPage(): ReactElement {
     );
   }
 
+  if (error) {
+    return (
+      <Section spacing="xl">
+        <EmptyState
+          title="Erro ao carregar a cidade"
+          description={error}
+        />
+        <div className="mt-6">
+          <Link
+            to="/cidades"
+            className="text-sm font-medium text-[var(--color-secondary)] underline-offset-4 hover:underline"
+          >
+            Voltar para cidades
+          </Link>
+        </div>
+      </Section>
+    );
+  }
+
+  if (notFound) {
+    return <Navigate to="/cidades" replace />;
+  }
+
   if (!cidade) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/cidades" replace />;
   }
 
   return (
