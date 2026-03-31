@@ -53,7 +53,7 @@ export function AuthProvider({
 
   const login = useCallback(async (email: string, password: string) => {
     if (resolveAdminUsesRealHttp()) {
-      const baseURL = resolveAdminBffBaseUrl();
+      const baseURL = resolveAdminBffBaseUrl().replace(/admin\/$/, "");
       const next = await loginWithPassword(baseURL, email, password);
       setSession(next);
       saveAdminSession(next);
