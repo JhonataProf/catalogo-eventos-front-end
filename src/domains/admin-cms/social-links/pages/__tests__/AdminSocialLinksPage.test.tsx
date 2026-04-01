@@ -109,9 +109,7 @@ describe("AdminSocialLinksPage", () => {
       screen.getByRole("button", { name: /salvar mídia social/i }),
     );
 
-    expect(
-      await screen.findByText("Não foi possível salvar a mídia social."),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("erro")).toBeInTheDocument();
   });
 
   it("deve alternar status do item", async () => {
@@ -164,11 +162,7 @@ describe("AdminSocialLinksPage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Desativar" }));
 
-    expect(
-      await screen.findByText(
-        "Não foi possível atualizar o status da mídia social.",
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("erro")).toBeInTheDocument();
   });
 
   it("deve excluir item com sucesso", async () => {
@@ -218,9 +212,7 @@ describe("AdminSocialLinksPage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Excluir" }));
 
-    expect(
-      await screen.findByText("Não foi possível remover a mídia social."),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("erro")).toBeInTheDocument();
   });
 
   it("deve exibir erro quando falhar o carregamento inicial", async () => {

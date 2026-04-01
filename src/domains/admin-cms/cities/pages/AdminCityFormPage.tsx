@@ -13,8 +13,10 @@ import type {
   ICreateCityInput,
   IUpdateCityInput,
 } from "@/entities/city/city.types";
+import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
 import { useAdminCityById } from "@/domains/admin-cms/cities/hooks/useAdminCityById";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 interface ICityFormRouteParams {
   id?: number;
@@ -164,8 +166,8 @@ export function AdminCityFormPage(): ReactElement {
         navigate("/admin/cidades", { replace: true });
         return;
       }
-    } catch {
-      setError("Não foi possível salvar a cidade.");
+    } catch (caught) {
+      setError(toApiError(caught, "Não foi possível salvar a cidade.").message);
     } finally {
       setIsSubmitting(false);
     }
@@ -301,18 +303,18 @@ export function AdminCityFormPage(): ReactElement {
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="imageUrl" className="text-sm font-medium text-zinc-700">
-              URL da imagem
-            </label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              value={formState.imageUrl}
-              onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
-          </div>
+          <AdminImageUrlField
+            id="imageUrl"
+            label="Imagem da cidade"
+            value={formState.imageUrl}
+            disabled={isSubmitting}
+            onChange={(next) => {
+              setFormState((s) => ({ ...s, imageUrl: next }));
+              if (successMessage) {
+                setSuccessMessage("");
+              }
+            }}
+          />
         </Card>
 
         <div className="flex justify-end gap-3">

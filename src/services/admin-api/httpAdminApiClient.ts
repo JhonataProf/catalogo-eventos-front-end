@@ -51,7 +51,7 @@ import {
 } from "./adminHttpSessionBridge";
 import { refreshAdminAccessTokenSingleFlight } from "./adminAccessTokenRefreshCoordinator";
 import { notifyAdminAuthForbidden } from "./adminAuthEvents";
-import { webImagePayloadFromImageUrlField } from "./adminWebImage";
+import { resolveWebImagePayloadFromImageUrlField } from "./adminWebImage";
 
 function trimBaseUrl(baseURL: string): string {
   return baseURL.replace(/\/+$/, "");
@@ -245,7 +245,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     },
 
     async createCity(input: ICreateCityInput): Promise<ICity> {
-      const image = webImagePayloadFromImageUrlField(
+      const image = await resolveWebImagePayloadFromImageUrlField(
         input.imageUrl,
         "Imagem da cidade",
       );
@@ -282,7 +282,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         body.published = input.published;
       }
       if (input.imageUrl !== undefined && input.imageUrl.trim() !== "") {
-        body.image = webImagePayloadFromImageUrlField(
+        body.image = await resolveWebImagePayloadFromImageUrlField(
           input.imageUrl,
           "Imagem da cidade",
         );
@@ -320,7 +320,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     },
 
     async createEvent(input: ICreateEventInput): Promise<IEvent> {
-      const image = webImagePayloadFromImageUrlField(
+      const image = await resolveWebImagePayloadFromImageUrlField(
         input.imageUrl,
         "Imagem do evento",
       );
@@ -345,7 +345,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       const { id, ...rest } = input;
       const body: Record<string, unknown> = { ...rest };
       if (rest.imageUrl !== undefined && rest.imageUrl.trim() !== "") {
-        body.image = webImagePayloadFromImageUrlField(
+        body.image = await resolveWebImagePayloadFromImageUrlField(
           rest.imageUrl,
           "Imagem do evento",
         );
@@ -394,7 +394,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async createTouristPoint(
       input: ICreateTouristPointInput,
     ): Promise<ITouristPoint> {
-      const image = webImagePayloadFromImageUrlField(
+      const image = await resolveWebImagePayloadFromImageUrlField(
         input.imageUrl,
         "Imagem do ponto turístico",
       );
@@ -421,7 +421,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       const { id, ...rest } = input;
       const body: Record<string, unknown> = { ...rest };
       if (rest.imageUrl !== undefined && rest.imageUrl.trim() !== "") {
-        body.image = webImagePayloadFromImageUrlField(
+        body.image = await resolveWebImagePayloadFromImageUrlField(
           rest.imageUrl,
           "Imagem do ponto turístico",
         );
@@ -449,7 +449,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async createHomeBanner(
       input: ICreateHomeBannerInput,
     ): Promise<IHomeBanner> {
-      const image = webImagePayloadFromImageUrlField(
+      const image = await resolveWebImagePayloadFromImageUrlField(
         input.imageUrl,
         "Imagem do banner",
       );
@@ -475,7 +475,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       const { id, ...rest } = input;
       const body: Record<string, unknown> = { ...rest };
       if (rest.imageUrl !== undefined && rest.imageUrl.trim() !== "") {
-        body.image = webImagePayloadFromImageUrlField(
+        body.image = await resolveWebImagePayloadFromImageUrlField(
           rest.imageUrl,
           "Imagem do banner",
         );
@@ -501,14 +501,14 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async createHomeHighlight(
       input: ICreateHomeHighlightInput,
     ): Promise<IHomeHighlight> {
-      const image = webImagePayloadFromImageUrlField(
-        input.imageUrl,
-        "Imagem do destaque",
-      );
       const ref = input.referenceId !== undefined ? Number(input.referenceId) : NaN;
       if (!Number.isFinite(ref)) {
         throw new Error("referenceId numérico é obrigatório para criar destaque.");
       }
+      const image = await resolveWebImagePayloadFromImageUrlField(
+        input.imageUrl,
+        "Imagem do destaque",
+      );
       const { data } = await http.post<unknown>("/admin/home-highlights", {
         type: input.type,
         referenceId: ref,
@@ -532,7 +532,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         body.referenceId = Number(rest.referenceId);
       }
       if (rest.imageUrl !== undefined && rest.imageUrl.trim() !== "") {
-        body.image = webImagePayloadFromImageUrlField(
+        body.image = await resolveWebImagePayloadFromImageUrlField(
           rest.imageUrl,
           "Imagem do destaque",
         );

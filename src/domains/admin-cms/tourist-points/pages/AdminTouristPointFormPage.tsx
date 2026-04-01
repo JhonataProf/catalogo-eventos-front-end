@@ -14,8 +14,10 @@ import type {
   ITouristPoint,
   IUpdateTouristPointInput,
 } from "@/entities/tourist-point/touristPoint.types";
+import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
 import { useAdminTouristPointFormSource } from "@/domains/admin-cms/tourist-points/hooks/useAdminTouristPointFormSource";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 interface ITouristPointFormRouteParams {
   id?: number;
@@ -195,8 +197,10 @@ export function AdminTouristPointFormPage(): ReactElement {
         navigate("/admin/pontos-turisticos", { replace: true });
         return;
       }
-    } catch {
-      setError("Não foi possível salvar o ponto turístico.");
+    } catch (caught) {
+      setError(
+        toApiError(caught, "Não foi possível salvar o ponto turístico.").message,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -337,18 +341,18 @@ export function AdminTouristPointFormPage(): ReactElement {
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="imageUrl" className="text-sm font-medium text-zinc-700">
-              URL da imagem
-            </label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              value={formState.imageUrl}
-              onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
-          </div>
+          <AdminImageUrlField
+            id="imageUrl"
+            label="Imagem do ponto turístico"
+            value={formState.imageUrl}
+            disabled={isSubmitting}
+            onChange={(next) => {
+              setFormState((s) => ({ ...s, imageUrl: next }));
+              if (successMessage) {
+                setSuccessMessage("");
+              }
+            }}
+          />
 
           <div className="flex items-center gap-3">
             <input
