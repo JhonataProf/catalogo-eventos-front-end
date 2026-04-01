@@ -12,6 +12,7 @@ import type {
   IHomeHighlight,
   IHomeHighlightBase,
 } from "@/entities/home-content/homeContent.types";
+import { AdminHighlightReferencePick } from "@/domains/admin-cms/components/AdminHighlightReferencePick";
 import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
 import { useAdminHomeHighlights } from "@/domains/admin-cms/home-content/hooks/useAdminHomeHighlights";
 import { adminApiClient } from "@/services/admin-api/client";
@@ -30,7 +31,7 @@ const HIGHLIGHT_TYPE_OPTIONS: Array<{
 
 function buildInitialFormState(): IHomeHighlightFormState {
   return {
-    type: "custom",
+    type: "event",
     referenceId: "",
     title: "",
     description: "",
@@ -62,15 +63,22 @@ export function AdminHomeHighlightsPage(): ReactElement {
   ): void {
     const { name, value, type } = event.target;
 
-    setFormState((currentState: IHomeHighlightFormState) => ({
-      ...currentState,
-      [name]:
+    setFormState((currentState: IHomeHighlightFormState) => {
+      const raw: string | number | boolean =
         type === "checkbox"
           ? (event.target as HTMLInputElement).checked
           : name === "order"
             ? Number(value)
-            : value,
-    }));
+            : value;
+      const nextState: IHomeHighlightFormState = {
+        ...currentState,
+        [name]: raw,
+      };
+      if (name === "type") {
+        nextState.referenceId = "";
+      }
+      return nextState;
+    });
   }
 
   async function handleSubmit(
@@ -82,6 +90,22 @@ export function AdminHomeHighlightsPage(): ReactElement {
       setIsSubmitting(true);
       setError("");
       setSuccessMessage("");
+
+      if (formState.type === "custom") {
+        setError(
+          'O tipo "Customizado" ainda não está disponível. Escolha Evento ou Ponto turístico.',
+        );
+        return;
+      }
+
+      const refTrim = formState.referenceId?.trim() ?? "";
+      if (
+        (formState.type === "event" || formState.type === "tourist-point") &&
+        (refTrim === "" || !Number.isFinite(Number(refTrim)))
+      ) {
+        setError("Selecione um evento ou ponto turístico na lista de resultados.");
+        return;
+      }
 
       const input: ICreateHomeHighlightInput = {
         type: formState.type,
@@ -114,6 +138,13 @@ export function AdminHomeHighlightsPage(): ReactElement {
       setError(toApiError(caught, "Não foi possível salvar o destaque.").message);
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  function handleReferenceIdChange(next: string): void {
+    setFormState((s) => ({ ...s, referenceId: next }));
+    if (successMessage) {
+      setSuccessMessage("");
     }
   }
 
@@ -174,25 +205,24 @@ export function AdminHomeHighlightsPage(): ReactElement {
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
             >
               {HIGHLIGHT_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.value === "custom"}
+                >
                   {option.label}
+                  {option.value === "custom" ? " (em breve)" : ""}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="referenceId" className="text-sm font-medium text-zinc-700">
-              Reference ID
-            </label>
-            <input
-              id="referenceId"
-              name="referenceId"
-              value={formState.referenceId ?? ""}
-              onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
-          </div>
+          <AdminHighlightReferencePick
+            highlightType={formState.type}
+            referenceId={formState.referenceId ?? ""}
+            onChangeReferenceId={handleReferenceIdChange}
+            disabled={isSubmitting}
+          />
 
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-medium text-zinc-700">

@@ -8,7 +8,7 @@ import type {
   ISocialLink,
   IUpdateSocialLinkInput,
 } from "@/entities/social-link/socialLink.types";
-import type { IAdminApiClient } from "./adminApi.types";
+import type { IAdminApiClient, IAdminListPickQuery } from "./adminApi.types";
 import {
   adminMockDelay,
   getInstitutionalContentMock,
@@ -55,6 +55,50 @@ import type {
   IUpdateHomeBannerInput,
   IUpdateHomeHighlightInput,
 } from "@/entities/home-content/homeContent.types";
+
+function filterEventsForPick(
+  items: IEvent[],
+  query?: IAdminListPickQuery,
+): IEvent[] {
+  let out: IEvent[] = [...items];
+  if (query?.search?.trim()) {
+    const s: string = query.search.trim().toLowerCase();
+    out = out.filter((e: IEvent) => e.name.toLowerCase().includes(s));
+  }
+  if (query?.category?.trim()) {
+    const c: string = query.category.trim().toLowerCase();
+    out = out.filter((e: IEvent) =>
+      (e.category ?? "").toLowerCase().includes(c),
+    );
+  }
+  const limit: number = query?.limit ?? 30;
+  const page: number = query?.page ?? 1;
+  const start: number = (page - 1) * limit;
+  return out.slice(start, start + limit);
+}
+
+function filterTouristPointsForPick(
+  items: ITouristPoint[],
+  query?: IAdminListPickQuery,
+): ITouristPoint[] {
+  let out: ITouristPoint[] = [...items];
+  if (query?.search?.trim()) {
+    const s: string = query.search.trim().toLowerCase();
+    out = out.filter((p: ITouristPoint) =>
+      p.name.toLowerCase().includes(s),
+    );
+  }
+  if (query?.category?.trim()) {
+    const c: string = query.category.trim().toLowerCase();
+    out = out.filter((p: ITouristPoint) =>
+      (p.category ?? "").toLowerCase().includes(c),
+    );
+  }
+  const limit: number = query?.limit ?? 30;
+  const page: number = query?.page ?? 1;
+  const start: number = (page - 1) * limit;
+  return out.slice(start, start + limit);
+}
 
 export function createInMemoryAdminApiClient(): IAdminApiClient {
   return {
@@ -254,6 +298,13 @@ export function createInMemoryAdminApiClient(): IAdminApiClient {
     return getEventsMock();
   },
 
+  async listEventsForPick(
+    query?: IAdminListPickQuery,
+  ): Promise<IEvent[]> {
+    await adminMockDelay();
+    return filterEventsForPick(getEventsMock(), query);
+  },
+
   async getEventById(id: number): Promise<IEvent | null> {
     await adminMockDelay();
 
@@ -323,6 +374,13 @@ export function createInMemoryAdminApiClient(): IAdminApiClient {
   async listTouristPoints(): Promise<ITouristPoint[]> {
     await adminMockDelay();
     return getTouristPointsMock();
+  },
+
+  async listTouristPointsForPick(
+    query?: IAdminListPickQuery,
+  ): Promise<ITouristPoint[]> {
+    await adminMockDelay();
+    return filterTouristPointsForPick(getTouristPointsMock(), query);
   },
 
   async getTouristPointById(id: number): Promise<ITouristPoint | null> {

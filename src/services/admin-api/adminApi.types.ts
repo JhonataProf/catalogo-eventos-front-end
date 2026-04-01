@@ -35,6 +35,15 @@ import type {
   IUpdateHomeHighlightInput,
 } from "@/entities/home-content/homeContent.types";
 
+/** Filtros para listagens admin usadas em combobox (nome + categoria na query do BFF). */
+export interface IAdminListPickQuery {
+  /** Texto parcial do nome; enviado como `name` na query (alinhado ao público). */
+  search?: string;
+  category?: string;
+  page?: number;
+  limit?: number;
+}
+
 export interface IAdminApiClient {
   /** `null` quando ainda não existe registro institucional (lista vazia). */
   getInstitutionalContent: () => Promise<IInstitutionalContent | null>;
@@ -58,12 +67,17 @@ export interface IAdminApiClient {
   deleteCity: (id: number) => Promise<void>;
 
   listEvents: () => Promise<IEvent[]>;
+  /** Lista paginada com filtros para UX de seleção (debounce no formulário). */
+  listEventsForPick: (query?: IAdminListPickQuery) => Promise<IEvent[]>;
   getEventById: (id: number) => Promise<IEvent | null>;
   createEvent: (input: ICreateEventInput) => Promise<IEvent>;
   updateEvent: (input: IUpdateEventInput) => Promise<IEvent>;
   deleteEvent: (id: number) => Promise<void>;
 
   listTouristPoints: () => Promise<ITouristPoint[]>;
+  listTouristPointsForPick: (
+    query?: IAdminListPickQuery,
+  ) => Promise<ITouristPoint[]>;
   getTouristPointById: (id: number) => Promise<ITouristPoint | null>;
   createTouristPoint: (
     input: ICreateTouristPointInput,

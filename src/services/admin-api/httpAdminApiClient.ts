@@ -31,7 +31,7 @@ import type {
   IUpdateHomeBannerInput,
   IUpdateHomeHighlightInput,
 } from "@/entities/home-content/homeContent.types";
-import type { IAdminApiClient } from "./adminApi.types";
+import type { IAdminApiClient, IAdminListPickQuery } from "./adminApi.types";
 import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
@@ -56,6 +56,40 @@ import { resolveWebImagePayloadFromImageUrlField } from "./adminWebImage";
 
 function trimBaseUrl(baseURL: string): string {
   return baseURL.replace(/\/+$/, "");
+}
+
+function buildAdminEventPickParams(
+  query?: IAdminListPickQuery,
+): Record<string, string | number> {
+  const out: Record<string, string | number> = {
+    page: query?.page ?? 1,
+    limit: query?.limit ?? 30,
+    sortDir: "asc",
+  };
+  if (query?.search?.trim()) {
+    out.name = query.search.trim();
+  }
+  if (query?.category?.trim()) {
+    out.category = query.category.trim();
+  }
+  return out;
+}
+
+function buildAdminTouristPointPickParams(
+  query?: IAdminListPickQuery,
+): Record<string, string | number> {
+  const out: Record<string, string | number> = {
+    page: query?.page ?? 1,
+    limit: query?.limit ?? 30,
+    sortDir: "asc",
+  };
+  if (query?.search?.trim()) {
+    out.name = query.search.trim();
+  }
+  if (query?.category?.trim()) {
+    out.category = query.category.trim();
+  }
+  return out;
 }
 
 function createAdminAxios(baseURL: string): AxiosInstance {
@@ -362,6 +396,16 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       return items.map((row) => mapEventFromApi(row as Record<string, unknown>));
     },
 
+    async listEventsForPick(
+      query?: IAdminListPickQuery,
+    ): Promise<IEvent[]> {
+      const { data } = await http.get<unknown>("/admin/events", {
+        params: buildAdminEventPickParams(query),
+      });
+      const { items } = unwrapCollection<Record<string, unknown>>(data);
+      return items.map((row) => mapEventFromApi(row as Record<string, unknown>));
+    },
+
     async getEventById(id: number): Promise<IEvent | null> {
       try {
         const { data } = await http.get<unknown>(`/admin/events/${id}`);
@@ -430,6 +474,18 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         }
       }
       return all;
+    },
+
+    async listTouristPointsForPick(
+      query?: IAdminListPickQuery,
+    ): Promise<ITouristPoint[]> {
+      const { data } = await http.get<unknown>("/admin/tourist-points", {
+        params: buildAdminTouristPointPickParams(query),
+      });
+      const { items } = unwrapCollection<Record<string, unknown>>(data);
+      return items.map((row) =>
+        mapTouristPointFromApi(row as Record<string, unknown>),
+      );
     },
 
     async getTouristPointById(id: number): Promise<ITouristPoint | null> {
