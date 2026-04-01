@@ -12,8 +12,10 @@ import type {
   IHomeHighlight,
   IHomeHighlightBase,
 } from "@/entities/home-content/homeContent.types";
+import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
 import { useAdminHomeHighlights } from "@/domains/admin-cms/home-content/hooks/useAdminHomeHighlights";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 type IHomeHighlightFormState = IHomeHighlightBase;
 
@@ -108,8 +110,8 @@ export function AdminHomeHighlightsPage(): ReactElement {
       });
 
       setSuccessMessage("Destaque cadastrado com sucesso.");
-    } catch {
-      setError("Não foi possível salvar o destaque.");
+    } catch (caught) {
+      setError(toApiError(caught, "Não foi possível salvar o destaque.").message);
     } finally {
       setIsSubmitting(false);
     }
@@ -125,8 +127,8 @@ export function AdminHomeHighlightsPage(): ReactElement {
       setItems((currentItems: IHomeHighlight[]) =>
         currentItems.filter((item: IHomeHighlight) => item.id !== id)
       );
-    } catch {
-      setError("Não foi possível remover o destaque.");
+    } catch (caught) {
+      setError(toApiError(caught, "Não foi possível remover o destaque.").message);
     }
   }
 
@@ -232,18 +234,18 @@ export function AdminHomeHighlightsPage(): ReactElement {
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="imageUrl" className="text-sm font-medium text-zinc-700">
-              URL da imagem
-            </label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              value={formState.imageUrl ?? ""}
-              onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
-          </div>
+          <AdminImageUrlField
+            id="imageUrl"
+            label="Imagem do destaque"
+            value={formState.imageUrl ?? ""}
+            disabled={isSubmitting}
+            onChange={(next) => {
+              setFormState((s) => ({ ...s, imageUrl: next }));
+              if (successMessage) {
+                setSuccessMessage("");
+              }
+            }}
+          />
 
           <div className="space-y-2">
             <label htmlFor="ctaUrl" className="text-sm font-medium text-zinc-700">

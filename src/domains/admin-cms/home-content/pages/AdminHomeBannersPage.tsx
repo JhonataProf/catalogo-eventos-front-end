@@ -11,8 +11,10 @@ import type {
   IHomeBanner,
   IHomeBannerBase,
 } from "@/entities/home-content/homeContent.types";
+import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
 import { useAdminHomeBanners } from "@/domains/admin-cms/home-content/hooks/useAdminHomeBanners";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 type IHomeBannerFormState = IHomeBannerBase;
 
@@ -93,8 +95,8 @@ export function AdminHomeBannersPage(): ReactElement {
       });
 
       setSuccessMessage("Banner cadastrado com sucesso.");
-    } catch {
-      setError("Não foi possível salvar o banner.");
+    } catch (caught) {
+      setError(toApiError(caught, "Não foi possível salvar o banner.").message);
     } finally {
       setIsSubmitting(false);
     }
@@ -110,8 +112,8 @@ export function AdminHomeBannersPage(): ReactElement {
       setItems((currentItems: IHomeBanner[]) =>
         currentItems.filter((item: IHomeBanner) => item.id !== id)
       );
-    } catch {
-      setError("Não foi possível remover o banner.");
+    } catch (caught) {
+      setError(toApiError(caught, "Não foi possível remover o banner.").message);
     }
   }
 
@@ -161,13 +163,18 @@ export function AdminHomeBannersPage(): ReactElement {
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="imageUrl" className="text-sm font-medium text-zinc-700">
-              URL da imagem
-            </label>
-            <input id="imageUrl" name="imageUrl" value={formState.imageUrl} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
-          </div>
+          <AdminImageUrlField
+            id="imageUrl"
+            label="Imagem do banner"
+            value={formState.imageUrl}
+            disabled={isSubmitting}
+            onChange={(next) => {
+              setFormState((s) => ({ ...s, imageUrl: next }));
+              if (successMessage) {
+                setSuccessMessage("");
+              }
+            }}
+          />
 
           <div className="space-y-2">
             <label htmlFor="ctaLabel" className="text-sm font-medium text-zinc-700">

@@ -14,6 +14,7 @@ import type {
 } from "@/entities/social-link/socialLink.types";
 import { useAdminSocialLinksList } from "@/domains/admin-cms/social-links/hooks/useAdminSocialLinksList";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 type ISocialLinkFormState = ISocialLinkBase;
 
@@ -110,8 +111,10 @@ export function AdminSocialLinksPage(): ReactElement {
       });
 
       setSuccessMessage("Mídia social cadastrada com sucesso.");
-    } catch {
-      setError("Não foi possível salvar a mídia social.");
+    } catch (caught) {
+      setError(
+        toApiError(caught, "Não foi possível salvar a mídia social.").message,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -132,8 +135,13 @@ export function AdminSocialLinksPage(): ReactElement {
           currentItem.id === updatedItem.id ? updatedItem : currentItem
         )
       );
-    } catch {
-      setError("Não foi possível atualizar o status da mídia social.");
+    } catch (caught) {
+      setError(
+        toApiError(
+          caught,
+          "Não foi possível atualizar o status da mídia social.",
+        ).message,
+      );
     }
   }
 
@@ -149,8 +157,10 @@ export function AdminSocialLinksPage(): ReactElement {
       );
 
       setSuccessMessage("Mídia social removida com sucesso.");
-    } catch {
-      setError("Não foi possível remover a mídia social.");
+    } catch (caught) {
+      setError(
+        toApiError(caught, "Não foi possível remover a mídia social.").message,
+      );
     }
   }
 

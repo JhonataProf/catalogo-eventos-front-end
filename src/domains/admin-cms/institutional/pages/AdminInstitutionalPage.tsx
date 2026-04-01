@@ -17,6 +17,7 @@ import type {
 } from "@/entities/institutional/institutional.types";
 import { useAdminInstitutionalContent } from "@/domains/admin-cms/institutional/hooks/useAdminInstitutionalContent";
 import { adminApiClient } from "@/services/admin-api/client";
+import { toApiError } from "@/services/api/apiError";
 
 interface IInstitutionalFormState {
   aboutTitle: string;
@@ -158,8 +159,11 @@ export function AdminInstitutionalPage(): ReactElement {
 
       setContent(response);
       setSuccessMessage("Conteúdo institucional salvo com sucesso.");
-    } catch {
-      setError("Não foi possível salvar o conteúdo institucional.");
+    } catch (caught) {
+      setError(
+        toApiError(caught, "Não foi possível salvar o conteúdo institucional.")
+          .message,
+      );
     } finally {
       setIsSubmitting(false);
     }
