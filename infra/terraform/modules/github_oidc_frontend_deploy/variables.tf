@@ -29,8 +29,14 @@ variable "allow_all_branches" {
   default     = false
 }
 
+variable "github_environment_name" {
+  description = "Nome do GitHub Environment usado no job de deploy (ex.: frontend-deploy). Quando preenchido e allow_all_branches=false, o trust usa sub repo:ORG/REPO:environment:NOME. Deixe vazio para confiar apenas em refs/heads/main (workflow sem environment no job)."
+  type        = string
+  default     = ""
+}
+
 variable "allowed_ref_pattern" {
-  description = "Claim sub exato quando allow_all_branches=false. Vazio = apenas refs/heads/main."
+  description = "Claim OIDC sub exato quando allow_all_branches=false (sobrescreve github_environment_name e o padrão main). Ex.: repo:ORG/REPO:ref:refs/heads/main ou repo:ORG/REPO:environment:frontend-deploy."
   type        = string
   default     = ""
 }

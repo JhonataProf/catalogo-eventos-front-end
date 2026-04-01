@@ -1,8 +1,9 @@
 # IAM role para GitHub Actions publicar o front (S3 sync + invalidação CloudFront) via OIDC.
 # O OIDC provider GitHub costuma ser compartilhado na conta; use create_oidc_provider=false se já existir.
 #
-# Trust padrão: apenas refs/heads/main (allow_all_branches=false). Para laboratório com qualquer branch,
-# defina allow_all_branches = true explicitamente em terraform.tfvars.
+# Trust padrão (allow_all_branches=false): refs/heads/main OU, se github_environment_name estiver definido,
+# repo:ORG/REPO:environment:NOME (alinhado ao job com `environment:` no GitHub Actions). Para qualquer branch,
+# defina allow_all_branches = true (só laboratório).
 
 terraform {
   required_version = ">= 1.5.0"
@@ -15,8 +16,11 @@ terraform {
 }
 
 locals {
+  # Com job usando `environment:` no workflow, o claim OIDC `sub` é
+  # repo:ORG/REPO:environment:NOME — não ref:refs/heads/... (ver variável github_environment_name).
   default_main_sub = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main"
-  effective_ref    = trimspace(var.allowed_ref_pattern) != "" ? trimspace(var.allowed_ref_pattern) : local.default_main_sub
+  default_env_sub  = trimspace(var.github_environment_name) != "" ? "repo:${var.github_org}/${var.github_repo}:environment:${trimspace(var.github_environment_name)}" : local.default_main_sub
+  effective_ref    = trimspace(var.allowed_ref_pattern) != "" ? trimspace(var.allowed_ref_pattern) : local.default_env_sub
   github_oidc_arn  = var.create_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
 }
 
@@ -86,10 +90,10 @@ data "aws_iam_policy_document" "deploy" {
   }
 
   statement {
-    sid         = "CloudFrontInvalidate"
-    effect      = "Allow"
-    actions     = ["cloudfront:CreateInvalidation"]
-    resources   = [var.cloudfront_distribution_arn]
+    sid       = "CloudFrontInvalidate"
+    effect    = "Allow"
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = [var.cloudfront_distribution_arn]
   }
 }
 

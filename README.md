@@ -225,6 +225,9 @@ O mesmo passo de validação exige **`CLOUDFRONT_DISTRIBUTION_ID`** com formato 
 | `DEPLOY_S3_BUCKET_PREFIX` | Opcional; se definida, o secret `S3_BUCKET` **tem** de começar por esse texto (reduz risco de `sync --delete` no bucket errado) |
 | `REQUIRE_VITE_PUBLIC_SITE_URL` | Defina `true` em go-live para **falhar** o job se `VITE_PUBLIC_SITE_URL` estiver vazio |
 | `DEPLOY_GITHUB_ENVIRONMENT` | Opcional; nome do GitHub Environment do job (padrão: `frontend-deploy`) |
+| `DEPLOY_ALLOW_HTTP_BFF` | **`true` só em laboratório.** Se definida, o secret `VITE_PUBLIC_BFF_BASE_URL` pode ser `http://` (ex.: ALB dev sem certificado). Em produção, omita e use sempre HTTPS. |
+
+**Termo “OIDC” neste repositório:** no deploy, refere-se a **GitHub Actions → AWS IAM** (`aws-actions/configure-aws-credentials` com `role-to-assume`), **não** a login OAuth no browser. O CRM continua com **email/senha + JWT** via `POST .../auth/login` no BFF.
 
 ---
 

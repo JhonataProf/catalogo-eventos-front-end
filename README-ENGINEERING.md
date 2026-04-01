@@ -40,7 +40,7 @@ Regras obrigatórias:
 - não assumir automaticamente que deploy estático é suficiente
 - avaliar se a área pública e a área CRM exigem estratégias diferentes
 - toda decisão de publicação deve explicitar trade-offs entre SEO, custo, simplicidade e operação
-- preferir **OIDC** (GitHub → AWS IAM role) no deploy em vez de chaves de acesso de longa duração
+- preferir **OIDC** (GitHub → AWS IAM role) no deploy em vez de chaves de acesso de longa duração — isto é **só CI/CD**; login do utilizador no CRM é outro fluxo (BFF + JWT, ver `docs/operations/production-gate.md`)
 
 ---
 

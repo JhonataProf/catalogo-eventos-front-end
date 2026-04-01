@@ -1,3 +1,4 @@
+import { normalizeBffApiRootUrl } from "@/services/api/bffBaseUrlNormalize";
 import { isApiMocksForced } from "@/services/api/apiClientMode";
 import type { IPublicApiClient } from "./publicApi.types";
 import { createHttpPublicApiClient } from "./httpPublicApiClient";
@@ -8,7 +9,7 @@ function resolvePublicBffBaseUrl(): string {
   return typeof raw === "string" ? raw.trim() : "";
 }
 
-const bffBaseUrl: string = resolvePublicBffBaseUrl();
+const bffBaseUrl: string = normalizeBffApiRootUrl(resolvePublicBffBaseUrl());
 
 /**
  * Cliente da API pública. HTTP ao BFF quando há `VITE_PUBLIC_BFF_BASE_URL` e

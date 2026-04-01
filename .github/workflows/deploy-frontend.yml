@@ -16,6 +16,11 @@
 #   DEPLOY_S3_BUCKET_PREFIX — se definida, o secret S3_BUCKET deve começar com esse prefixo.
 #   REQUIRE_VITE_PUBLIC_SITE_URL — "true" exige secret VITE_PUBLIC_SITE_URL (HTTPS) no build.
 #   DEPLOY_GITHUB_ENVIRONMENT — nome do Environment GitHub (opcional); padrão: frontend-deploy
+#   DEPLOY_ALLOW_HTTP_BFF — "true" (só laboratório) permite VITE_PUBLIC_BFF_BASE_URL em http://;
+#     padrão exige HTTPS. Útil quando o ALB de dev ainda não tem certificado.
+#
+# Ordem do job: validação → build (yarn) → credenciais AWS (OIDC ou chaves) → S3 → CloudFront.
+# Se a validação ou o build falharem, o passo OIDC nem chega a executar — não confundir com falha de trust IAM.
 #
 # Obrigatório no build de produção: VITE_PUBLIC_BFF_BASE_URL (HTTPS).
 # Opcionais: VITE_PUBLIC_SITE_URL, VITE_ADMIN_BFF_BASE_URL, VITE_PUBLIC_GTM_ID, VITE_PUBLIC_SENTRY_DSN.
@@ -53,6 +58,7 @@ jobs:
           SITE_URL: ${{ secrets.VITE_PUBLIC_SITE_URL }}
           BUCKET_PREFIX: ${{ vars.DEPLOY_S3_BUCKET_PREFIX }}
           REQUIRE_SITE_URL: ${{ vars.REQUIRE_VITE_PUBLIC_SITE_URL }}
+          ALLOW_HTTP_BFF: ${{ vars.DEPLOY_ALLOW_HTTP_BFF }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
@@ -97,10 +103,16 @@ jobs:
           fi
 
           if [[ -z "${BFF_URL// }" ]]; then
-            fail "Secret VITE_PUBLIC_BFF_BASE_URL é obrigatório para deploy de produção (URL HTTPS do BFF)."
+            fail "Secret VITE_PUBLIC_BFF_BASE_URL é obrigatório para deploy (URL do BFF)."
           fi
-          if [[ "$BFF_URL" != https://* ]]; then
-            fail "VITE_PUBLIC_BFF_BASE_URL deve ser HTTPS (https://...)."
+          if [[ "${ALLOW_HTTP_BFF:-}" == "true" || "${ALLOW_HTTP_BFF:-}" == "True" ]]; then
+            if [[ "$BFF_URL" != http://* && "$BFF_URL" != https://* ]]; then
+              fail "VITE_PUBLIC_BFF_BASE_URL deve começar com http:// ou https://"
+            fi
+          else
+            if [[ "$BFF_URL" != https://* ]]; then
+              fail "VITE_PUBLIC_BFF_BASE_URL deve ser HTTPS (https://...). Para ALB dev sem TLS, defina a variável de repositório DEPLOY_ALLOW_HTTP_BFF=true (apenas laboratório)."
+            fi
           fi
 
           check_https() {
@@ -141,6 +153,9 @@ jobs:
           VITE_PUBLIC_SENTRY_DSN: ${{ secrets.VITE_PUBLIC_SENTRY_DSN }}
         run: yarn build
 
+      # IAM trust da role (AWS_ROLE_ARN) deve permitir o claim OIDC `sub` deste job:
+      # com `environment:` abaixo, o GitHub emite sub repo:ORG/REPO:environment:NOME — não ref:refs/heads/main.
+      # Ver módulo Terraform github_oidc_frontend_deploy (github_environment_name ou allow_all_branches).
       - name: Configure AWS credentials (OIDC)
         if: ${{ vars.AWS_AUTH_METHOD != 'access-key' }}
         uses: aws-actions/configure-aws-credentials@v4

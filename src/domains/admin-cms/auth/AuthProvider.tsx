@@ -1,3 +1,10 @@
+import { loginWithPassword } from "@/services/admin-api/adminAuth.api";
+import { ADMIN_AUTH_EXPIRED_EVENT } from "@/services/admin-api/adminAuthEvents";
+import { normalizeBffApiRootUrl } from "@/services/api/bffBaseUrlNormalize";
+import {
+  resolveAdminBffBaseUrl,
+  resolveAdminUsesRealHttp,
+} from "@/services/admin-api/adminBffConfig";
 import {
   useCallback,
   useEffect,
@@ -6,23 +13,17 @@ import {
   type PropsWithChildren,
   type ReactElement,
 } from "react";
-import type { IAdminAuthSession, IAuthContextValue } from "./auth.types";
+import {
+  isAdminMockLoginAllowed,
+  mustClearAdminSessionWithoutApiInProduction,
+} from "./adminAuthDevPolicy";
+import { AuthContext } from "./auth.context";
 import {
   clearAdminUser,
   loadAdminSession,
   saveAdminSession,
 } from "./auth.storage";
-import { AuthContext } from "./auth.context";
-import {
-  resolveAdminBffBaseUrl,
-  resolveAdminUsesRealHttp,
-} from "@/services/admin-api/adminBffConfig";
-import { loginWithPassword } from "@/services/admin-api/adminAuth.api";
-import { ADMIN_AUTH_EXPIRED_EVENT } from "@/services/admin-api/adminAuthEvents";
-import {
-  isAdminMockLoginAllowed,
-  mustClearAdminSessionWithoutApiInProduction,
-} from "./adminAuthDevPolicy";
+import type { IAdminAuthSession, IAuthContextValue } from "./auth.types";
 
 function readInitialAdminSession(): IAdminAuthSession | null {
   const usesRealHttp = resolveAdminUsesRealHttp();
@@ -53,7 +54,7 @@ export function AuthProvider({
 
   const login = useCallback(async (email: string, password: string) => {
     if (resolveAdminUsesRealHttp()) {
-      const baseURL = resolveAdminBffBaseUrl().replace(/admin\/$/, "");
+      const baseURL = normalizeBffApiRootUrl(resolveAdminBffBaseUrl());
       const next = await loginWithPassword(baseURL, email, password);
       setSession(next);
       saveAdminSession(next);

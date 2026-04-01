@@ -49,6 +49,13 @@ Marca à medida que concluíres. Itens que **não** são automatizados só no re
 
 ### GitHub
 
+#### Diagnóstico rápido: “OIDC parou” vs outras falhas
+
+- **OIDC aqui =** autenticação **GitHub → AWS** no job de deploy (secret `AWS_ROLE_ARN`, `permissions: id-token: write`). **Não** é o login do painel `/admin` (esse é JWT no BFF).
+- O workflow corre **validação** e **`yarn build` antes** de obter credenciais AWS. Se o job falha cedo (ex.: `VITE_PUBLIC_BFF_BASE_URL` inválido, build quebrado), o passo **Configure AWS credentials (OIDC)** **não executa** — o log pode parecer “OIDC”, mas a causa é anterior.
+- **Trust IAM:** a role OIDC do módulo Terraform costuma permitir só `refs/heads/main`. Deploy a partir de outra branch pode falhar em `AssumeRoleWithWebIdentity` até ajustar `allow_all_branches` / `allowed_ref_pattern` no Terraform.
+- **BFF em HTTP (dev):** o workflow exige HTTPS por defeito. Para ALB sem TLS só em laboratório, use a variável de repositório **`DEPLOY_ALLOW_HTTP_BFF=true`** (ver README Parte B).
+
 - [ ] **Environment** `frontend-deploy` criado (**Settings → Environments**) ou variável `DEPLOY_GITHUB_ENVIRONMENT` aponta para um environment existente.
 - [ ] (Recomendado em produção) **Required reviewers** nesse environment antes do job de deploy.
 - [ ] Secrets corretos: `S3_BUCKET`, `CLOUDFRONT_DISTRIBUTION_ID`, `AWS_ROLE_ARN` (OIDC), `VITE_PUBLIC_BFF_BASE_URL` (HTTPS).
