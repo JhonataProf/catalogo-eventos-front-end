@@ -1,4 +1,5 @@
 import type {
+  ICreateInstitutionalContentInput,
   IInstitutionalContent,
   IUpdateInstitutionalContentInput,
 } from "@/entities/institutional/institutional.types";
@@ -35,7 +36,11 @@ import type {
 } from "@/entities/home-content/homeContent.types";
 
 export interface IAdminApiClient {
-  getInstitutionalContent: () => Promise<IInstitutionalContent>;
+  /** `null` quando ainda não existe registro institucional (lista vazia). */
+  getInstitutionalContent: () => Promise<IInstitutionalContent | null>;
+  createInstitutionalContent: (
+    input: ICreateInstitutionalContentInput,
+  ) => Promise<IInstitutionalContent>;
   updateInstitutionalContent: (
     input: IUpdateInstitutionalContentInput,
   ) => Promise<IInstitutionalContent>;

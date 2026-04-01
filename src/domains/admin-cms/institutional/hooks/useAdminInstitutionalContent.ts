@@ -20,7 +20,7 @@ export function useAdminInstitutionalContent(): IUseAdminInstitutionalContentRes
       setIsLoading(true);
       setError("");
 
-      const response: IInstitutionalContent =
+      const response: IInstitutionalContent | null =
         await adminApiClient.getInstitutionalContent();
       setContent(response);
     } catch {

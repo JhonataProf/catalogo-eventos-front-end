@@ -35,3 +35,9 @@ export type IUpdateInstitutionalContentInput = Pick<
   | "values"
 >;
 
+/** Cadastro do único registro institucional (sem id; servidor define id e updatedAt). */
+export type ICreateInstitutionalContentInput = Omit<
+  IInstitutionalContent,
+  "id" | "updatedAt"
+>;
+

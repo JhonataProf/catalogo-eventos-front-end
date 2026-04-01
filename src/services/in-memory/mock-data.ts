@@ -29,15 +29,21 @@ let institutionalContentMock: IInstitutionalContent = {
   vision:
     "Ser a principal referência digital de turismo e agenda cultural da região do Celeiro do MS.",
 
-  values: [
-    "Transparência",
-    "Valorização regional",
-    "Simplicidade de uso",
-    "Acessibilidade",
-  ],
+  values: ["Excelência", "Sustentabilidade", "Regionalismo"],
 
   updatedAt: new Date().toISOString(),
 };
+
+/** Quando `false`, o admin trata como «ainda não cadastrado» (lista vazia). */
+let institutionalRecordPresent = true;
+
+export function isInstitutionalRecordPresent(): boolean {
+  return institutionalRecordPresent;
+}
+
+export function setInstitutionalRecordPresent(present: boolean): void {
+  institutionalRecordPresent = present;
+}
 
 let socialLinksMock: ISocialLink[] = [
   {

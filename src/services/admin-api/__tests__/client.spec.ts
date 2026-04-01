@@ -18,16 +18,47 @@ describe("adminApiClient", () => {
   });
 
   describe("institutional content", () => {
+    it("deve cadastrar quando ainda não existe registro (mock)", async () => {
+      vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
+      vi.stubEnv("VITE_ADMIN_BFF_BASE_URL", "");
+      vi.stubEnv("VITE_USE_API_MOCKS", "");
+      vi.resetModules();
+      const mockData = await import("@/services/in-memory/mock-data");
+      mockData.setInstitutionalRecordPresent(false);
+      const module: AdminApiModule = await import("../client");
+      const adminApiClient = module.adminApiClient;
+
+      expect(await adminApiClient.getInstitutionalContent()).toBeNull();
+
+      const created = await adminApiClient.createInstitutionalContent({
+        aboutTitle: "Sobre",
+        aboutText: "Texto sobre",
+        whoWeAreTitle: "Quem",
+        whoWeAreText: "Somos",
+        purposeTitle: "Propósito",
+        purposeText: "Prop texto",
+        mission: "Missão",
+        vision: "Visão",
+        values: ["A", "B"],
+      });
+
+      expect(created.id).toBe(1);
+      expect(created.aboutTitle).toBe("Sobre");
+      expect(await adminApiClient.getInstitutionalContent()).not.toBeNull();
+
+      mockData.setInstitutionalRecordPresent(true);
+    });
+
     it("deve obter e atualizar o conteúdo institucional", async () => {
       const adminApiClient = await loadAdminApiClient();
 
       const initialContent = await adminApiClient.getInstitutionalContent();
 
-      expect(initialContent).toBeDefined();
-      expect(initialContent.aboutTitle).toBeTruthy();
+      expect(initialContent).not.toBeNull();
+      expect(initialContent!.aboutTitle).toBeTruthy();
 
       const updatedContent = await adminApiClient.updateInstitutionalContent({
-        id: initialContent.id,
+        id: initialContent!.id,
         aboutTitle: "Novo título institucional",
         aboutText: "Novo texto institucional",
         whoWeAreTitle: "Quem somos atualizado",
@@ -49,8 +80,9 @@ describe("adminApiClient", () => {
 
       const persistedContent = await adminApiClient.getInstitutionalContent();
 
-      expect(persistedContent.aboutTitle).toBe("Novo título institucional");
-      expect(persistedContent.vision).toBe("Nova visão");
+      expect(persistedContent).not.toBeNull();
+      expect(persistedContent!.aboutTitle).toBe("Novo título institucional");
+      expect(persistedContent!.vision).toBe("Nova visão");
     });
   });
 

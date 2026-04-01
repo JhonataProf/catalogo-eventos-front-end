@@ -12,6 +12,7 @@ import {
   SectionHeader,
 } from "@/design-system/ui";
 import type {
+  ICreateInstitutionalContentInput,
   IInstitutionalContent,
   IUpdateInstitutionalContentInput,
 } from "@/entities/institutional/institutional.types";
@@ -70,12 +71,17 @@ function mapContentToFormState(
   };
 }
 
-function mapFormStateToInput(
+function valuesFromFormText(valuesText: string): string[] {
+  return valuesText
+    .split("\n")
+    .map((value: string) => value.trim())
+    .filter(Boolean);
+}
+
+function mapFormStateToCreate(
   formState: IInstitutionalFormState,
-  id: number,
-): IUpdateInstitutionalContentInput {
+): ICreateInstitutionalContentInput {
   return {
-    id,
     aboutTitle: formState.aboutTitle.trim(),
     aboutText: formState.aboutText.trim(),
 
@@ -87,16 +93,30 @@ function mapFormStateToInput(
 
     mission: formState.mission.trim(),
     vision: formState.vision.trim(),
-    values: formState.valuesText
-      .split("\n")
-      .map((value: string) => value.trim())
-      .filter(Boolean),
+    values: valuesFromFormText(formState.valuesText),
+  };
+}
+
+function mapFormStateToInput(
+  formState: IInstitutionalFormState,
+  id: number,
+): IUpdateInstitutionalContentInput {
+  return {
+    id,
+    ...mapFormStateToCreate(formState),
   };
 }
 
 export function AdminInstitutionalPage(): ReactElement {
-  const { content, setContent, isLoading, error: loadError } =
-    useAdminInstitutionalContent();
+  const {
+    content,
+    setContent,
+    isLoading,
+    error: loadError,
+    reload,
+  } = useAdminInstitutionalContent();
+
+  const isCreateMode: boolean = !content;
   const [formState, setFormState] = useState<IInstitutionalFormState>(
     buildInitialFormState()
   );
@@ -105,11 +125,12 @@ export function AdminInstitutionalPage(): ReactElement {
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    if (!content) {
+    if (content) {
+      setFormState(mapContentToFormState(content));
       return;
     }
 
-    setFormState(mapContentToFormState(content));
+    setFormState(buildInitialFormState());
   }, [content]);
 
   const lastUpdatedLabel: string = useMemo(() => {
@@ -146,6 +167,12 @@ export function AdminInstitutionalPage(): ReactElement {
       setSuccessMessage("");
 
       if (!content) {
+        const created: IInstitutionalContent =
+          await adminApiClient.createInstitutionalContent(
+            mapFormStateToCreate(formState),
+          );
+        setContent(created);
+        setSuccessMessage("Conteúdo institucional cadastrado com sucesso.");
         return;
       }
 
@@ -192,7 +219,11 @@ export function AdminInstitutionalPage(): ReactElement {
       <SectionHeader
         kicker="Admin CMS"
         tone="primary"
-        description="Gerencie os textos institucionais exibidos no portal público."
+        description={
+          isCreateMode
+            ? "Cadastre o único conteúdo institucional do portal. Depois de criado, use esta tela apenas para editar."
+            : "Edite os textos institucionais exibidos no portal público (há apenas um registro)."
+        }
       >
         Institucional
       </SectionHeader>
@@ -205,9 +236,22 @@ export function AdminInstitutionalPage(): ReactElement {
 
       {error || loadError ? (
         <Card className="border border-red-200 bg-red-50">
-          <p className="text-sm font-medium text-red-700">
-            {error || loadError}
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-medium text-red-700">
+              {error || loadError}
+            </p>
+            {loadError ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={isLoading}
+                onClick={() => void reload()}
+              >
+                Tentar novamente
+              </Button>
+            ) : null}
+          </div>
         </Card>
       ) : null}
 
@@ -215,6 +259,15 @@ export function AdminInstitutionalPage(): ReactElement {
         <Card className="border border-emerald-200 bg-emerald-50">
           <p className="text-sm font-medium text-emerald-700">
             {successMessage}
+          </p>
+        </Card>
+      ) : null}
+
+      {isCreateMode && !loadError ? (
+        <Card className="border border-sky-200 bg-sky-50">
+          <p className="text-sm text-sky-900">
+            Nenhum conteúdo institucional cadastrado ainda. Preencha os campos
+            abaixo e use <strong>Cadastrar</strong> para criar o único registro.
           </p>
         </Card>
       ) : null}
@@ -399,8 +452,15 @@ export function AdminInstitutionalPage(): ReactElement {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" variant="primary" isLoading={isSubmitting}>
-            Salvar alterações
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
+            {isCreateMode
+              ? "Cadastrar conteúdo institucional"
+              : "Salvar alterações"}
           </Button>
         </div>
       </form>

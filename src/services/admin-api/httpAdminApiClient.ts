@@ -1,4 +1,5 @@
 import type {
+  ICreateInstitutionalContentInput,
   IInstitutionalContent,
   IUpdateInstitutionalContentInput,
 } from "@/entities/institutional/institutional.types";
@@ -115,20 +116,32 @@ function createAdminAxios(baseURL: string): AxiosInstance {
   return http;
 }
 
-async function pickInstitutional(
+/**
+ * Lista via GET /admin/institutional-content (fonte de verdade para o singleton).
+ * Ordena por updatedAt descendente; o primeiro item é o registro canônico quando há um só.
+ */
+async function listInstitutionalSorted(
   http: AxiosInstance,
-): Promise<IInstitutionalContent> {
+): Promise<IInstitutionalContent[]> {
   const { data } = await http.get<unknown>("/admin/institutional-content");
   const { items } = unwrapCollection<Record<string, unknown>>(data);
   if (items.length === 0) {
-    throw new Error("Nenhum conteúdo institucional encontrado na API.");
+    return [];
   }
-  const sorted = [...items].sort((a, b) => {
-    const ta = new Date(String(a.updatedAt ?? 0)).getTime();
-    const tb = new Date(String(b.updatedAt ?? 0)).getTime();
-    return tb - ta;
-  });
-  return mapInstitutionalFromApi(sorted[0] as Record<string, unknown>);
+  const mapped: IInstitutionalContent[] = items.map((row) =>
+    mapInstitutionalFromApi(row as Record<string, unknown>),
+  );
+  return mapped.sort(
+    (a, b) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
+}
+
+async function pickInstitutional(
+  http: AxiosInstance,
+): Promise<IInstitutionalContent | null> {
+  const list: IInstitutionalContent[] = await listInstitutionalSorted(http);
+  return list[0] ?? null;
 }
 
 export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
@@ -136,13 +149,55 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
   const http = createAdminAxios(baseURL);
 
   return {
-    async getInstitutionalContent(): Promise<IInstitutionalContent> {
+    async getInstitutionalContent(): Promise<IInstitutionalContent | null> {
       return pickInstitutional(http);
+    },
+
+    async createInstitutionalContent(
+      input: ICreateInstitutionalContentInput,
+    ): Promise<IInstitutionalContent> {
+      const body: Record<string, unknown> = {
+        aboutTitle: input.aboutTitle,
+        aboutText: input.aboutText,
+        whoWeAreTitle: input.whoWeAreTitle,
+        whoWeAreText: input.whoWeAreText,
+        purposeTitle: input.purposeTitle,
+        purposeText: input.purposeText,
+        mission: input.mission,
+        vision: input.vision,
+        valuesJson: JSON.stringify(input.values),
+      };
+      const { data } = await http.post<unknown>(
+        "/admin/institutional-content",
+        body,
+      );
+      const raw = unwrapResource<Record<string, unknown>>(data);
+      return mapInstitutionalFromApi(raw);
     },
 
     async updateInstitutionalContent(
       input: IUpdateInstitutionalContentInput,
     ): Promise<IInstitutionalContent> {
+      const list: IInstitutionalContent[] =
+        await listInstitutionalSorted(http);
+
+      if (list.length === 0) {
+        throw new Error(
+          "Nenhum conteúdo institucional na listagem. Recarregue a página ou cadastre o registro.",
+        );
+      }
+
+      let patchId: number;
+      if (list.some((c) => c.id === input.id)) {
+        patchId = input.id;
+      } else if (list.length === 1) {
+        patchId = list[0]!.id;
+      } else {
+        throw new Error(
+          "O id informado não consta na listagem institucional e existem vários registros. Recarregue a página ou corrija os dados no servidor.",
+        );
+      }
+
       const body: Record<string, unknown> = {};
       if (input.aboutTitle !== undefined) {
         body.aboutTitle = input.aboutTitle;
@@ -173,7 +228,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       }
 
       const { data } = await http.patch<unknown>(
-        `/admin/institutional-content/${input.id}`,
+        `/admin/institutional-content/${patchId}`,
         body,
       );
       const raw = unwrapResource<Record<string, unknown>>(data);

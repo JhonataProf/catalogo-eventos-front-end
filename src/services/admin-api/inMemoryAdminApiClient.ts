@@ -1,4 +1,5 @@
 import type {
+  ICreateInstitutionalContentInput,
   IInstitutionalContent,
   IUpdateInstitutionalContentInput,
 } from "@/entities/institutional/institutional.types";
@@ -11,8 +12,10 @@ import type { IAdminApiClient } from "./adminApi.types";
 import {
   adminMockDelay,
   getInstitutionalContentMock,
+  isInstitutionalRecordPresent,
   getSocialLinksMock,
   setInstitutionalContentMock,
+  setInstitutionalRecordPresent,
   setSocialLinksMock,
   getCitiesMock,
   setCitiesMock,
@@ -55,9 +58,29 @@ import type {
 
 export function createInMemoryAdminApiClient(): IAdminApiClient {
   return {
-  async getInstitutionalContent(): Promise<IInstitutionalContent> {
+  async getInstitutionalContent(): Promise<IInstitutionalContent | null> {
     await adminMockDelay();
+    if (!isInstitutionalRecordPresent()) {
+      return null;
+    }
     return getInstitutionalContentMock();
+  },
+
+  async createInstitutionalContent(
+    input: ICreateInstitutionalContentInput,
+  ): Promise<IInstitutionalContent> {
+    await adminMockDelay();
+
+    const nextValue: IInstitutionalContent = {
+      id: 1,
+      updatedAt: new Date().toISOString(),
+      ...input,
+    };
+
+    setInstitutionalContentMock(nextValue);
+    setInstitutionalRecordPresent(true);
+
+    return nextValue;
   },
 
   async updateInstitutionalContent(
@@ -65,9 +88,20 @@ export function createInMemoryAdminApiClient(): IAdminApiClient {
   ): Promise<IInstitutionalContent> {
     await adminMockDelay();
 
+    if (!isInstitutionalRecordPresent()) {
+      throw new Error(
+        "Nenhum conteúdo institucional na listagem. Recarregue a página ou cadastre o registro.",
+      );
+    }
+
+    const listed: IInstitutionalContent = getInstitutionalContentMock();
+    const patchId: number =
+      listed.id === input.id ? input.id : listed.id;
+
     const nextValue: IInstitutionalContent = {
-      ...getInstitutionalContentMock(),
+      ...listed,
       ...input,
+      id: patchId,
       updatedAt: new Date().toISOString(),
     };
 
