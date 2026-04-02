@@ -20,6 +20,7 @@ import {
   EVENT_CATEGORY_VALUES,
 } from "@/constants/contentCategories";
 import { useAdminEventFormSource } from "@/domains/admin-cms/events/hooks/useAdminEventFormSource";
+import { buildFormattedDateRangePtBr } from "@/domains/admin-cms/events/utils/buildFormattedDateRangePtBr";
 import { toApiError } from "@/services/api/apiError";
 import {
   createAdminEvent,
@@ -59,6 +60,22 @@ function buildInitialFormState(): IEventFormState {
     imageUrl: "",
     featured: false,
     published: true,
+  };
+}
+
+function syncFormattedDateFromDateFields(
+  state: IEventFormState,
+): IEventFormState {
+  const { startDate, endDate } = state;
+  if (startDate && endDate && startDate <= endDate) {
+    return {
+      ...state,
+      formattedDate: buildFormattedDateRangePtBr(startDate, endDate),
+    };
+  }
+  return {
+    ...state,
+    formattedDate: "",
   };
 }
 
@@ -148,6 +165,10 @@ export function AdminEventFormPage(): ReactElement {
         nextState.citySlug = selectedCity?.slug ?? "";
       }
 
+      if (name === "startDate" || name === "endDate") {
+        return syncFormattedDateFromDateFields(nextState);
+      }
+
       return nextState;
     });
 
@@ -160,6 +181,17 @@ export function AdminEventFormPage(): ReactElement {
     event: SyntheticEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
+
+    if (
+      formState.startDate &&
+      formState.endDate &&
+      formState.startDate > formState.endDate
+    ) {
+      setError(
+        "A data de início não pode ser posterior à data de fim. Ajuste as datas e tente novamente.",
+      );
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -344,6 +376,7 @@ export function AdminEventFormPage(): ReactElement {
               name="startDate"
               type="date"
               value={formState.startDate}
+              max={formState.endDate || undefined}
               onChange={handleInputChange}
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
             />
@@ -358,6 +391,7 @@ export function AdminEventFormPage(): ReactElement {
               name="endDate"
               type="date"
               value={formState.endDate}
+              min={formState.startDate || undefined}
               onChange={handleInputChange}
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
             />
