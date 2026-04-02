@@ -5,6 +5,7 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
+import { labelForEventCategory } from "@/constants/contentCategories";
 import { usePublishedEventById } from "@/domains/catalogo-publico/eventos/hooks/usePublishedEventById";
 import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
@@ -87,7 +88,7 @@ export function EventoDetailsPage(): ReactElement {
               <div className="space-y-2">
                 {event.category ? (
                   <span className="inline-flex rounded-full bg-[var(--color-bg-light)] px-3 py-1 text-sm font-medium text-[var(--color-secondary)]">
-                    {event.category}
+                    {labelForEventCategory(event.category)}
                   </span>
                 ) : null}
 
@@ -144,7 +145,9 @@ export function EventoDetailsPage(): ReactElement {
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Categoria</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {event.category ?? "Não informado"}
+              {event.category
+                ? labelForEventCategory(event.category)
+                : "Não informado"}
             </p>
           </Card>
 

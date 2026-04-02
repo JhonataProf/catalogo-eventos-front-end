@@ -52,9 +52,9 @@ describe("PontoTuristicoDetailsPage", () => {
       citySlug: "dourados",
       name: "Parque Antenor Martins",
       description: "Área verde com lago, pista de caminhada e espaço de lazer.",
-      category: "Natureza",
+      category: "parque",
       address: "Rua Antônio Emílio de Figueiredo",
-      openingHours: "Todos os dias",
+      openingHours: "08:00",
       imageUrl: "/images/highlights/parque-antenor-martins.jpg",
       featured: true,
       published: true,
@@ -72,11 +72,11 @@ describe("PontoTuristicoDetailsPage", () => {
       screen.getByText("Área verde com lago, pista de caminhada e espaço de lazer.")
     ).toBeInTheDocument();
 
-    expect(screen.getAllByText("Natureza")).toHaveLength(2);
+    expect(screen.getAllByText("Parque")).toHaveLength(2);
     expect(
       screen.getAllByText("Rua Antônio Emílio de Figueiredo").length
     ).toBeGreaterThan(0);
-    expect(screen.getAllByText("Todos os dias").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("08:00").length).toBeGreaterThan(0);
   });
 
   it("deve redirecionar para /pontos-turisticos quando o ponto não existir", async () => {

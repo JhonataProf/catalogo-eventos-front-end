@@ -74,7 +74,7 @@ describe("PontosTuristicosPage", () => {
             cidadeSlug: "dourados",
             titulo: "Parque Antenor Martins",
             descricao: "Área verde com espaço de lazer.",
-            categoria: "Natureza",
+            categoria: "Parque",
             localLabel: "Rua Antônio Emílio de Figueiredo",
             href: "/pontos-turisticos/pto-1",
             ctaLabel: "Ver local",

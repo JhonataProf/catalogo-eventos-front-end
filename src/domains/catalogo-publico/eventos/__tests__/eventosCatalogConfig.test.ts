@@ -23,7 +23,7 @@ describe("fetchEventosCatalogo", () => {
           citySlug: "dourados",
           name: "Festival Gastronômico",
           description: "Sabores regionais",
-          category: "Gastronomia",
+          category: "gastronomia",
           formattedDate: "20 a 22 de março de 2026",
           location: "Parque dos Ipês",
           imageUrl: "/images/festival.jpg",
@@ -81,7 +81,7 @@ describe("fetchEventosCatalogo", () => {
     await fetchEventosCatalogo({
       cidade: "dourados",
       busca: "festival",
-      categoria: "Gastronomia",
+      categoria: "gastronomia",
       page: 1,
       limit: 12,
     });
@@ -89,7 +89,7 @@ describe("fetchEventosCatalogo", () => {
     expect(publicApiClient.listPublishedEvents).toHaveBeenCalledWith({
       citySlug: "dourados",
       search: "festival",
-      category: "Gastronomia",
+      category: "gastronomia",
       page: 1,
       limit: 12,
     });

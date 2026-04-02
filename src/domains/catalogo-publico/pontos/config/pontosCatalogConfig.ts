@@ -1,3 +1,4 @@
+import { labelForTouristPointCategory } from "@/constants/contentCategories";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { loadPublishedTouristPointsCatalog } from "@/services/public-api/publicTouristPoints.api";
 import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
@@ -13,7 +14,9 @@ function mapTouristPointToCatalogItem(
     titulo: touristPoint.name,
     descricao: touristPoint.description,
     imagemUrl: touristPoint.imageUrl,
-    categoria: touristPoint.category,
+    categoria: touristPoint.category
+      ? labelForTouristPointCategory(touristPoint.category)
+      : undefined,
     localLabel: touristPoint.address,
     destaque: touristPoint.featured,
     href: `/pontos-turisticos/${touristPoint.id}`,

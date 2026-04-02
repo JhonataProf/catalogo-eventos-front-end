@@ -1,3 +1,4 @@
+import { labelForEventCategory } from "@/constants/contentCategories";
 import type { IEvent } from "@/entities/event/event.types";
 import { publicApiClient } from "@/services/public-api/client";
 import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
@@ -11,7 +12,9 @@ function mapEventToCatalogItem(event: IEvent): ICatalogoItem {
     titulo: event.name,
     descricao: event.description,
     imagemUrl: event.imageUrl,
-    categoria: event.category,
+    categoria: event.category
+      ? labelForEventCategory(event.category)
+      : undefined,
     dataLabel: event.formattedDate,
     localLabel: event.location,
     destaque: event.featured,

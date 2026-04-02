@@ -34,8 +34,8 @@ describe("CatalogFilters", () => {
   const config: ICatalogoFiltersConfig = {
     searchPlaceholder: "Busque por nome",
     categorias: [
-      { label: "Cultura", value: "Cultura" },
-      { label: "Natureza", value: "Natureza" },
+      { label: "Feira", value: "feira" },
+      { label: "Parque", value: "parque" },
     ],
   };
 
@@ -123,13 +123,13 @@ describe("CatalogFilters", () => {
     );
 
     fireEvent.change(screen.getByLabelText("Categoria"), {
-      target: { value: "Cultura" },
+      target: { value: "feira" },
     });
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({
       busca: "",
-      categoria: "Cultura",
+      categoria: "feira",
     });
   });
 
