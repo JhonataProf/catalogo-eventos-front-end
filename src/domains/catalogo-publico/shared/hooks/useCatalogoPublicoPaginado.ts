@@ -1,22 +1,28 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toApiError } from "@/services/api/apiError";
+import type { ICatalogoPublicoLoadingExtension } from "../model/catalogoPublicoLoadingExtension";
 import type {
+  ICatalogoFetcher,
+  ICatalogoFetcherContext,
   ICatalogoPaginatedState,
   ICatalogoQuery,
   ICatalogoResult,
 } from "../model/catalogo.types";
+import { isRequestAborted } from "../utils/isRequestAborted";
 
 interface IUseCatalogoPublicoPaginadoParams {
   baseQuery: Omit<ICatalogoQuery, "page">;
-  fetcher: (query: ICatalogoQuery) => Promise<ICatalogoResult>;
+  fetcher: ICatalogoFetcher;
   initialPage?: number;
-  /** Quando `false`, não dispara fetch até estar pronto (ex.: cidades do catálogo carregadas). */
   enabled?: boolean;
+  loading?: ICatalogoPublicoLoadingExtension;
 }
 
 interface IUseCatalogoPublicoPaginadoResult {
   data: ICatalogoPaginatedState;
   isInitialLoading: boolean;
+  /** Lista anterior visível com overlay (stale-while-revalidate). */
+  isStaleListRefreshing: boolean;
   isLoadingMore: boolean;
   error: string | null;
   loadMore: () => Promise<void>;
@@ -35,23 +41,45 @@ function buildInitialState(limit: number): ICatalogoPaginatedState {
   };
 }
 
-export function useCatalogoPublicoPaginado({
-  baseQuery,
-  fetcher,
-  initialPage = 1,
-  enabled = true,
-}: IUseCatalogoPublicoPaginadoParams): IUseCatalogoPublicoPaginadoResult {
+function sleepMs(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+export function useCatalogoPublicoPaginado(
+  params: IUseCatalogoPublicoPaginadoParams,
+): IUseCatalogoPublicoPaginadoResult {
+  const {
+    baseQuery,
+    fetcher,
+    initialPage = 1,
+    enabled = true,
+    loading: loadingOpts,
+  } = params;
+
+  const staleWhileRevalidate: boolean = Boolean(
+    loadingOpts?.staleWhileRevalidate,
+  );
+  const minSkeletonMs: number = loadingOpts?.minSkeletonMs ?? 0;
+
   const cidade: string = baseQuery.cidade;
   const busca: string | undefined = baseQuery.busca;
   const categoria: string | undefined = baseQuery.categoria;
   const safeLimit: number = baseQuery.limit > 0 ? baseQuery.limit : DEFAULT_LIMIT;
 
   const [data, setData] = useState<ICatalogoPaginatedState>(
-    buildInitialState(safeLimit)
+    buildInitialState(safeLimit),
   );
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const latestItemCountRef = useRef<number>(0);
+
+  useEffect(() => {
+    latestItemCountRef.current = data.items.length;
+  }, [data.items.length]);
 
   const stableBaseQuery = useMemo(
     () => ({
@@ -60,17 +88,25 @@ export function useCatalogoPublicoPaginado({
       categoria,
       limit: safeLimit,
     }),
-    [cidade, busca, categoria, safeLimit]
+    [cidade, busca, categoria, safeLimit],
   );
 
   const executeFetch = useCallback(
-    async (page: number, append: boolean): Promise<void> => {
+    async (
+      page: number,
+      append: boolean,
+      context?: ICatalogoFetcherContext,
+    ): Promise<void> => {
       const query: ICatalogoQuery = {
         ...stableBaseQuery,
         page,
       };
 
-      const response: ICatalogoResult = await fetcher(query);
+      const response: ICatalogoResult = await fetcher(query, context);
+
+      if (context?.signal?.aborted) {
+        return;
+      }
 
       setData((currentState: ICatalogoPaginatedState) => {
         const nextItems = append
@@ -89,24 +125,69 @@ export function useCatalogoPublicoPaginado({
         };
       });
     },
-    [fetcher, stableBaseQuery]
+    [fetcher, stableBaseQuery],
+  );
+
+  const finishInitialLoadingWithOptionalMinDelay = useCallback(
+    async (
+      isActive: () => boolean,
+      syncStartedAt: number,
+      useMinSkeleton: boolean,
+    ): Promise<void> => {
+      if (!isActive()) {
+        return;
+      }
+      if (useMinSkeleton && minSkeletonMs > 0) {
+        const elapsed: number = Date.now() - syncStartedAt;
+        const wait: number = Math.max(0, minSkeletonMs - elapsed);
+        if (wait > 0) {
+          await sleepMs(wait);
+        }
+      }
+      if (!isActive()) {
+        return;
+      }
+      setIsInitialLoading(false);
+    },
+    [minSkeletonMs],
   );
 
   const reload = useCallback(async (): Promise<void> => {
     if (!enabled) {
       return;
     }
+
+    const hadItems: boolean = latestItemCountRef.current > 0;
+    const useStaleOverlay: boolean = staleWhileRevalidate && hadItems;
+    const useMinSkeleton: boolean = minSkeletonMs > 0 && !useStaleOverlay;
+    const t0: number = Date.now();
+
     try {
       setIsInitialLoading(true);
       setError(null);
       await executeFetch(initialPage, false);
     } catch (caught) {
-      setError(toApiError(caught).message);
-      setData(buildInitialState(safeLimit));
+      if (!isRequestAborted(caught)) {
+        setError(toApiError(caught).message);
+        if (!staleWhileRevalidate) {
+          setData(buildInitialState(safeLimit));
+        }
+      }
     } finally {
-      setIsInitialLoading(false);
+      await finishInitialLoadingWithOptionalMinDelay(
+        () => true,
+        t0,
+        useMinSkeleton,
+      );
     }
-  }, [enabled, executeFetch, initialPage, safeLimit]);
+  }, [
+    enabled,
+    executeFetch,
+    initialPage,
+    safeLimit,
+    staleWhileRevalidate,
+    finishInitialLoadingWithOptionalMinDelay,
+  ]);
 
   const loadMore = useCallback(async (): Promise<void> => {
     if (!enabled || isLoadingMore || isInitialLoading || !data.hasMore) {
@@ -118,6 +199,9 @@ export function useCatalogoPublicoPaginado({
       setError(null);
       await executeFetch(data.page + 1, true);
     } catch (caught) {
+      if (isRequestAborted(caught)) {
+        return;
+      }
       setError(toApiError(caught).message);
     } finally {
       setIsLoadingMore(false);
@@ -140,41 +224,40 @@ export function useCatalogoPublicoPaginado({
     }
 
     let isActive: boolean = true;
+    const abortController: AbortController = new AbortController();
 
     async function syncData(): Promise<void> {
+      const hadItems: boolean = latestItemCountRef.current > 0;
+      const useStaleOverlay: boolean = staleWhileRevalidate && hadItems;
+      const useMinSkeleton: boolean = minSkeletonMs > 0 && !useStaleOverlay;
+      const t0: number = Date.now();
+
       try {
         setIsInitialLoading(true);
         setError(null);
 
-        const query: ICatalogoQuery = {
-          ...stableBaseQuery,
-          page: initialPage,
-        };
-
-        const response: ICatalogoResult = await fetcher(query);
+        await executeFetch(initialPage, false, {
+          signal: abortController.signal,
+        });
 
         if (!isActive) {
           return;
         }
-
-        setData({
-          items: response.items,
-          total: response.total,
-          page: response.page,
-          limit: response.limit,
-          hasMore: response.items.length < response.total,
-        });
       } catch (caught) {
-        if (!isActive) {
+        if (!isActive || isRequestAborted(caught)) {
           return;
         }
 
         setError(toApiError(caught).message);
-        setData(buildInitialState(safeLimit));
-      } finally {
-        if (isActive) {
-          setIsInitialLoading(false);
+        if (!staleWhileRevalidate) {
+          setData(buildInitialState(safeLimit));
         }
+      } finally {
+        await finishInitialLoadingWithOptionalMinDelay(
+          () => isActive,
+          t0,
+          useMinSkeleton,
+        );
       }
     }
 
@@ -182,12 +265,26 @@ export function useCatalogoPublicoPaginado({
 
     return () => {
       isActive = false;
+      abortController.abort();
     };
-  }, [enabled, fetcher, initialPage, safeLimit, stableBaseQuery]);
+  }, [
+    enabled,
+    executeFetch,
+    finishInitialLoadingWithOptionalMinDelay,
+    initialPage,
+    minSkeletonMs,
+    safeLimit,
+    stableBaseQuery,
+    staleWhileRevalidate,
+  ]);
+
+  const isStaleListRefreshing: boolean =
+    staleWhileRevalidate && isInitialLoading && data.items.length > 0;
 
   return {
     data,
     isInitialLoading,
+    isStaleListRefreshing,
     isLoadingMore,
     error,
     loadMore,

@@ -1,7 +1,12 @@
 import { labelForEventCategory } from "@/constants/contentCategories";
 import type { IEvent } from "@/entities/event/event.types";
 import { publicApiClient } from "@/services/public-api/client";
-import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
+import type {
+  ICatalogoFetcherContext,
+  ICatalogoItem,
+  ICatalogoQuery,
+  ICatalogoResult,
+} from "../../shared/model/catalogo.types";
 
 function mapEventToCatalogItem(event: IEvent): ICatalogoItem {
   return {
@@ -24,7 +29,8 @@ function mapEventToCatalogItem(event: IEvent): ICatalogoItem {
 }
 
 export async function fetchEventosCatalogo(
-  query: ICatalogoQuery
+  query: ICatalogoQuery,
+  context?: ICatalogoFetcherContext,
 ): Promise<ICatalogoResult> {
   const response = await publicApiClient.listPublishedEvents({
     citySlug: query.cidade,
@@ -32,6 +38,7 @@ export async function fetchEventosCatalogo(
     category: query.categoria,
     page: query.page,
     limit: query.limit,
+    signal: context?.signal,
   });
 
   return {

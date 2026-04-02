@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { CATALOGO_PUBLICO_SEARCH_DEBOUNCE_MS } from "@/domains/catalogo-publico/shared/constants/catalogoPublicoSearchDebounce";
 import { EventosPage } from "../pages/EventosPage";
 
 vi.mock("@/domains/catalogo-publico/shared/hooks/useCatalogoCidade", () => ({
@@ -64,6 +65,7 @@ describe("EventosPage", () => {
         hasMore: false,
       },
       isInitialLoading: true,
+      isStaleListRefreshing: false,
       isLoadingMore: false,
       error: null,
       loadMore: vi.fn(),
@@ -103,6 +105,7 @@ describe("EventosPage", () => {
         hasMore: false,
       },
       isInitialLoading: false,
+      isStaleListRefreshing: false,
       isLoadingMore: false,
       error: null,
       loadMore: vi.fn(),
@@ -130,6 +133,7 @@ describe("EventosPage", () => {
         hasMore: false,
       },
       isInitialLoading: false,
+      isStaleListRefreshing: false,
       isLoadingMore: false,
       error: null,
       loadMore: vi.fn(),
@@ -155,6 +159,7 @@ describe("EventosPage", () => {
         hasMore: false,
       },
       isInitialLoading: false,
+      isStaleListRefreshing: false,
       isLoadingMore: false,
       error: "Não foi possível carregar os dados.",
       loadMore: vi.fn(),
@@ -194,6 +199,7 @@ describe("EventosPage", () => {
         hasMore: true,
       },
       isInitialLoading: false,
+      isStaleListRefreshing: false,
       isLoadingMore: true,
       error: null,
       loadMore: vi.fn(),
@@ -209,5 +215,50 @@ describe("EventosPage", () => {
     expect(
       screen.getByRole("button", { name: /carregando/i }),
     ).toBeInTheDocument();
+  });
+
+  it("só envia busca para o hook após debounce da digitação", async () => {
+    vi.useFakeTimers();
+    const captured: Array<{ busca?: string; categoria?: string }> = [];
+    vi.mocked(useCatalogoPublicoPaginado).mockImplementation((params) => {
+      captured.push({ ...params.baseQuery });
+      return {
+        data: {
+          items: [],
+          total: 0,
+          page: 1,
+          limit: 6,
+          hasMore: false,
+        },
+        isInitialLoading: false,
+        isStaleListRefreshing: false,
+        isLoadingMore: false,
+        error: null,
+        loadMore: vi.fn(),
+        reload: vi.fn(),
+      };
+    });
+
+    try {
+      render(
+        <MemoryRouter>
+          <EventosPage />
+        </MemoryRouter>,
+      );
+
+      fireEvent.change(screen.getByLabelText("Buscar"), {
+        target: { value: "festival" },
+      });
+
+      expect(captured[captured.length - 1]?.busca).toBe("");
+
+      await act(async () => {
+        vi.advanceTimersByTime(CATALOGO_PUBLICO_SEARCH_DEBOUNCE_MS);
+      });
+
+      expect(captured[captured.length - 1]?.busca).toBe("festival");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

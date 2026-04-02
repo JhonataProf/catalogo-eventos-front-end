@@ -41,7 +41,9 @@ describe("PontoTuristicoDetailsPage", () => {
     renderWithRoute("/pontos-turisticos/1");
 
     expect(
-      screen.getByText("Carregando ponto turístico...")
+      screen.getByRole("status", {
+        name: /carregando dados do ponto turístico/i,
+      }),
     ).toBeInTheDocument();
   });
 

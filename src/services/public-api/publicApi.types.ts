@@ -17,6 +17,8 @@ export interface IPublicListParams {
   category?: string;
   page?: number;
   limit?: number;
+  /** Cancelamento ao trocar filtros / desmontar (catálogo público). */
+  signal?: AbortSignal;
 }
 
 export interface IPublicListResponse<TItem> {

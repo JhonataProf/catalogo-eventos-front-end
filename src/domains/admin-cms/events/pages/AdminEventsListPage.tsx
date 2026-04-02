@@ -2,6 +2,7 @@ import { useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { IEvent } from "@/entities/event/event.types";
+import { AdminCrmListTableSkeleton } from "@/domains/admin-cms/components/AdminCrmListTableSkeleton";
 import { useAdminEventsList } from "@/domains/admin-cms/events/hooks/useAdminEventsList";
 import { toApiError } from "@/services/api/apiError";
 import { deleteAdminEvent } from "@/services/admin-api/adminEvents.api";
@@ -49,9 +50,7 @@ export function AdminEventsListPage(): ReactElement {
       ) : null}
 
       <Card>
-        {isLoading ? (
-          <p className="text-sm text-zinc-600">Carregando dados...</p>
-        ) : null}
+        {isLoading ? <AdminCrmListTableSkeleton /> : null}
 
         {!isLoading && items.length === 0 ? (
           <p className="text-sm text-zinc-600">Nenhum evento cadastrado.</p>

@@ -28,4 +28,18 @@ describe("LoadMoreButton", () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it("deve ficar desabilitado quando disabled for true", () => {
+    const onClick = vi.fn();
+
+    render(
+      <LoadMoreButton isLoading={false} onClick={onClick} disabled />
+    );
+
+    expect(screen.getByRole("button", { name: /carregar mais/i })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: /carregar mais/i }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

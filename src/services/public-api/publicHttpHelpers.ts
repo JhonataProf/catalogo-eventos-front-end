@@ -16,6 +16,7 @@ export async function resolveEventCityId(
   try {
     const { data } = await http.get<unknown>(
       `/public/cities/${encodeURIComponent(params.citySlug)}`,
+      { signal: params.signal },
     );
     const raw = unwrapResource<Record<string, unknown>>(data);
     const city = mapCityFromApi(raw);

@@ -2,6 +2,7 @@ import { useState, type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
+import { AdminCrmListTableSkeleton } from "@/domains/admin-cms/components/AdminCrmListTableSkeleton";
 import { useAdminTouristPointsList } from "@/domains/admin-cms/tourist-points/hooks/useAdminTouristPointsList";
 import { adminApiClient } from "@/services/admin-api/client";
 
@@ -49,9 +50,7 @@ export function AdminTouristPointsListPage(): ReactElement {
       ) : null}
 
       <Card>
-        {isLoading ? (
-          <p className="text-sm text-zinc-600">Carregando dados...</p>
-        ) : null}
+        {isLoading ? <AdminCrmListTableSkeleton /> : null}
 
         {!isLoading && items.length === 0 ? (
           <p className="text-sm text-zinc-600">

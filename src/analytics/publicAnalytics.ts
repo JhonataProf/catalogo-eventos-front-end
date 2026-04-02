@@ -2,6 +2,9 @@
  * Ponto único para eventos de negócio/navegação na área pública.
  * Não chamar `dataLayer.push` diretamente em componentes de domínio.
  *
+ * Evolução (RUM / Core Web Vitals, percepção de carregamento do catálogo): preferir
+ * eventos nomeados aqui ou extensão documentada — evitar `dataLayer` espalhado na UI.
+ *
  * @see docs/architecture/frontend-analytics-constraints.md
  */
 

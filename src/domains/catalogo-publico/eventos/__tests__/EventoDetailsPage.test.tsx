@@ -34,7 +34,9 @@ describe("EventoDetailsPage", () => {
 
     renderWithRoute("/eventos/1");
 
-    expect(screen.getByText("Carregando evento...")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: /carregando dados do evento/i }),
+    ).toBeInTheDocument();
   });
 
   it("deve renderizar os dados do evento quando encontrado", async () => {

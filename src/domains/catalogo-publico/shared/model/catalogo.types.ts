@@ -38,3 +38,12 @@ export interface ICatalogoPaginatedState {
   limit: number;
   hasMore: boolean;
 }
+
+export interface ICatalogoFetcherContext {
+  signal?: AbortSignal;
+}
+
+export type ICatalogoFetcher = (
+  query: ICatalogoQuery,
+  context?: ICatalogoFetcherContext,
+) => Promise<ICatalogoResult>;

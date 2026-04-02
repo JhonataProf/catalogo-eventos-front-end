@@ -1,7 +1,12 @@
 import { labelForTouristPointCategory } from "@/constants/contentCategories";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { loadPublishedTouristPointsCatalog } from "@/services/public-api/publicTouristPoints.api";
-import type { ICatalogoItem, ICatalogoQuery, ICatalogoResult } from "../../shared/model/catalogo.types";
+import type {
+  ICatalogoFetcherContext,
+  ICatalogoItem,
+  ICatalogoQuery,
+  ICatalogoResult,
+} from "../../shared/model/catalogo.types";
 
 function mapTouristPointToCatalogItem(
   touristPoint: ITouristPoint
@@ -25,7 +30,8 @@ function mapTouristPointToCatalogItem(
 }
 
 export async function fetchPontosCatalogo(
-  query: ICatalogoQuery
+  query: ICatalogoQuery,
+  context?: ICatalogoFetcherContext,
 ): Promise<ICatalogoResult> {
   const response = await loadPublishedTouristPointsCatalog({
     citySlug: query.cidade,
@@ -33,6 +39,7 @@ export async function fetchPontosCatalogo(
     category: query.categoria,
     page: query.page,
     limit: query.limit,
+    signal: context?.signal,
   });
 
   return {

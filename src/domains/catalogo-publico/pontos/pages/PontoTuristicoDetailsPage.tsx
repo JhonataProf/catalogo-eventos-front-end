@@ -8,6 +8,7 @@ import {
 import { labelForTouristPointCategory } from "@/constants/contentCategories";
 import { usePublishedTouristPointById } from "@/domains/catalogo-publico/pontos/hooks/usePublishedTouristPointById";
 import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
+import { PublicEntityDetailSkeleton } from "@/domains/catalogo-publico/shared/components/PublicEntityDetailSkeleton";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
 import { usePublicPageMetadata } from "@/shell/public/seo/usePublicPageMetadata";
 import { type ReactElement } from "react";
@@ -47,9 +48,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
 
   if (isLoading) {
     return (
-      <Section spacing="xl">
-        <p className="text-sm text-zinc-600">Carregando ponto turístico...</p>
-      </Section>
+      <PublicEntityDetailSkeleton loadingLabel="Carregando dados do ponto turístico" />
     );
   }
 

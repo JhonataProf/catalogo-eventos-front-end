@@ -182,10 +182,9 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
       limit: 5,
     });
 
-    expect(mockGet).toHaveBeenNthCalledWith(
-      1,
-      "/public/cities/dourados",
-    );
+    expect(mockGet).toHaveBeenNthCalledWith(1, "/public/cities/dourados", {
+      signal: undefined,
+    });
     expect(mockGet).toHaveBeenNthCalledWith(2, "/public/events", {
       params: {
         page: "2",
@@ -195,6 +194,7 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
         category: "Show",
         cityId: 7,
       },
+      signal: undefined,
     });
     expect(result.items).toHaveLength(1);
     expect(result.total).toBe(1);

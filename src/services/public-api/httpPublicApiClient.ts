@@ -86,6 +86,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       }
       const { data } = await http.get<unknown>("/public/events", {
         params: buildEventQuery(params, cityId),
+        signal: params.signal,
       });
       const parsed = unwrapCollection<Record<string, unknown>>(data);
       const items = parsed.items
@@ -144,6 +145,7 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
     ): Promise<IPublicListResponse<ITouristPoint>> {
       const { data } = await http.get<unknown>("/public/tourist-points", {
         params: buildTouristPointQuery(params),
+        signal: params.signal,
       });
       const parsed = unwrapCollection<Record<string, unknown>>(data);
       let items = parsed.items
