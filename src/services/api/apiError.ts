@@ -19,6 +19,68 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Formato BFF: `error.details.errors[]` com `{ path, message }` (ex.: Zod / validação).
+ */
+function readValidationErrorsMessage(data: unknown): string | undefined {
+  if (typeof data !== "object" || data === null) {
+    return undefined;
+  }
+  const root = data as Record<string, unknown>;
+  const errObj = root.error;
+  if (typeof errObj !== "object" || errObj === null) {
+    return undefined;
+  }
+  const details = (errObj as Record<string, unknown>).details;
+  if (typeof details !== "object" || details === null) {
+    return undefined;
+  }
+  const errors = (details as Record<string, unknown>).errors;
+  if (!Array.isArray(errors) || errors.length === 0) {
+    return undefined;
+  }
+
+  const parts: string[] = [];
+  for (const item of errors) {
+    if (typeof item !== "object" || item === null) {
+      continue;
+    }
+    const row = item as Record<string, unknown>;
+    const pathRaw = row.path;
+    const path =
+      typeof pathRaw === "string"
+        ? pathRaw.trim()
+        : typeof pathRaw === "number"
+          ? String(pathRaw)
+          : "";
+    const msg =
+      typeof row.message === "string" && row.message.trim() !== ""
+        ? row.message.trim()
+        : "";
+    if (!msg) {
+      continue;
+    }
+    parts.push(path !== "" ? `${path}: ${msg}` : msg);
+  }
+
+  if (parts.length === 0) {
+    return undefined;
+  }
+  return parts.join("; ");
+}
+
+function readErrorCodeFromResponseData(data: unknown): string | undefined {
+  if (typeof data !== "object" || data === null) {
+    return undefined;
+  }
+  const nested = (data as Record<string, unknown>).error;
+  if (typeof nested !== "object" || nested === null) {
+    return undefined;
+  }
+  const code = (nested as Record<string, unknown>).code;
+  return typeof code === "string" && code.trim() !== "" ? code.trim() : undefined;
+}
+
 function readMessageFromResponseData(data: unknown): string | undefined {
   if (typeof data !== "object" || data === null) {
     return undefined;
@@ -71,10 +133,12 @@ export function toApiError(error: unknown, fallbackMessage = "Falha na comunica�
           : undefined;
     const correlationId = readCorrelationIdFromResponseData(data);
     const requestId = requestIdHeader ?? correlationId;
-    const fromBody = readMessageFromResponseData(data);
-    const message =
-      fromBody ?? error.message ?? fallbackMessage;
-    return new ApiError(message, status, undefined, requestId);
+    const validationSummary = readValidationErrorsMessage(data);
+    const fromBody =
+      validationSummary ?? readMessageFromResponseData(data);
+    const message = fromBody ?? error.message ?? fallbackMessage;
+    const code = readErrorCodeFromResponseData(data);
+    return new ApiError(message, status, code, requestId);
   }
   if (error instanceof Error) {
     return new ApiError(error.message, undefined, undefined, undefined);

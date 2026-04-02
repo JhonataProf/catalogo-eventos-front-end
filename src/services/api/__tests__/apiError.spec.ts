@@ -69,4 +69,33 @@ describe("toApiError", () => {
     expect(out.message).toBe("Credenciais inválidas");
     expect(out.requestId).toBe("corr-123");
   });
+
+  it("prioriza error.details.errors para mensagem de validação e repassa error.code", () => {
+    const err = new AxiosError("bad");
+    err.response = {
+      status: 400,
+      data: {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Validation error",
+          details: {
+            errors: [
+              { path: "startDate", message: "Data inicial é obrigatória" },
+              { path: "endDate", message: "Data final é obrigatória" },
+            ],
+          },
+        },
+        meta: { correlationId: "3cae" },
+      },
+      headers: {},
+      statusText: "",
+      config: {} as InternalAxiosRequestConfig,
+    };
+    const out = toApiError(err);
+    expect(out.code).toBe("VALIDATION_ERROR");
+    expect(out.message).toBe(
+      "startDate: Data inicial é obrigatória; endDate: Data final é obrigatória",
+    );
+    expect(out.requestId).toBe("3cae");
+  });
 });

@@ -15,6 +15,10 @@ import type {
   IUpdateEventInput,
 } from "@/entities/event/event.types";
 import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
+import {
+  EVENT_CATEGORY_OPTIONS,
+  EVENT_CATEGORY_VALUES,
+} from "@/constants/contentCategories";
 import { useAdminEventFormSource } from "@/domains/admin-cms/events/hooks/useAdminEventFormSource";
 import { toApiError } from "@/services/api/apiError";
 import {
@@ -294,13 +298,28 @@ export function AdminEventFormPage(): ReactElement {
             <label htmlFor="category" className="text-sm font-medium text-zinc-700">
               Categoria
             </label>
-            <input
+            <select
               id="category"
               name="category"
               value={formState.category}
               onChange={handleInputChange}
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
+            >
+              <option value="">Selecione uma categoria</option>
+              {EVENT_CATEGORY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+              {formState.category !== "" &&
+              !(EVENT_CATEGORY_VALUES as readonly string[]).includes(
+                formState.category,
+              ) ? (
+                <option value={formState.category}>
+                  {formState.category} (valor atual)
+                </option>
+              ) : null}
+            </select>
           </div>
 
           <div className="space-y-2">

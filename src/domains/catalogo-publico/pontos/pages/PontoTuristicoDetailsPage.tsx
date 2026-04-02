@@ -5,6 +5,7 @@ import {
   Section,
   SectionHeader,
 } from "@/design-system/ui";
+import { labelForTouristPointCategory } from "@/constants/contentCategories";
 import { usePublishedTouristPointById } from "@/domains/catalogo-publico/pontos/hooks/usePublishedTouristPointById";
 import { EmptyState } from "@/domains/catalogo-publico/shared/components/EmptyState";
 import { truncateMetaDescription } from "@/shell/public/seo/truncateMetaDescription";
@@ -88,7 +89,7 @@ export function PontoTuristicoDetailsPage(): ReactElement {
               <div className="space-y-2">
                 {touristPoint.category ? (
                   <span className="inline-flex rounded-full bg-[var(--color-bg-light)] px-3 py-1 text-sm font-medium text-[var(--color-secondary)]">
-                    {touristPoint.category}
+                    {labelForTouristPointCategory(touristPoint.category)}
                   </span>
                 ) : null}
 
@@ -147,7 +148,9 @@ export function PontoTuristicoDetailsPage(): ReactElement {
           <Card>
             <h2 className="text-lg font-semibold text-zinc-900">Categoria</h2>
             <p className="mt-3 text-sm leading-6 text-zinc-600">
-              {touristPoint.category ?? "Não informado"}
+              {touristPoint.category
+                ? labelForTouristPointCategory(touristPoint.category)
+                : "Não informado"}
             </p>
           </Card>
 

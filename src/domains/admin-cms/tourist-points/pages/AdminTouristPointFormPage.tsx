@@ -15,7 +15,17 @@ import type {
   IUpdateTouristPointInput,
 } from "@/entities/tourist-point/touristPoint.types";
 import { AdminImageUrlField } from "@/domains/admin-cms/components/AdminImageUrlField";
+import {
+  TOURIST_POINT_CATEGORY_OPTIONS,
+  TOURIST_POINT_CATEGORY_VALUES,
+} from "@/constants/contentCategories";
 import { useAdminTouristPointFormSource } from "@/domains/admin-cms/tourist-points/hooks/useAdminTouristPointFormSource";
+import {
+  finalizeHHmmString,
+  maskHHmmInput,
+  openingHoursFromApiToForm,
+  openingHoursToApi,
+} from "@/domains/admin-cms/utils/hhmmInput";
 import { adminApiClient } from "@/services/admin-api/client";
 import { toApiError } from "@/services/api/apiError";
 
@@ -61,7 +71,7 @@ function mapTouristPointToFormState(
     description: touristPoint.description,
     category: touristPoint.category ?? "",
     address: touristPoint.address ?? "",
-    openingHours: touristPoint.openingHours ?? "",
+    openingHours: openingHoursFromApiToForm(touristPoint.openingHours),
     imageUrl: touristPoint.imageUrl ?? "",
     featured: touristPoint.featured,
     published: touristPoint.published,
@@ -152,6 +162,29 @@ export function AdminTouristPointFormPage(): ReactElement {
     }
   }
 
+  function handleOpeningHoursChange(
+    event: ChangeEvent<HTMLInputElement>,
+  ): void {
+    const masked = maskHHmmInput(event.target.value);
+    setFormState((currentState: ITouristPointFormState) => ({
+      ...currentState,
+      openingHours: masked,
+    }));
+    if (successMessage) {
+      setSuccessMessage("");
+    }
+  }
+
+  function handleOpeningHoursBlur(): void {
+    setFormState((currentState: ITouristPointFormState) => ({
+      ...currentState,
+      openingHours:
+        currentState.openingHours.trim() === ""
+          ? ""
+          : finalizeHHmmString(currentState.openingHours),
+    }));
+  }
+
   async function handleSubmit(
     event: SyntheticEvent<HTMLFormElement>
   ): Promise<void> {
@@ -171,7 +204,7 @@ export function AdminTouristPointFormPage(): ReactElement {
           description: formState.description.trim(),
           category: formState.category.trim() || undefined,
           address: formState.address.trim() || undefined,
-          openingHours: formState.openingHours.trim() || undefined,
+          openingHours: openingHoursToApi(formState.openingHours),
           imageUrl: formState.imageUrl.trim() || undefined,
           featured: formState.featured,
           published: formState.published,
@@ -187,7 +220,7 @@ export function AdminTouristPointFormPage(): ReactElement {
           description: formState.description.trim(),
           category: formState.category.trim() || undefined,
           address: formState.address.trim() || undefined,
-          openingHours: formState.openingHours.trim() || undefined,
+          openingHours: openingHoursToApi(formState.openingHours),
           imageUrl: formState.imageUrl.trim() || undefined,
           featured: formState.featured,
           published: formState.published,
@@ -292,13 +325,28 @@ export function AdminTouristPointFormPage(): ReactElement {
             <label htmlFor="category" className="text-sm font-medium text-zinc-700">
               Categoria
             </label>
-            <input
+            <select
               id="category"
               name="category"
               value={formState.category}
               onChange={handleInputChange}
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
-            />
+            >
+              <option value="">Selecione uma categoria</option>
+              {TOURIST_POINT_CATEGORY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+              {formState.category !== "" &&
+              !(TOURIST_POINT_CATEGORY_VALUES as readonly string[]).includes(
+                formState.category,
+              ) ? (
+                <option value={formState.category}>
+                  {formState.category} (valor atual)
+                </option>
+              ) : null}
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -321,10 +369,19 @@ export function AdminTouristPointFormPage(): ReactElement {
             <input
               id="openingHours"
               name="openingHours"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="HH:mm (ex.: 08:30)"
+              maxLength={5}
               value={formState.openingHours}
-              onChange={handleInputChange}
+              onChange={handleOpeningHoursChange}
+              onBlur={handleOpeningHoursBlur}
               className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
             />
+            <p className="text-xs text-zinc-500">
+              Envio para a API no formato 24h (HH:mm).
+            </p>
           </div>
 
           <div className="space-y-2 md:col-span-2">

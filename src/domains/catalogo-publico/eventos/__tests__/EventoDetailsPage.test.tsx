@@ -44,7 +44,7 @@ describe("EventoDetailsPage", () => {
       citySlug: "dourados",
       name: "Festival Gastronômico de Dourados",
       description: "Sabores regionais, música e experiências culturais.",
-      category: "Gastronomia",
+      category: "gastronomia",
       startDate: "2026-03-20",
       endDate: "2026-03-22",
       formattedDate: "20 a 22 de março de 2026",

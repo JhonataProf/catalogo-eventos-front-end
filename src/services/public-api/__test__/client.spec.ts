@@ -85,13 +85,13 @@ describe("publicApiClient", () => {
       const publicApiClient = await loadPublicApiClient();
 
       const result = await publicApiClient.listPublishedEvents({
-        category: "Gastronomia",
+        category: "gastronomia",
         page: 1,
         limit: 50,
       });
 
       expect(result.items.length).toBeGreaterThan(0);
-      expect(result.items.every((item) => item.category === "Gastronomia")).toBe(
+      expect(result.items.every((item) => item.category === "gastronomia")).toBe(
         true,
       );
     });
@@ -190,13 +190,13 @@ describe("publicApiClient", () => {
       const publicApiClient = await loadPublicApiClient();
 
       const result = await publicApiClient.listPublishedTouristPoints({
-        category: "Natureza",
+        category: "parque",
         page: 1,
         limit: 50,
       });
 
       expect(result.items.length).toBeGreaterThan(0);
-      expect(result.items.every((item) => item.category === "Natureza")).toBe(
+      expect(result.items.every((item) => item.category === "parque")).toBe(
         true,
       );
     });
