@@ -51,7 +51,7 @@ jobs:
     environment: ${{ vars.DEPLOY_GITHUB_ENVIRONMENT || 'frontend-deploy' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@v4
