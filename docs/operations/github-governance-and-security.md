@@ -29,6 +29,15 @@ Recomenda-se, no repositório: **Settings → Branches → Branch protection rul
 - **Settings → Code security** (ou **Security**): ativar **Secret scanning** e **Dependabot alerts** se ainda não estiverem (depende do plano GitHub).
 - Tratar **Dependabot security updates** com prioridade; merge após revisão e CI verde.
 
+### Dependency graph e workflow “Dependency review”
+
+O workflow `.github/workflows/dependency-review.yml` usa `actions/dependency-review-action`, que **só funciona** com o **Dependency graph** ligado:
+
+1. Abrir **Settings** do repositório → **Code security and analysis** (ou **Security** → **Advanced security**, conforme a UI).
+2. Ativar **Dependency graph** (em orgs privadas pode exigir plano / GitHub Advanced Security).
+
+Enquanto o gráfico não estiver disponível, o passo no Actions pode registar erro; no nosso workflow o passo está com **`continue-on-error: true`** para **não bloquear merges** em PRs. Depois de ativar o gráfico e confirmar que o passo fica verde, podem remover `continue-on-error` nesse passo se quiserem falha bloqueante em vulnerabilidades detectadas na PR.
+
 ---
 
 ## CODEOWNERS
@@ -57,7 +66,7 @@ O ficheiro `.github/CODEOWNERS` pode ser preenchido com `@org/team` ou `@usernam
 
 - **CI** (`ci.yml`): dispara em **pull request**, em **push** a `main`/`master` e manualmente via **Actions → CI → Run workflow** (`workflow_dispatch`). O mesmo ficheiro garante **gates idênticos** em PR e na branch principal, sem duplicar jobs nem alterar nomes de checks entre fluxos.
 - Passos: install (`HUSKY=0`), audit informativo (não bloqueia), Prettier check, ESLint, typecheck, coverage, validação Vite (smoke), build smoke.
-- **Dependency review** (`dependency-review.yml`): PRs contra `main`/`master`.
+- **Dependency review** (`dependency-review.yml`): PRs contra `main`/`master` (requer **Dependency graph**; ver secção acima).
 - **Dependabot** (`.github/dependabot.yml`): PRs semanais agrupados (produção vs desenvolvimento). O projeto usa **Yarn** e só **`yarn.lock`**; na configuração do Dependabot o ecosistema continua a chamar-se `npm` (requisito da API), mas os PRs atualizam o `yarn.lock`.
 
 ## Modelos de PR e issues

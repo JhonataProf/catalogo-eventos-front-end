@@ -1,5 +1,9 @@
 # Compara dependências da base da PR com o head e alerta sobre alterações com vulnerabilidades conhecidas.
-# Requer Dependency graph ativo (repositórios públicos: por defeito).
+#
+# Requer Dependency graph ativo: Settings → Code security and analysis → Dependency graph.
+# Repositórios privados sem GitHub Advanced Security podem não ter o gráfico; o passo abaixo
+# usa continue-on-error para não bloquear PRs — ative o gráfico e, se quiserem gate estrito,
+# removam continue-on-error depois de confirmar que o passo fica verde.
 
 name: Dependency review
 
@@ -19,4 +23,5 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Dependency Review
+        continue-on-error: true
         uses: actions/dependency-review-action@v4
