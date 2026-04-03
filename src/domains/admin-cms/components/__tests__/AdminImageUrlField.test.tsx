@@ -6,11 +6,7 @@ describe("AdminImageUrlField", () => {
   it("exibe pré-visualização quando o valor é data URL", () => {
     const dataUrl = "data:image/png;base64,AAAA";
     render(
-      <AdminImageUrlField
-        id="imageUrl"
-        value={dataUrl}
-        onChange={vi.fn()}
-      />,
+      <AdminImageUrlField id="imageUrl" value={dataUrl} onChange={vi.fn()} />,
     );
 
     const preview = screen.getByRole("img", {
@@ -21,9 +17,7 @@ describe("AdminImageUrlField", () => {
 
   it("exibe pré-visualização para URL https", () => {
     const url = "https://cdn.example.com/a.png";
-    render(
-      <AdminImageUrlField id="imageUrl" value={url} onChange={vi.fn()} />,
-    );
+    render(<AdminImageUrlField id="imageUrl" value={url} onChange={vi.fn()} />);
 
     expect(
       screen.getByRole("img", { name: /pré-visualização da imagem/i }),

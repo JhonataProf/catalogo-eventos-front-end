@@ -17,7 +17,10 @@ export function AdminCrmListTableSkeleton({
     { length: columnCount },
     (_, index: number) => index,
   );
-  const rows: number[] = Array.from({ length: rowCount }, (_, index: number) => index);
+  const rows: number[] = Array.from(
+    { length: rowCount },
+    (_, index: number) => index,
+  );
 
   return (
     <div

@@ -65,12 +65,12 @@ O fluxo cria o pedido **ACM na região `us-east-1`**, registros **CNAME de valid
 
 ### Ajustes no projeto (build / env)
 
-| Item | Ação |
-|------|------|
-| **CORS / API** | No BFF, incluir `https://<seu-alias>` em `Access-Control-Allow-Origin` (ou regra equivalente). |
-| **`VITE_PUBLIC_BFF_BASE_URL`** | Continua apontando para a API (pode ser outro hostname). Mixed content: API em HTTPS. |
-| **CI (GitHub Actions)** | Secrets `S3_BUCKET` e `CLOUDFRONT_DISTRIBUTION_ID` **não mudam**; o sync e a invalidação seguem iguais. |
-| **Canonical / SEO** | Quando usar domínio próprio, alinhar metadados/canonical na aplicação (fora do Terraform). |
+| Item                           | Ação                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| **CORS / API**                 | No BFF, incluir `https://<seu-alias>` em `Access-Control-Allow-Origin` (ou regra equivalente).          |
+| **`VITE_PUBLIC_BFF_BASE_URL`** | Continua apontando para a API (pode ser outro hostname). Mixed content: API em HTTPS.                   |
+| **CI (GitHub Actions)**        | Secrets `S3_BUCKET` e `CLOUDFRONT_DISTRIBUTION_ID` **não mudam**; o sync e a invalidação seguem iguais. |
+| **Canonical / SEO**            | Quando usar domínio próprio, alinhar metadados/canonical na aplicação (fora do Terraform).              |
 
 Ver também `.env.example`.
 
@@ -127,13 +127,13 @@ terraform -chdir=infra/terraform/environments/dev state list
 
 ## Riscos
 
-| Risco | Mitigação |
-|-------|-----------|
-| Propagação DNS / validação ACM lenta | Aguardar; não remover registros CNAME de validação até `apply` concluir. |
-| Certificado não cobre um alias | Planejar FQDN + SANs antes do `apply`. |
-| CORS não atualizado | Checklist pós-deploy; testar chamada real do browser. |
-| `terraform apply` atualiza CloudFront (vários minutos) | Janela de manutenção se necessário. |
-| Estado local perdido | Usar backend remoto (`backend.tf.example`). |
+| Risco                                                  | Mitigação                                                                |
+| ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Propagação DNS / validação ACM lenta                   | Aguardar; não remover registros CNAME de validação até `apply` concluir. |
+| Certificado não cobre um alias                         | Planejar FQDN + SANs antes do `apply`.                                   |
+| CORS não atualizado                                    | Checklist pós-deploy; testar chamada real do browser.                    |
+| `terraform apply` atualiza CloudFront (vários minutos) | Janela de manutenção se necessário.                                      |
+| Estado local perdido                                   | Usar backend remoto (`backend.tf.example`).                              |
 
 ## Rollback
 

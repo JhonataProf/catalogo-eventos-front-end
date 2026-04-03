@@ -82,7 +82,7 @@ export function AdminCityFormPage(): ReactElement {
   } = useAdminCityById(cityId);
 
   const [formState, setFormState] = useState<ICityFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const isLoading: boolean = isEditMode ? cityLoading : false;
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -102,7 +102,7 @@ export function AdminCityFormPage(): ReactElement {
   }, [isEditMode]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
     const { name, value, type } = event.target;
 
@@ -128,7 +128,7 @@ export function AdminCityFormPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -221,7 +221,10 @@ export function AdminCityFormPage(): ReactElement {
         </Card>
       ) : null}
 
-      <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)}>
+      <form
+        className="space-y-6"
+        onSubmit={(event) => void handleSubmit(event)}
+      >
         <Card className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium text-zinc-700">
@@ -250,7 +253,10 @@ export function AdminCityFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="state" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="state"
+              className="text-sm font-medium text-zinc-700"
+            >
               UF
             </label>
             <input
@@ -276,7 +282,10 @@ export function AdminCityFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="summary" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="summary"
+              className="text-sm font-medium text-zinc-700"
+            >
               Resumo
             </label>
             <textarea
@@ -290,7 +299,10 @@ export function AdminCityFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="description" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-zinc-700"
+            >
               Descrição longa
             </label>
             <textarea

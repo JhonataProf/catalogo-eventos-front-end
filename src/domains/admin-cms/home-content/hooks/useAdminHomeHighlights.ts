@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { IHomeHighlight } from "@/entities/home-content/homeContent.types";
 import { adminApiClient } from "@/services/admin-api/client";
 
@@ -20,7 +26,8 @@ export function useAdminHomeHighlights(): IUseAdminHomeHighlightsResult {
       setIsLoading(true);
       setError("");
 
-      const response: IHomeHighlight[] = await adminApiClient.listHomeHighlights();
+      const response: IHomeHighlight[] =
+        await adminApiClient.listHomeHighlights();
       setItems(response);
     } catch {
       setError("Não foi possível carregar os destaques.");

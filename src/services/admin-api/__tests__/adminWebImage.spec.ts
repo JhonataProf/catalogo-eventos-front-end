@@ -23,10 +23,7 @@ describe("resolveWebImagePayloadFromImageUrlField", () => {
       "fetch",
       vi.fn().mockResolvedValue({
         ok: true,
-        blob: () =>
-          Promise.resolve(
-            new Blob([bytes], { type: "image/jpeg" }),
-          ),
+        blob: () => Promise.resolve(new Blob([bytes], { type: "image/jpeg" })),
       }),
     );
 

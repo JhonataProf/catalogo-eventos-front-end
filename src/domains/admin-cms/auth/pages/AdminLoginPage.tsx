@@ -14,7 +14,8 @@ export function AdminLoginPage(): ReactElement {
   const location = useLocation();
   const { login } = useAuth();
 
-  const locationState: ILocationState | null = location.state as ILocationState | null;
+  const locationState: ILocationState | null =
+    location.state as ILocationState | null;
 
   const adminApiConfigured = resolveAdminBffBaseUrl() !== "";
 
@@ -27,7 +28,9 @@ export function AdminLoginPage(): ReactElement {
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  async function handleSubmit(event: SyntheticEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmit(
+    event: SyntheticEvent<HTMLFormElement>,
+  ): Promise<void> {
     event.preventDefault();
 
     try {
@@ -76,16 +79,23 @@ export function AdminLoginPage(): ReactElement {
             role="alert"
           >
             A API administrativa não está configurada neste build. Defina{" "}
-            <code className="rounded bg-amber-100 px-1">VITE_PUBLIC_BFF_BASE_URL</code>{" "}
+            <code className="rounded bg-amber-100 px-1">
+              VITE_PUBLIC_BFF_BASE_URL
+            </code>{" "}
             ou{" "}
-            <code className="rounded bg-amber-100 px-1">VITE_ADMIN_BFF_BASE_URL</code>{" "}
-            (HTTPS, com <code className="rounded bg-amber-100 px-1">/api</code> se
-            aplicável), faça um novo build e publique novamente.
+            <code className="rounded bg-amber-100 px-1">
+              VITE_ADMIN_BFF_BASE_URL
+            </code>{" "}
+            (HTTPS, com <code className="rounded bg-amber-100 px-1">/api</code>{" "}
+            se aplicável), faça um novo build e publique novamente.
           </div>
         ) : null}
       </div>
 
-      <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>
+      <form
+        className="space-y-4"
+        onSubmit={(event) => void handleSubmit(event)}
+      >
         <div className="space-y-2">
           <label
             htmlFor="admin-email"

@@ -143,7 +143,10 @@ export function PontosTuristicosPage(): ReactElement {
             />
           ) : null}
 
-          {!isInitialLoading && !error && isCitiesReady && data.items.length > 0 ? (
+          {!isInitialLoading &&
+          !error &&
+          isCitiesReady &&
+          data.items.length > 0 ? (
             <>
               <CatalogGrid items={data.items} />
               {data.hasMore ? (

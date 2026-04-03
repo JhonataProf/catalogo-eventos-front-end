@@ -20,9 +20,7 @@ export function TopNav(): ReactElement {
           </div>
 
           <div className="leading-tight">
-            <p className="text-sm font-semibold text-zinc-900">
-              Celeiro do MS
-            </p>
+            <p className="text-sm font-semibold text-zinc-900">Celeiro do MS</p>
             <p className="text-xs text-zinc-500">Turismo &amp; Eventos</p>
           </div>
         </NavLink>

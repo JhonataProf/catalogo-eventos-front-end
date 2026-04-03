@@ -13,10 +13,10 @@ Aprovado (Fase 1 — escopo apenas publicação estática única; sem Fase 2 SEO
 
 ## 2. Decisão formal: estática única vs estratégia diferente público/CRM
 
-| Pergunta | Decisão Fase 1 |
-|----------|----------------|
-| A aplicação inteira pode seguir como **estática**? | **Sim.** Um artefato `dist/` servido por **S3 + CloudFront**. |
-| A área pública precisa de **infra/host distinto** do CRM nesta fase? | **Não.** Mesma distribuição; separação lógica por rota. Evita duplicar pipeline, bucket e DNS. |
+| Pergunta                                                               | Decisão Fase 1                                                                                                                                                    |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A aplicação inteira pode seguir como **estática**?                     | **Sim.** Um artefato `dist/` servido por **S3 + CloudFront**.                                                                                                     |
+| A área pública precisa de **infra/host distinto** do CRM nesta fase?   | **Não.** Mesma distribuição; separação lógica por rota. Evita duplicar pipeline, bucket e DNS.                                                                    |
 | A área pública precisa de **estratégia diferente** para **SEO forte**? | **Sim, em fase posterior** (SSR/pré-render/edge HTML ou equivalente), **sem** mudar a decisão de Fase 1 de um único site estático até que o time priorize Fase 2. |
 
 ## 3. Critérios técnicos da decisão
@@ -43,10 +43,10 @@ Usuário → CloudFront (HTTPS, headers mínimos) → S3 (privado, OAC)
 
 ## 5. Variáveis de build (mapeamento)
 
-| Variável | Obrigatória | Onde é lida | Comportamento |
-|----------|-------------|-------------|---------------|
-| `VITE_PUBLIC_BFF_BASE_URL` | Não | `src/services/public-api/client.ts`, `src/vite-env.d.ts` | Se **definida** (ex.: `https://host/api`), o cliente público usa **HTTP**; se **vazia/ausente**, usa **in-memory** (útil só para dev sem API). |
-| `VITE_*` futuras (ex.: analytics) | — | — | **Não existem** no código hoje; ao adicionar, documentar aqui e em `.env.example`. |
+| Variável                          | Obrigatória | Onde é lida                                              | Comportamento                                                                                                                                  |
+| --------------------------------- | ----------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_PUBLIC_BFF_BASE_URL`        | Não         | `src/services/public-api/client.ts`, `src/vite-env.d.ts` | Se **definida** (ex.: `https://host/api`), o cliente público usa **HTTP**; se **vazia/ausente**, usa **in-memory** (útil só para dev sem API). |
+| `VITE_*` futuras (ex.: analytics) | —           | —                                                        | **Não existem** no código hoje; ao adicionar, documentar aqui e em `.env.example`.                                                             |
 
 **Build:** `yarn build` embute `import.meta.env` no bundle — cada ambiente (dev CI, staging, prod) deve injetar o `.env` ou equivalente do CI **antes** do build.
 
@@ -78,13 +78,13 @@ Usuário → CloudFront (HTTPS, headers mínimos) → S3 (privado, OAC)
 
 ## 9. Riscos e trade-offs
 
-| Risco / trade-off | Mitigação Fase 1 |
-|-------------------|------------------|
-| `index.html` cacheado após release | Invalidação no deploy; TTL curto no default behavior. |
-| SEO fraco para fichas dinâmicas | Aceito na Fase 1; Fase 2 de renderização quando priorizado. |
+| Risco / trade-off                                       | Mitigação Fase 1                                                 |
+| ------------------------------------------------------- | ---------------------------------------------------------------- |
+| `index.html` cacheado após release                      | Invalidação no deploy; TTL curto no default behavior.            |
+| SEO fraco para fichas dinâmicas                         | Aceito na Fase 1; Fase 2 de renderização quando priorizado.      |
 | Um único bucket: vazamento de escopo “público vs admin” | Mitigação é **aplicação + BFF**, não segundo bucket obrigatório. |
-| URL CloudFront longa | Aceitável para laboratório; domínio próprio = fase seguinte. |
-| State Terraform local perdido | Usar backend remoto quando o time crescer. |
+| URL CloudFront longa                                    | Aceitável para laboratório; domínio próprio = fase seguinte.     |
+| State Terraform local perdido                           | Usar backend remoto quando o time crescer.                       |
 
 ## 10. Referências
 

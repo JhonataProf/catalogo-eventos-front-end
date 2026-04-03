@@ -39,9 +39,7 @@ export function EventoDetailsPage(): ReactElement {
         : isLoading
           ? "Carregando evento… | Celeiro do MS"
           : "Evento | Celeiro do MS",
-    description: event
-      ? truncateMetaDescription(event.description)
-      : undefined,
+    description: event ? truncateMetaDescription(event.description) : undefined,
     canonicalPath: canonicalEventPath,
   });
 
@@ -54,10 +52,7 @@ export function EventoDetailsPage(): ReactElement {
   if (error) {
     return (
       <Section spacing="xl">
-        <EmptyState
-          title="Erro ao carregar o evento"
-          description={error}
-        />
+        <EmptyState title="Erro ao carregar o evento" description={error} />
         <div className="mt-6">
           <Link
             to="/eventos"

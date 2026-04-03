@@ -34,9 +34,7 @@ function readInitialAdminSession(): IAdminAuthSession | null {
   return loadAdminSession();
 }
 
-export function AuthProvider({
-  children,
-}: PropsWithChildren): ReactElement {
+export function AuthProvider({ children }: PropsWithChildren): ReactElement {
   const [session, setSession] = useState<IAdminAuthSession | null>(
     readInitialAdminSession,
   );
@@ -106,8 +104,6 @@ export function AuthProvider({
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }

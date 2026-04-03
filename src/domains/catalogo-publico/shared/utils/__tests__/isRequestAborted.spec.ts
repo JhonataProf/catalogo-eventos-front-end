@@ -3,9 +3,9 @@ import { isRequestAborted } from "../isRequestAborted";
 
 describe("isRequestAborted", () => {
   it("detecta AbortError do DOM", () => {
-    expect(
-      isRequestAborted(new DOMException("aborted", "AbortError")),
-    ).toBe(true);
+    expect(isRequestAborted(new DOMException("aborted", "AbortError"))).toBe(
+      true,
+    );
   });
 
   it("detecta cancelamento do Axios", () => {

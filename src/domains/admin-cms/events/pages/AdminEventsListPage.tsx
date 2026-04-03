@@ -18,7 +18,7 @@ export function AdminEventsListPage(): ReactElement {
       await deleteAdminEvent(id);
 
       setItems((currentItems: IEvent[]) =>
-        currentItems.filter((item: IEvent) => item.id !== id)
+        currentItems.filter((item: IEvent) => item.id !== id),
       );
     } catch (caught) {
       setError(toApiError(caught).message);
@@ -75,9 +75,7 @@ export function AdminEventsListPage(): ReactElement {
                     <td className="py-4">{item.name}</td>
                     <td className="py-4">{item.citySlug}</td>
                     <td className="py-4">{item.category ?? "-"}</td>
-                    <td className="py-4">
-                      {item.featured ? "Sim" : "Não"}
-                    </td>
+                    <td className="py-4">{item.featured ? "Sim" : "Não"}</td>
                     <td className="py-4">
                       {item.published ? "Publicado" : "Rascunho"}
                     </td>

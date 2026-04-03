@@ -32,7 +32,9 @@ function canPreview(value: string): boolean {
  * Campo de imagem para o CMS: upload local (data URL) ou URL, com pré-visualização.
  * O valor segue no mesmo `imageUrl` usado pelo cliente HTTP admin.
  */
-export function AdminImageUrlField(props: IAdminImageUrlFieldProps): ReactElement {
+export function AdminImageUrlField(
+  props: IAdminImageUrlFieldProps,
+): ReactElement {
   const {
     id,
     label = "Imagem",
@@ -101,7 +103,8 @@ export function AdminImageUrlField(props: IAdminImageUrlFieldProps): ReactElemen
       <div className="flex flex-col gap-1">
         <span className="text-sm font-medium text-zinc-700">{label}</span>
         <p className="text-xs text-zinc-500">
-          Envie um arquivo do seu computador ou cole uma URL (https) já hospedada.
+          Envie um arquivo do seu computador ou cole uma URL (https) já
+          hospedada.
         </p>
       </div>
 
@@ -141,7 +144,10 @@ export function AdminImageUrlField(props: IAdminImageUrlFieldProps): ReactElemen
       ) : null}
 
       <div className="space-y-2">
-        <label htmlFor={urlInputId} className="text-sm font-medium text-zinc-700">
+        <label
+          htmlFor={urlInputId}
+          className="text-sm font-medium text-zinc-700"
+        >
           URL ou data URL (opcional se enviou arquivo acima)
         </label>
         <input
@@ -159,7 +165,9 @@ export function AdminImageUrlField(props: IAdminImageUrlFieldProps): ReactElemen
 
       {showPreview ? (
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 p-3">
-          <p className="mb-2 text-xs font-medium text-zinc-600">Pré-visualização</p>
+          <p className="mb-2 text-xs font-medium text-zinc-600">
+            Pré-visualização
+          </p>
           <img
             src={value.trim()}
             alt="Pré-visualização da imagem"

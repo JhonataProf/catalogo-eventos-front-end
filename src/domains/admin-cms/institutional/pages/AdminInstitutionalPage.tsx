@@ -6,11 +6,7 @@ import {
   type SyntheticEvent,
   type ReactElement,
 } from "react";
-import {
-  Button,
-  Card,
-  SectionHeader,
-} from "@/design-system/ui";
+import { Button, Card, SectionHeader } from "@/design-system/ui";
 import type {
   ICreateInstitutionalContentInput,
   IInstitutionalContent,
@@ -53,7 +49,7 @@ function buildInitialFormState(): IInstitutionalFormState {
 }
 
 function mapContentToFormState(
-  content: IInstitutionalContent
+  content: IInstitutionalContent,
 ): IInstitutionalFormState {
   return {
     aboutTitle: content.aboutTitle,
@@ -118,7 +114,7 @@ export function AdminInstitutionalPage(): ReactElement {
 
   const isCreateMode: boolean = !content;
   const [formState, setFormState] = useState<IInstitutionalFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -142,7 +138,7 @@ export function AdminInstitutionalPage(): ReactElement {
   }, [content?.updatedAt]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
     const { name, value } = event.target;
 
@@ -157,7 +153,7 @@ export function AdminInstitutionalPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -272,7 +268,10 @@ export function AdminInstitutionalPage(): ReactElement {
         </Card>
       ) : null}
 
-      <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)}>
+      <form
+        className="space-y-6"
+        onSubmit={(event) => void handleSubmit(event)}
+      >
         <Card className="space-y-4">
           <h2 className="text-lg font-semibold text-zinc-900">
             Sobre o portal

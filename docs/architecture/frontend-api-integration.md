@@ -38,30 +38,30 @@ Valores são paths relativos à base URL do BFF configurada no cliente.
 
 ### Público (`httpPublicApiClient`)
 
-| Método | Path | Uso resumido |
-|--------|------|----------------|
-| GET | `/public/cities` | Lista cidades |
-| GET | `/public/cities/:slug` | Cidade por slug |
-| GET | `/public/events` | Lista / filtros (incl. por cidade) |
-| GET | `/public/events/:id` | Evento por id |
-| GET | `/public/tourist-points` | Lista pontos turísticos |
-| GET | `/public/tourist-points/:id` | Ponto por id |
-| GET | `/public/institutional-content` | Conteúdo institucional |
-| GET | `/public/social-links` | Links sociais |
-| GET | `/public/home-content` | Banners e destaques da home |
+| Método | Path                            | Uso resumido                       |
+| ------ | ------------------------------- | ---------------------------------- |
+| GET    | `/public/cities`                | Lista cidades                      |
+| GET    | `/public/cities/:slug`          | Cidade por slug                    |
+| GET    | `/public/events`                | Lista / filtros (incl. por cidade) |
+| GET    | `/public/events/:id`            | Evento por id                      |
+| GET    | `/public/tourist-points`        | Lista pontos turísticos            |
+| GET    | `/public/tourist-points/:id`    | Ponto por id                       |
+| GET    | `/public/institutional-content` | Conteúdo institucional             |
+| GET    | `/public/social-links`          | Links sociais                      |
+| GET    | `/public/home-content`          | Banners e destaques da home        |
 
 ### Admin (`httpAdminApiClient`)
 
-| Método | Path | Uso resumido |
-|--------|------|----------------|
-| GET/PATCH | `/admin/institutional-content` | Ler / atualizar institucional |
-| GET/POST/PATCH/DELETE | `/admin/social-links` (+ `/:id`) | CRUD links sociais |
-| GET/POST/PATCH/DELETE | `/admin/cities` (+ `/:id`) | CRUD cidades |
-| GET | `/public/cities/:slug` | Leitura pública por slug (formulários admin) |
-| GET/POST/PATCH/DELETE | `/admin/events` (+ `/:id`) | CRUD eventos |
-| GET/POST/PATCH/DELETE | `/admin/tourist-points` (+ `/:id`) | CRUD pontos turísticos |
-| GET/POST/PATCH/DELETE | `/admin/home-banners` (+ `/:id`) | CRUD banners |
-| GET/POST/PATCH/DELETE | `/admin/home-highlights` (+ `/:id`) | CRUD destaques |
+| Método                | Path                                | Uso resumido                                 |
+| --------------------- | ----------------------------------- | -------------------------------------------- |
+| GET/PATCH             | `/admin/institutional-content`      | Ler / atualizar institucional                |
+| GET/POST/PATCH/DELETE | `/admin/social-links` (+ `/:id`)    | CRUD links sociais                           |
+| GET/POST/PATCH/DELETE | `/admin/cities` (+ `/:id`)          | CRUD cidades                                 |
+| GET                   | `/public/cities/:slug`              | Leitura pública por slug (formulários admin) |
+| GET/POST/PATCH/DELETE | `/admin/events` (+ `/:id`)          | CRUD eventos                                 |
+| GET/POST/PATCH/DELETE | `/admin/tourist-points` (+ `/:id`)  | CRUD pontos turísticos                       |
+| GET/POST/PATCH/DELETE | `/admin/home-banners` (+ `/:id`)    | CRUD banners                                 |
+| GET/POST/PATCH/DELETE | `/admin/home-highlights` (+ `/:id`) | CRUD destaques                               |
 
 ## Arquivos de referência
 

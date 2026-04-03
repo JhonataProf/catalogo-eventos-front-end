@@ -12,14 +12,16 @@ export const EVENT_CATEGORY_VALUES = [
 
 export type EventCategoryValue = (typeof EVENT_CATEGORY_VALUES)[number];
 
-export const EVENT_CATEGORY_OPTIONS: { value: EventCategoryValue; label: string }[] =
-  [
-    { value: "show", label: "Show" },
-    { value: "esporte", label: "Esporte" },
-    { value: "feira", label: "Feira" },
-    { value: "teatro", label: "Teatro" },
-    { value: "gastronomia", label: "Gastronomia" },
-  ];
+export const EVENT_CATEGORY_OPTIONS: {
+  value: EventCategoryValue;
+  label: string;
+}[] = [
+  { value: "show", label: "Show" },
+  { value: "esporte", label: "Esporte" },
+  { value: "feira", label: "Feira" },
+  { value: "teatro", label: "Teatro" },
+  { value: "gastronomia", label: "Gastronomia" },
+];
 
 export const TOURIST_POINT_CATEGORY_VALUES = [
   "parque",
@@ -42,9 +44,7 @@ export const TOURIST_POINT_CATEGORY_OPTIONS: {
 ];
 
 const EVENT_CATEGORY_LABEL_BY_VALUE: Record<string, string> =
-  Object.fromEntries(
-    EVENT_CATEGORY_OPTIONS.map((o) => [o.value, o.label]),
-  );
+  Object.fromEntries(EVENT_CATEGORY_OPTIONS.map((o) => [o.value, o.label]));
 
 const TOURIST_POINT_CATEGORY_LABEL_BY_VALUE: Record<string, string> =
   Object.fromEntries(

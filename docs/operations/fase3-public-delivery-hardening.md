@@ -4,23 +4,23 @@ Escopo **somente** publicação estática + SEO técnico mínimo + governança d
 
 ## 1. Endurecimento mínimo entregue
 
-| Área | O quê |
-|------|--------|
-| **robots / sitemap** | Pós-build `scripts/finalize-public-seo.mjs`: `dist/robots.txt` com `Disallow: /admin` e `Sitemap:` quando `VITE_PUBLIC_SITE_URL` existe; `dist/sitemap.xml` com rotas estáveis (`/`, `/eventos`, `/pontos-turisticos`, `/sobre`). |
-| **Metadata** | `usePublicPageMetadata` nas rotas públicas: `document.title`, `meta description`, `link rel=canonical` (se `VITE_PUBLIC_SITE_URL` no bundle). |
-| **Tag manager** | `VITE_PUBLIC_GTM_ID` opcional — injeção única no `index.html` via `vite.config` (`loadEnv`). |
-| **Observabilidade** | `reportPublicError` + listeners globais em **produção** (`main.tsx`) para `error` e `unhandledrejection` (hoje: `console.error` estruturado; ponto de extensão para Sentry). |
-| **Rollback / operação** | Inalterado na essência: `s3 sync` + invalidação; ver `infra/README.md`. |
+| Área                    | O quê                                                                                                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **robots / sitemap**    | Pós-build `scripts/finalize-public-seo.mjs`: `dist/robots.txt` com `Disallow: /admin` e `Sitemap:` quando `VITE_PUBLIC_SITE_URL` existe; `dist/sitemap.xml` com rotas estáveis (`/`, `/eventos`, `/pontos-turisticos`, `/sobre`). |
+| **Metadata**            | `usePublicPageMetadata` nas rotas públicas: `document.title`, `meta description`, `link rel=canonical` (se `VITE_PUBLIC_SITE_URL` no bundle).                                                                                     |
+| **Tag manager**         | `VITE_PUBLIC_GTM_ID` opcional — injeção única no `index.html` via `vite.config` (`loadEnv`).                                                                                                                                      |
+| **Observabilidade**     | `reportPublicError` + listeners globais em **produção** (`main.tsx`) para `error` e `unhandledrejection` (hoje: `console.error` estruturado; ponto de extensão para Sentry).                                                      |
+| **Rollback / operação** | Inalterado na essência: `s3 sync` + invalidação; ver `infra/README.md`.                                                                                                                                                           |
 
 Fichas dinâmicas (`/eventos/:id`, `/pontos-turisticos/:id`, `/cidades/:slug`) têm **title/description/canonical em tempo de execução** no cliente; **não** entram no `sitemap.xml` estático da v1 (mitigação: Search Console + evolução futura com sitemap gerado pela API ou build incremental).
 
 ## 2. Variáveis de build (resumo)
 
-| Variável | Uso |
-|----------|-----|
-| `VITE_PUBLIC_SITE_URL` | Canonical, robots `Sitemap`, geração de `sitemap.xml`. **HTTPS**, sem barra final. |
-| `VITE_PUBLIC_GTM_ID` | Opcional. Container GTM. |
-| `VITE_PUBLIC_BFF_BASE_URL` | API pública + admin (se não houver `VITE_ADMIN_BFF_BASE_URL`). |
+| Variável                   | Uso                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| `VITE_PUBLIC_SITE_URL`     | Canonical, robots `Sitemap`, geração de `sitemap.xml`. **HTTPS**, sem barra final. |
+| `VITE_PUBLIC_GTM_ID`       | Opcional. Container GTM.                                                           |
+| `VITE_PUBLIC_BFF_BASE_URL` | API pública + admin (se não houver `VITE_ADMIN_BFF_BASE_URL`).                     |
 
 ## 3. Como validar SEO técnico, cache e roteamento
 

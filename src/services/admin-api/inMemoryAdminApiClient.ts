@@ -84,9 +84,7 @@ function filterTouristPointsForPick(
   let out: ITouristPoint[] = [...items];
   if (query?.search?.trim()) {
     const s: string = query.search.trim().toLowerCase();
-    out = out.filter((p: ITouristPoint) =>
-      p.name.toLowerCase().includes(s),
-    );
+    out = out.filter((p: ITouristPoint) => p.name.toLowerCase().includes(s));
   }
   if (query?.category?.trim()) {
     const c: string = query.category.trim().toLowerCase();
@@ -102,473 +100,474 @@ function filterTouristPointsForPick(
 
 export function createInMemoryAdminApiClient(): IAdminApiClient {
   return {
-  async getInstitutionalContent(): Promise<IInstitutionalContent | null> {
-    await adminMockDelay();
-    if (!isInstitutionalRecordPresent()) {
-      return null;
-    }
-    return getInstitutionalContentMock();
-  },
+    async getInstitutionalContent(): Promise<IInstitutionalContent | null> {
+      await adminMockDelay();
+      if (!isInstitutionalRecordPresent()) {
+        return null;
+      }
+      return getInstitutionalContentMock();
+    },
 
-  async createInstitutionalContent(
-    input: ICreateInstitutionalContentInput,
-  ): Promise<IInstitutionalContent> {
-    await adminMockDelay();
+    async createInstitutionalContent(
+      input: ICreateInstitutionalContentInput,
+    ): Promise<IInstitutionalContent> {
+      await adminMockDelay();
 
-    const nextValue: IInstitutionalContent = {
-      id: 1,
-      updatedAt: new Date().toISOString(),
-      ...input,
-    };
+      const nextValue: IInstitutionalContent = {
+        id: 1,
+        updatedAt: new Date().toISOString(),
+        ...input,
+      };
 
-    setInstitutionalContentMock(nextValue);
-    setInstitutionalRecordPresent(true);
+      setInstitutionalContentMock(nextValue);
+      setInstitutionalRecordPresent(true);
 
-    return nextValue;
-  },
+      return nextValue;
+    },
 
-  async updateInstitutionalContent(
-    input: IUpdateInstitutionalContentInput,
-  ): Promise<IInstitutionalContent> {
-    await adminMockDelay();
+    async updateInstitutionalContent(
+      input: IUpdateInstitutionalContentInput,
+    ): Promise<IInstitutionalContent> {
+      await adminMockDelay();
 
-    if (!isInstitutionalRecordPresent()) {
-      throw new Error(
-        "Nenhum conteúdo institucional na listagem. Recarregue a página ou cadastre o registro.",
+      if (!isInstitutionalRecordPresent()) {
+        throw new Error(
+          "Nenhum conteúdo institucional na listagem. Recarregue a página ou cadastre o registro.",
+        );
+      }
+
+      const listed: IInstitutionalContent = getInstitutionalContentMock();
+      const patchId: number = listed.id === input.id ? input.id : listed.id;
+
+      const nextValue: IInstitutionalContent = {
+        ...listed,
+        ...input,
+        id: patchId,
+        updatedAt: new Date().toISOString(),
+      };
+
+      setInstitutionalContentMock(nextValue);
+
+      return nextValue;
+    },
+
+    async listSocialLinks(): Promise<ISocialLink[]> {
+      await adminMockDelay();
+      return getSocialLinksMock();
+    },
+
+    async createSocialLink(
+      input: ICreateSocialLinkInput,
+    ): Promise<ISocialLink> {
+      await adminMockDelay();
+
+      const currentItems: ISocialLink[] = getSocialLinksMock();
+
+      const nextItem: ISocialLink = {
+        id: Math.random(),
+        ...input,
+      };
+
+      setSocialLinksMock([...currentItems, nextItem]);
+
+      return nextItem;
+    },
+
+    async updateSocialLink(
+      input: IUpdateSocialLinkInput,
+    ): Promise<ISocialLink> {
+      await adminMockDelay();
+
+      const currentItems: ISocialLink[] = getSocialLinksMock();
+      const currentItem: ISocialLink | undefined = currentItems.find(
+        (item: ISocialLink) => item.id === input.id,
       );
-    }
 
-    const listed: IInstitutionalContent = getInstitutionalContentMock();
-    const patchId: number =
-      listed.id === input.id ? input.id : listed.id;
+      if (!currentItem) {
+        throw new Error("Link social não encontrado.");
+      }
 
-    const nextValue: IInstitutionalContent = {
-      ...listed,
-      ...input,
-      id: patchId,
-      updatedAt: new Date().toISOString(),
-    };
+      const nextItem: ISocialLink = {
+        ...currentItem,
+        ...input,
+      };
 
-    setInstitutionalContentMock(nextValue);
+      const nextItems: ISocialLink[] = currentItems.map((item: ISocialLink) =>
+        item.id === input.id ? nextItem : item,
+      );
 
-    return nextValue;
-  },
+      setSocialLinksMock(nextItems);
 
-  async listSocialLinks(): Promise<ISocialLink[]> {
-    await adminMockDelay();
-    return getSocialLinksMock();
-  },
+      return nextItem;
+    },
 
-  async createSocialLink(input: ICreateSocialLinkInput): Promise<ISocialLink> {
-    await adminMockDelay();
+    async deleteSocialLink(id: number): Promise<void> {
+      await adminMockDelay();
 
-    const currentItems: ISocialLink[] = getSocialLinksMock();
+      const currentItems: ISocialLink[] = getSocialLinksMock();
+      const nextItems: ISocialLink[] = currentItems.filter(
+        (item: ISocialLink) => item.id !== id,
+      );
 
-    const nextItem: ISocialLink = {
-      id: Math.random(),
-      ...input,
-    };
+      setSocialLinksMock(nextItems);
+    },
 
-    setSocialLinksMock([...currentItems, nextItem]);
+    async listCities(): Promise<ICity[]> {
+      await adminMockDelay();
+      return getCitiesMock();
+    },
 
-    return nextItem;
-  },
+    async getCityById(id: number): Promise<ICity | null> {
+      await adminMockDelay();
 
-  async updateSocialLink(input: IUpdateSocialLinkInput): Promise<ISocialLink> {
-    await adminMockDelay();
+      const currentItems: ICity[] = getCitiesMock();
+      const foundItem: ICity | undefined = currentItems.find(
+        (item: ICity) => item.id === id,
+      );
 
-    const currentItems: ISocialLink[] = getSocialLinksMock();
-    const currentItem: ISocialLink | undefined = currentItems.find(
-      (item: ISocialLink) => item.id === input.id,
-    );
+      return foundItem ?? null;
+    },
 
-    if (!currentItem) {
-      throw new Error("Link social não encontrado.");
-    }
+    async getCityBySlug(slug: string): Promise<ICity | null> {
+      await adminMockDelay();
 
-    const nextItem: ISocialLink = {
-      ...currentItem,
-      ...input,
-    };
+      const currentItems: ICity[] = getCitiesMock();
+      const foundItem: ICity | undefined = currentItems.find(
+        (item: ICity) => item.slug === slug,
+      );
 
-    const nextItems: ISocialLink[] = currentItems.map((item: ISocialLink) =>
-      item.id === input.id ? nextItem : item,
-    );
+      return foundItem ?? null;
+    },
 
-    setSocialLinksMock(nextItems);
+    async createCity(input: ICreateCityInput): Promise<ICity> {
+      await adminMockDelay();
 
-    return nextItem;
-  },
+      const currentItems: ICity[] = getCitiesMock();
 
-  async deleteSocialLink(id: number): Promise<void> {
-    await adminMockDelay();
+      const nextItem: ICity = {
+        id: Math.random(),
+        ...input,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    const currentItems: ISocialLink[] = getSocialLinksMock();
-    const nextItems: ISocialLink[] = currentItems.filter(
-      (item: ISocialLink) => item.id !== id,
-    );
+      setCitiesMock([...currentItems, nextItem]);
 
-    setSocialLinksMock(nextItems);
-  },
+      return nextItem;
+    },
 
-  async listCities(): Promise<ICity[]> {
-    await adminMockDelay();
-    return getCitiesMock();
-  },
+    async updateCity(input: IUpdateCityInput): Promise<ICity> {
+      await adminMockDelay();
 
-  async getCityById(id: number): Promise<ICity | null> {
-    await adminMockDelay();
+      const currentItems: ICity[] = getCitiesMock();
+      const currentItem: ICity | undefined = currentItems.find(
+        (item: ICity) => item.id === input.id,
+      );
 
-    const currentItems: ICity[] = getCitiesMock();
-    const foundItem: ICity | undefined = currentItems.find(
-      (item: ICity) => item.id === id,
-    );
+      if (!currentItem) {
+        throw new Error("Cidade não encontrada.");
+      }
 
-    return foundItem ?? null;
-  },
+      const nextItem: ICity = {
+        ...currentItem,
+        ...input,
+        updatedAt: new Date().toISOString(),
+      };
 
-  async getCityBySlug(slug: string): Promise<ICity | null> {
-    await adminMockDelay();
+      const nextItems: ICity[] = currentItems.map((item: ICity) =>
+        item.id === input.id ? nextItem : item,
+      );
 
-    const currentItems: ICity[] = getCitiesMock();
-    const foundItem: ICity | undefined = currentItems.find(
-      (item: ICity) => item.slug === slug,
-    );
+      setCitiesMock(nextItems);
 
-    return foundItem ?? null;
-  },
+      return nextItem;
+    },
 
-  async createCity(input: ICreateCityInput): Promise<ICity> {
-    await adminMockDelay();
+    async deleteCity(id: number): Promise<void> {
+      await adminMockDelay();
 
-    const currentItems: ICity[] = getCitiesMock();
+      const currentItems: ICity[] = getCitiesMock();
+      const nextItems: ICity[] = currentItems.filter(
+        (item: ICity) => item.id !== id,
+      );
 
-    const nextItem: ICity = {
-      id: Math.random(),
-      ...input,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      setCitiesMock(nextItems);
+    },
 
-    setCitiesMock([...currentItems, nextItem]);
+    async listEvents(): Promise<IEvent[]> {
+      await adminMockDelay();
+      return getEventsMock();
+    },
 
-    return nextItem;
-  },
+    async listEventsForPick(query?: IAdminListPickQuery): Promise<IEvent[]> {
+      await adminMockDelay();
+      return filterEventsForPick(getEventsMock(), query);
+    },
 
-  async updateCity(input: IUpdateCityInput): Promise<ICity> {
-    await adminMockDelay();
+    async getEventById(id: number): Promise<IEvent | null> {
+      await adminMockDelay();
 
-    const currentItems: ICity[] = getCitiesMock();
-    const currentItem: ICity | undefined = currentItems.find(
-      (item: ICity) => item.id === input.id,
-    );
+      const currentItems: IEvent[] = getEventsMock();
+      const foundItem: IEvent | undefined = currentItems.find(
+        (item: IEvent) => item.id === id,
+      );
 
-    if (!currentItem) {
-      throw new Error("Cidade não encontrada.");
-    }
+      return foundItem ?? null;
+    },
 
-    const nextItem: ICity = {
-      ...currentItem,
-      ...input,
-      updatedAt: new Date().toISOString(),
-    };
+    async createEvent(input: ICreateEventInput): Promise<IEvent> {
+      await adminMockDelay();
 
-    const nextItems: ICity[] = currentItems.map((item: ICity) =>
-      item.id === input.id ? nextItem : item,
-    );
+      const currentItems: IEvent[] = getEventsMock();
 
-    setCitiesMock(nextItems);
+      const nextItem: IEvent = {
+        id: Math.random(),
+        ...input,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    return nextItem;
-  },
+      setEventsMock([...currentItems, nextItem]);
 
-  async deleteCity(id: number): Promise<void> {
-    await adminMockDelay();
+      return nextItem;
+    },
+
+    async updateEvent(input: IUpdateEventInput): Promise<IEvent> {
+      await adminMockDelay();
 
-    const currentItems: ICity[] = getCitiesMock();
-    const nextItems: ICity[] = currentItems.filter(
-      (item: ICity) => item.id !== id,
-    );
+      const currentItems: IEvent[] = getEventsMock();
+      const currentItem: IEvent | undefined = currentItems.find(
+        (item: IEvent) => item.id === input.id,
+      );
 
-    setCitiesMock(nextItems);
-  },
+      if (!currentItem) {
+        throw new Error("Evento não encontrado.");
+      }
 
-  async listEvents(): Promise<IEvent[]> {
-    await adminMockDelay();
-    return getEventsMock();
-  },
+      const nextItem: IEvent = {
+        ...currentItem,
+        ...input,
+        updatedAt: new Date().toISOString(),
+      };
 
-  async listEventsForPick(
-    query?: IAdminListPickQuery,
-  ): Promise<IEvent[]> {
-    await adminMockDelay();
-    return filterEventsForPick(getEventsMock(), query);
-  },
+      const nextItems: IEvent[] = currentItems.map((item: IEvent) =>
+        item.id === input.id ? nextItem : item,
+      );
 
-  async getEventById(id: number): Promise<IEvent | null> {
-    await adminMockDelay();
+      setEventsMock(nextItems);
 
-    const currentItems: IEvent[] = getEventsMock();
-    const foundItem: IEvent | undefined = currentItems.find(
-      (item: IEvent) => item.id === id,
-    );
+      return nextItem;
+    },
 
-    return foundItem ?? null;
-  },
+    async deleteEvent(id: number): Promise<void> {
+      await adminMockDelay();
 
-  async createEvent(input: ICreateEventInput): Promise<IEvent> {
-    await adminMockDelay();
+      const currentItems: IEvent[] = getEventsMock();
+      const nextItems: IEvent[] = currentItems.filter(
+        (item: IEvent) => item.id !== id,
+      );
 
-    const currentItems: IEvent[] = getEventsMock();
+      setEventsMock(nextItems);
+    },
 
-    const nextItem: IEvent = {
-      id: Math.random(),
-      ...input,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    async listTouristPoints(): Promise<ITouristPoint[]> {
+      await adminMockDelay();
+      return getTouristPointsMock();
+    },
 
-    setEventsMock([...currentItems, nextItem]);
+    async listTouristPointsForPick(
+      query?: IAdminListPickQuery,
+    ): Promise<ITouristPoint[]> {
+      await adminMockDelay();
+      return filterTouristPointsForPick(getTouristPointsMock(), query);
+    },
 
-    return nextItem;
-  },
+    async getTouristPointById(id: number): Promise<ITouristPoint | null> {
+      await adminMockDelay();
 
-  async updateEvent(input: IUpdateEventInput): Promise<IEvent> {
-    await adminMockDelay();
+      const currentItems: ITouristPoint[] = getTouristPointsMock();
+      const foundItem: ITouristPoint | undefined = currentItems.find(
+        (item: ITouristPoint) => item.id === id,
+      );
 
-    const currentItems: IEvent[] = getEventsMock();
-    const currentItem: IEvent | undefined = currentItems.find(
-      (item: IEvent) => item.id === input.id,
-    );
+      return foundItem ?? null;
+    },
 
-    if (!currentItem) {
-      throw new Error("Evento não encontrado.");
-    }
+    async createTouristPoint(
+      input: ICreateTouristPointInput,
+    ): Promise<ITouristPoint> {
+      await adminMockDelay();
 
-    const nextItem: IEvent = {
-      ...currentItem,
-      ...input,
-      updatedAt: new Date().toISOString(),
-    };
+      const currentItems: ITouristPoint[] = getTouristPointsMock();
 
-    const nextItems: IEvent[] = currentItems.map((item: IEvent) =>
-      item.id === input.id ? nextItem : item,
-    );
+      const nextItem: ITouristPoint = {
+        id: Math.random(),
+        ...input,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    setEventsMock(nextItems);
+      setTouristPointsMock([...currentItems, nextItem]);
 
-    return nextItem;
-  },
+      return nextItem;
+    },
 
-  async deleteEvent(id: number): Promise<void> {
-    await adminMockDelay();
+    async updateTouristPoint(
+      input: IUpdateTouristPointInput,
+    ): Promise<ITouristPoint> {
+      await adminMockDelay();
 
-    const currentItems: IEvent[] = getEventsMock();
-    const nextItems: IEvent[] = currentItems.filter(
-      (item: IEvent) => item.id !== id,
-    );
+      const currentItems: ITouristPoint[] = getTouristPointsMock();
+      const currentItem: ITouristPoint | undefined = currentItems.find(
+        (item: ITouristPoint) => item.id === input.id,
+      );
 
-    setEventsMock(nextItems);
-  },
+      if (!currentItem) {
+        throw new Error("Ponto turístico não encontrado.");
+      }
 
-  async listTouristPoints(): Promise<ITouristPoint[]> {
-    await adminMockDelay();
-    return getTouristPointsMock();
-  },
+      const nextItem: ITouristPoint = {
+        ...currentItem,
+        ...input,
+        updatedAt: new Date().toISOString(),
+      };
 
-  async listTouristPointsForPick(
-    query?: IAdminListPickQuery,
-  ): Promise<ITouristPoint[]> {
-    await adminMockDelay();
-    return filterTouristPointsForPick(getTouristPointsMock(), query);
-  },
+      const nextItems: ITouristPoint[] = currentItems.map(
+        (item: ITouristPoint) => (item.id === input.id ? nextItem : item),
+      );
 
-  async getTouristPointById(id: number): Promise<ITouristPoint | null> {
-    await adminMockDelay();
+      setTouristPointsMock(nextItems);
 
-    const currentItems: ITouristPoint[] = getTouristPointsMock();
-    const foundItem: ITouristPoint | undefined = currentItems.find(
-      (item: ITouristPoint) => item.id === id,
-    );
+      return nextItem;
+    },
 
-    return foundItem ?? null;
-  },
+    async deleteTouristPoint(id: number): Promise<void> {
+      await adminMockDelay();
 
-  async createTouristPoint(
-    input: ICreateTouristPointInput,
-  ): Promise<ITouristPoint> {
-    await adminMockDelay();
+      const currentItems: ITouristPoint[] = getTouristPointsMock();
+      const nextItems: ITouristPoint[] = currentItems.filter(
+        (item: ITouristPoint) => item.id !== id,
+      );
 
-    const currentItems: ITouristPoint[] = getTouristPointsMock();
+      setTouristPointsMock(nextItems);
+    },
+
+    async listHomeBanners(): Promise<IHomeBanner[]> {
+      await adminMockDelay();
+      return getHomeBannersMock();
+    },
+
+    async createHomeBanner(
+      input: ICreateHomeBannerInput,
+    ): Promise<IHomeBanner> {
+      await adminMockDelay();
 
-    const nextItem: ITouristPoint = {
-      id: Math.random(),
-      ...input,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    setTouristPointsMock([...currentItems, nextItem]);
-
-    return nextItem;
-  },
-
-  async updateTouristPoint(
-    input: IUpdateTouristPointInput,
-  ): Promise<ITouristPoint> {
-    await adminMockDelay();
-
-    const currentItems: ITouristPoint[] = getTouristPointsMock();
-    const currentItem: ITouristPoint | undefined = currentItems.find(
-      (item: ITouristPoint) => item.id === input.id,
-    );
-
-    if (!currentItem) {
-      throw new Error("Ponto turístico não encontrado.");
-    }
-
-    const nextItem: ITouristPoint = {
-      ...currentItem,
-      ...input,
-      updatedAt: new Date().toISOString(),
-    };
-
-    const nextItems: ITouristPoint[] = currentItems.map(
-      (item: ITouristPoint) => (item.id === input.id ? nextItem : item),
-    );
-
-    setTouristPointsMock(nextItems);
-
-    return nextItem;
-  },
-
-  async deleteTouristPoint(id: number): Promise<void> {
-    await adminMockDelay();
-
-    const currentItems: ITouristPoint[] = getTouristPointsMock();
-    const nextItems: ITouristPoint[] = currentItems.filter(
-      (item: ITouristPoint) => item.id !== id,
-    );
-
-    setTouristPointsMock(nextItems);
-  },
-
-  async listHomeBanners(): Promise<IHomeBanner[]> {
-    await adminMockDelay();
-    return getHomeBannersMock();
-  },
-
-  async createHomeBanner(
-    input: ICreateHomeBannerInput
-  ): Promise<IHomeBanner> {
-    await adminMockDelay();
-
-    const currentItems: IHomeBanner[] = getHomeBannersMock();
-
-    const nextItem: IHomeBanner = {
-      id: Math.random(),
-      ...input,
-    };
-
-    setHomeBannersMock([...currentItems, nextItem]);
-
-    return nextItem;
-  },
-
-  async updateHomeBanner(
-    input: IUpdateHomeBannerInput
-  ): Promise<IHomeBanner> {
-    await adminMockDelay();
-
-    const currentItems: IHomeBanner[] = getHomeBannersMock();
-    const currentItem: IHomeBanner | undefined = currentItems.find(
-      (item: IHomeBanner) => item.id === input.id
-    );
-
-    if (!currentItem) {
-      throw new Error("Banner não encontrado.");
-    }
-
-    const nextItem: IHomeBanner = {
-      ...currentItem,
-      ...input,
-    };
-
-    setHomeBannersMock(
-      currentItems.map((item: IHomeBanner) =>
-        item.id === input.id ? nextItem : item
-      )
-    );
-
-    return nextItem;
-  },
-
-  async deleteHomeBanner(id: number): Promise<void> {
-    await adminMockDelay();
-
-    const currentItems: IHomeBanner[] = getHomeBannersMock();
-    setHomeBannersMock(
-      currentItems.filter((item: IHomeBanner) => item.id !== id)
-    );
-  },
-
-  async listHomeHighlights(): Promise<IHomeHighlight[]> {
-    await adminMockDelay();
-    return getHomeHighlightsMock();
-  },
-
-  async createHomeHighlight(
-    input: ICreateHomeHighlightInput
-  ): Promise<IHomeHighlight> {
-    await adminMockDelay();
-
-    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
-
-    const nextItem: IHomeHighlight = {
-      id: Math.random(),
-      ...input,
-    };
-
-    setHomeHighlightsMock([...currentItems, nextItem]);
-
-    return nextItem;
-  },
-
-  async updateHomeHighlight(
-    input: IUpdateHomeHighlightInput
-  ): Promise<IHomeHighlight> {
-    await adminMockDelay();
-
-    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
-    const currentItem: IHomeHighlight | undefined = currentItems.find(
-      (item: IHomeHighlight) => item.id === input.id
-    );
-
-    if (!currentItem) {
-      throw new Error("Destaque não encontrado.");
-    }
-
-    const nextItem: IHomeHighlight = {
-      ...currentItem,
-      ...input,
-    };
-
-    setHomeHighlightsMock(
-      currentItems.map((item: IHomeHighlight) =>
-        item.id === input.id ? nextItem : item
-      )
-    );
-
-    return nextItem;
-  },
-
-  async deleteHomeHighlight(id: number): Promise<void> {
-    await adminMockDelay();
-
-    const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
-    setHomeHighlightsMock(
-      currentItems.filter((item: IHomeHighlight) => item.id !== id)
-    );
-  },
-};
+      const currentItems: IHomeBanner[] = getHomeBannersMock();
+
+      const nextItem: IHomeBanner = {
+        id: Math.random(),
+        ...input,
+      };
+
+      setHomeBannersMock([...currentItems, nextItem]);
+
+      return nextItem;
+    },
+
+    async updateHomeBanner(
+      input: IUpdateHomeBannerInput,
+    ): Promise<IHomeBanner> {
+      await adminMockDelay();
+
+      const currentItems: IHomeBanner[] = getHomeBannersMock();
+      const currentItem: IHomeBanner | undefined = currentItems.find(
+        (item: IHomeBanner) => item.id === input.id,
+      );
+
+      if (!currentItem) {
+        throw new Error("Banner não encontrado.");
+      }
+
+      const nextItem: IHomeBanner = {
+        ...currentItem,
+        ...input,
+      };
+
+      setHomeBannersMock(
+        currentItems.map((item: IHomeBanner) =>
+          item.id === input.id ? nextItem : item,
+        ),
+      );
+
+      return nextItem;
+    },
+
+    async deleteHomeBanner(id: number): Promise<void> {
+      await adminMockDelay();
+
+      const currentItems: IHomeBanner[] = getHomeBannersMock();
+      setHomeBannersMock(
+        currentItems.filter((item: IHomeBanner) => item.id !== id),
+      );
+    },
+
+    async listHomeHighlights(): Promise<IHomeHighlight[]> {
+      await adminMockDelay();
+      return getHomeHighlightsMock();
+    },
+
+    async createHomeHighlight(
+      input: ICreateHomeHighlightInput,
+    ): Promise<IHomeHighlight> {
+      await adminMockDelay();
+
+      const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+
+      const nextItem: IHomeHighlight = {
+        id: Math.random(),
+        ...input,
+      };
+
+      setHomeHighlightsMock([...currentItems, nextItem]);
+
+      return nextItem;
+    },
+
+    async updateHomeHighlight(
+      input: IUpdateHomeHighlightInput,
+    ): Promise<IHomeHighlight> {
+      await adminMockDelay();
+
+      const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+      const currentItem: IHomeHighlight | undefined = currentItems.find(
+        (item: IHomeHighlight) => item.id === input.id,
+      );
+
+      if (!currentItem) {
+        throw new Error("Destaque não encontrado.");
+      }
+
+      const nextItem: IHomeHighlight = {
+        ...currentItem,
+        ...input,
+      };
+
+      setHomeHighlightsMock(
+        currentItems.map((item: IHomeHighlight) =>
+          item.id === input.id ? nextItem : item,
+        ),
+      );
+
+      return nextItem;
+    },
+
+    async deleteHomeHighlight(id: number): Promise<void> {
+      await adminMockDelay();
+
+      const currentItems: IHomeHighlight[] = getHomeHighlightsMock();
+      setHomeHighlightsMock(
+        currentItems.filter((item: IHomeHighlight) => item.id !== id),
+      );
+    },
+  };
 }

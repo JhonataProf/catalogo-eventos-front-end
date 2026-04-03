@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { IHomeBanner } from "@/entities/home-content/homeContent.types";
 import { adminApiClient } from "@/services/admin-api/client";
 

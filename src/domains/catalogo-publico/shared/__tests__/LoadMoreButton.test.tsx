@@ -7,7 +7,7 @@ describe("LoadMoreButton", () => {
     render(<LoadMoreButton isLoading={false} onClick={vi.fn()} />);
 
     expect(
-      screen.getByRole("button", { name: /carregar mais/i })
+      screen.getByRole("button", { name: /carregar mais/i }),
     ).toBeInTheDocument();
   });
 
@@ -15,7 +15,7 @@ describe("LoadMoreButton", () => {
     render(<LoadMoreButton isLoading={true} onClick={vi.fn()} />);
 
     expect(
-      screen.getByRole("button", { name: /carregando/i })
+      screen.getByRole("button", { name: /carregando/i }),
     ).toBeInTheDocument();
   });
 
@@ -32,11 +32,11 @@ describe("LoadMoreButton", () => {
   it("deve ficar desabilitado quando disabled for true", () => {
     const onClick = vi.fn();
 
-    render(
-      <LoadMoreButton isLoading={false} onClick={onClick} disabled />
-    );
+    render(<LoadMoreButton isLoading={false} onClick={onClick} disabled />);
 
-    expect(screen.getByRole("button", { name: /carregar mais/i })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /carregar mais/i }),
+    ).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: /carregar mais/i }));
 

@@ -49,15 +49,15 @@ export const AdminEventFormPageLazy = lazy(() =>
 );
 
 export const AdminTouristPointsListPageLazy = lazy(() =>
-  import(
-    "@/domains/admin-cms/tourist-points/pages/AdminTouristPointsListPage"
-  ).then((m) => ({ default: m.AdminTouristPointsListPage })),
+  import("@/domains/admin-cms/tourist-points/pages/AdminTouristPointsListPage").then(
+    (m) => ({ default: m.AdminTouristPointsListPage }),
+  ),
 );
 
 export const AdminTouristPointFormPageLazy = lazy(() =>
-  import(
-    "@/domains/admin-cms/tourist-points/pages/AdminTouristPointFormPage"
-  ).then((m) => ({ default: m.AdminTouristPointFormPage })),
+  import("@/domains/admin-cms/tourist-points/pages/AdminTouristPointFormPage").then(
+    (m) => ({ default: m.AdminTouristPointFormPage }),
+  ),
 );
 
 export const AdminHomeBannersPageLazy = lazy(() =>

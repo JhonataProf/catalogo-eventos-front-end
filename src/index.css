@@ -6,9 +6,9 @@
 
 :root {
   /* Cores principais do projeto */
-  --color-primary: #0098C9;
-  --color-secondary: #0D8B54;
-  --color-accent: #DFDA0C;
+  --color-primary: #0098c9;
+  --color-secondary: #0d8b54;
+  --color-accent: #dfda0c;
 
   /* Variações do verde base (#0D8B54) para backgrounds */
   --color-bg-soft: rgba(13, 139, 84, 0.04);

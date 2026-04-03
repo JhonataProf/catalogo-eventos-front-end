@@ -8,7 +8,7 @@ describe("TopNav", () => {
     render(
       <MemoryRouter>
         <TopNav />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Celeiro do MS")).toBeInTheDocument();
@@ -19,31 +19,31 @@ describe("TopNav", () => {
     render(
       <MemoryRouter>
         <TopNav />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(
       "href",
-      "/"
+      "/",
     );
 
     expect(screen.getByRole("link", { name: "Eventos" })).toHaveAttribute(
       "href",
-      "/eventos"
+      "/eventos",
     );
 
     expect(
-      screen.getByRole("link", { name: "Pontos turísticos" })
+      screen.getByRole("link", { name: "Pontos turísticos" }),
     ).toHaveAttribute("href", "/pontos-turisticos");
 
     expect(screen.getByRole("link", { name: "Cidades" })).toHaveAttribute(
       "href",
-      "/cidades"
+      "/cidades",
     );
 
     expect(screen.getByRole("link", { name: "Sobre" })).toHaveAttribute(
       "href",
-      "/sobre"
+      "/sobre",
     );
   });
 
@@ -51,19 +51,17 @@ describe("TopNav", () => {
     render(
       <MemoryRouter>
         <TopNav />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(
-      screen.getByAltText("Logo do Celeiro do MS")
-    ).toBeInTheDocument();
+    expect(screen.getByAltText("Logo do Celeiro do MS")).toBeInTheDocument();
   });
 
   it("deve marcar o link atual conforme a rota", () => {
     render(
       <MemoryRouter initialEntries={["/eventos"]}>
         <TopNav />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const eventosLink = screen.getByRole("link", { name: "Eventos" });

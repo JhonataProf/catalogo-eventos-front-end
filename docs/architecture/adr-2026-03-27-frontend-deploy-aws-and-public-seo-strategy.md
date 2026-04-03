@@ -31,12 +31,12 @@ A pergunta de `frontend-deployment-decision-record.md` resume o dilema: **public
 
 ## Alternativas consideradas
 
-| Alternativa | Por que não foi escolhida como solução única |
-|-------------|-----------------------------------------------|
-| **Somente SPA estática, sem Fase 2** | Contradiz o requisito de SEO crítico dado o mapa de dados assíncronos no ADR de rotas. |
-| **SSR de todo o app (público + admin) desde o início** | Aumenta custo, complexidade operacional e superfície de deploy sem benefício proporcional no CRM. |
+| Alternativa                                                         | Por que não foi escolhida como solução única                                                                       |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Somente SPA estática, sem Fase 2**                                | Contradiz o requisito de SEO crítico dado o mapa de dados assíncronos no ADR de rotas.                             |
+| **SSR de todo o app (público + admin) desde o início**              | Aumenta custo, complexidade operacional e superfície de deploy sem benefício proporcional no CRM.                  |
 | **Dois domínios ou dois buckets desde a Fase 1** (público vs admin) | Possível evolução futura; não obrigatória para o baseline se políticas de cache e segurança forem claras por path. |
-| **Adiar qualquer deploy até existir SSR** | Retém valor de entrega (CRM, homologação, métricas) e atrasa feedback operacional; rejeitada em favor de fases. |
+| **Adiar qualquer deploy até existir SSR**                           | Retém valor de entrega (CRM, homologação, métricas) e atrasa feedback operacional; rejeitada em favor de fases.    |
 
 ## Trade-offs
 

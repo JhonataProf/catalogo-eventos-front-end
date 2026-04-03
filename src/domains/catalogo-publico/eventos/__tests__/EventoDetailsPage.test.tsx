@@ -18,7 +18,7 @@ function renderWithRoute(initialEntry: string) {
         <Route path="/eventos/:id" element={<EventoDetailsPage />} />
         <Route path="/eventos" element={<div>Eventos fallback</div>} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -29,7 +29,7 @@ describe("EventoDetailsPage", () => {
 
   it("deve renderizar loading inicial", () => {
     vi.mocked(publicApiClient.getPublishedEventById).mockImplementation(
-      () => new Promise(() => undefined)
+      () => new Promise(() => undefined),
     );
 
     renderWithRoute("/eventos/1");
@@ -61,11 +61,11 @@ describe("EventoDetailsPage", () => {
     renderWithRoute("/eventos/1");
 
     expect(
-      await screen.findByText("Festival Gastronômico de Dourados")
+      await screen.findByText("Festival Gastronômico de Dourados"),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Sabores regionais, música e experiências culturais.")
+      screen.getByText("Sabores regionais, música e experiências culturais."),
     ).toBeInTheDocument();
 
     expect(screen.getAllByText("Gastronomia").length).toBeGreaterThan(0);
@@ -85,17 +85,17 @@ describe("EventoDetailsPage", () => {
 
   it("deve exibir estado de erro quando a API falhar", async () => {
     vi.mocked(publicApiClient.getPublishedEventById).mockRejectedValue(
-      new Error("falha de rede")
+      new Error("falha de rede"),
     );
 
     renderWithRoute("/eventos/1");
 
     expect(
-      await screen.findByText("Erro ao carregar o evento")
+      await screen.findByText("Erro ao carregar o evento"),
     ).toBeInTheDocument();
     expect(screen.getByText("falha de rede")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Voltar para eventos" })
+      screen.getByRole("link", { name: "Voltar para eventos" }),
     ).toHaveAttribute("href", "/eventos");
   });
 });

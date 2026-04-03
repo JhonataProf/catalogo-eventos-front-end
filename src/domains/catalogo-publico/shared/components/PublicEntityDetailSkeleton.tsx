@@ -27,22 +27,36 @@ export function PublicEntityDetailSkeleton({
             <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
               <div className="space-y-5">
                 <div className="space-y-2">
-                  <div className={`h-8 w-24 rounded-full ${skeletonBlockClass}`} />
-                  <div className={`h-12 w-full max-w-xl rounded-lg ${skeletonBlockClass}`} />
-                  <div className={`h-12 w-4/5 max-w-lg rounded-lg ${skeletonBlockClass}`} />
+                  <div
+                    className={`h-8 w-24 rounded-full ${skeletonBlockClass}`}
+                  />
+                  <div
+                    className={`h-12 w-full max-w-xl rounded-lg ${skeletonBlockClass}`}
+                  />
+                  <div
+                    className={`h-12 w-4/5 max-w-lg rounded-lg ${skeletonBlockClass}`}
+                  />
                   <div className="space-y-1 pt-1">
                     <div className={`h-4 w-48 ${skeletonBlockClass}`} />
                     <div className={`h-4 w-56 ${skeletonBlockClass}`} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className={`h-4 w-full max-w-2xl ${skeletonBlockClass}`} />
-                  <div className={`h-4 w-full max-w-2xl ${skeletonBlockClass}`} />
+                  <div
+                    className={`h-4 w-full max-w-2xl ${skeletonBlockClass}`}
+                  />
+                  <div
+                    className={`h-4 w-full max-w-2xl ${skeletonBlockClass}`}
+                  />
                   <div className={`h-4 w-2/3 max-w-xl ${skeletonBlockClass}`} />
                 </div>
                 <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className={`h-12 w-40 rounded-lg ${skeletonBlockClass}`} />
-                  <div className={`h-12 w-52 rounded-lg ${skeletonBlockClass}`} />
+                  <div
+                    className={`h-12 w-40 rounded-lg ${skeletonBlockClass}`}
+                  />
+                  <div
+                    className={`h-12 w-52 rounded-lg ${skeletonBlockClass}`}
+                  />
                 </div>
               </div>
               <div

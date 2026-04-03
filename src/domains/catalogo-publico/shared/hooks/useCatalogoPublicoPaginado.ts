@@ -66,7 +66,8 @@ export function useCatalogoPublicoPaginado(
   const cidade: string = baseQuery.cidade;
   const busca: string | undefined = baseQuery.busca;
   const categoria: string | undefined = baseQuery.categoria;
-  const safeLimit: number = baseQuery.limit > 0 ? baseQuery.limit : DEFAULT_LIMIT;
+  const safeLimit: number =
+    baseQuery.limit > 0 ? baseQuery.limit : DEFAULT_LIMIT;
 
   const [data, setData] = useState<ICatalogoPaginatedState>(
     buildInitialState(safeLimit),
@@ -184,6 +185,7 @@ export function useCatalogoPublicoPaginado(
     enabled,
     executeFetch,
     initialPage,
+    minSkeletonMs,
     safeLimit,
     staleWhileRevalidate,
     finishInitialLoadingWithOptionalMinDelay,

@@ -27,9 +27,7 @@ export function SectionHeader({
   tone = "primary",
 }: ISectionHeaderProps): ReactElement {
   const alignClass: string =
-    align === "center"
-      ? "items-center text-center"
-      : "items-start text-left";
+    align === "center" ? "items-center text-center" : "items-start text-left";
 
   return (
     <header className={cn("flex flex-col gap-2", alignClass, className)}>
@@ -37,7 +35,7 @@ export function SectionHeader({
         <p
           className={cn(
             "text-xs font-semibold uppercase tracking-[0.14em]",
-            kickerTone[tone]
+            kickerTone[tone],
           )}
         >
           {kicker}

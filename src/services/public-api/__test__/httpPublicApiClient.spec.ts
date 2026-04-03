@@ -14,7 +14,8 @@ vi.mock("axios", async (importOriginal) => {
     ...actual,
     default: {
       ...actual.default,
-      create: (...args: Parameters<typeof mockCreate>) => mockCreate(...args as Parameters<typeof mockCreate>),
+      create: (...args: Parameters<typeof mockCreate>) =>
+        mockCreate(...(args as Parameters<typeof mockCreate>)),
     },
   };
 });
@@ -23,7 +24,12 @@ import { createHttpPublicApiClient } from "../httpPublicApiClient";
 
 function collectionBody<T>(
   items: T[],
-  meta: { page?: number; limit?: number; total?: number; totalPages?: number } = {},
+  meta: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
+  } = {},
 ) {
   return {
     data: items,
@@ -123,9 +129,7 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
       isAxiosError: true,
       response: { status: 404 },
     });
-    await expect(
-      client.getPublishedCityBySlug("missing"),
-    ).resolves.toBeNull();
+    await expect(client.getPublishedCityBySlug("missing")).resolves.toBeNull();
   });
 
   it("getPublishedCityBySlug propaga falha que não é 404", async () => {
@@ -425,7 +429,9 @@ describe("createHttpPublicApiClient (axios mockado)", () => {
       response: { status: 404 },
     });
     const client = createHttpPublicApiClient("https://x/api");
-    await expect(client.listPublishedTouristPointByCityId(1)).resolves.toBeNull();
+    await expect(
+      client.listPublishedTouristPointByCityId(1),
+    ).resolves.toBeNull();
   });
 
   it("listPublishedTouristPointByCityId lista por slug e filtra cityId", async () => {

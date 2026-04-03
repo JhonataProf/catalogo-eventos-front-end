@@ -24,10 +24,10 @@ export function useInstitutionalContent(): IUseInstitutionalContentResult {
         setIsLoading(true);
         setError("");
 
-        const response: IInstitutionalContent =
-          await getOrCreateSessionPromise(CACHE_KEY, () =>
-            publicApiClient.getInstitutionalContent(),
-          );
+        const response: IInstitutionalContent = await getOrCreateSessionPromise(
+          CACHE_KEY,
+          () => publicApiClient.getInstitutionalContent(),
+        );
 
         if (!isActive) {
           return;

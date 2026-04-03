@@ -169,8 +169,8 @@ export function AdminHighlightReferencePick(
         </span>
         <p className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-600">
           O tipo &quot;Customizado&quot; está desabilitado por enquanto. Escolha
-          &quot;Evento&quot; ou &quot;Ponto turístico&quot; para buscar e vincular
-          um item.
+          &quot;Evento&quot; ou &quot;Ponto turístico&quot; para buscar e
+          vincular um item.
         </p>
       </div>
     );
@@ -187,8 +187,7 @@ export function AdminHighlightReferencePick(
           label: `${p.name}${p.category ? ` · ${p.category}` : ""}`,
         }));
 
-  const kindLabel: string =
-    mode === "event" ? "evento" : "ponto turístico";
+  const kindLabel: string = mode === "event" ? "evento" : "ponto turístico";
 
   return (
     <div className="space-y-3 md:col-span-2">
@@ -280,7 +279,9 @@ export function AdminHighlightReferencePick(
               <button
                 type="button"
                 disabled={disabled}
-                onClick={() => handlePick(row.id, `${row.label} (id ${row.id})`)}
+                onClick={() =>
+                  handlePick(row.id, `${row.label} (id ${row.id})`)
+                }
                 className="w-full px-3 py-2.5 text-left text-sm text-zinc-800 transition hover:bg-zinc-50 disabled:opacity-50"
               >
                 {row.label}

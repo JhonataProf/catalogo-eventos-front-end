@@ -10,20 +10,20 @@ import type {
 describe("useCatalogoPublicoPaginado", () => {
   it("deve carregar os dados iniciais", async () => {
     const fetcher: ICatalogoFetcher = vi.fn().mockResolvedValue({
-        items: [
-          {
-            id: "evt-1",
-            kind: "evento",
-            cidadeId: "dourados",
-            cidadeSlug: "dourados",
-            titulo: "Festival",
-            descricao: "Descrição",
-          },
-        ],
-        page: 1,
-        limit: 6,
-        total: 1,
-      });
+      items: [
+        {
+          id: "evt-1",
+          kind: "evento",
+          cidadeId: "dourados",
+          cidadeSlug: "dourados",
+          titulo: "Festival",
+          descricao: "Descrição",
+        },
+      ],
+      page: 1,
+      limit: 6,
+      total: 1,
+    });
 
     const baseQuery = {
       cidade: "dourados",
@@ -34,7 +34,7 @@ describe("useCatalogoPublicoPaginado", () => {
       useCatalogoPublicoPaginado({
         baseQuery,
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -93,7 +93,7 @@ describe("useCatalogoPublicoPaginado", () => {
       useCatalogoPublicoPaginado({
         baseQuery,
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -126,7 +126,7 @@ describe("useCatalogoPublicoPaginado", () => {
       useCatalogoPublicoPaginado({
         baseQuery,
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -138,14 +138,12 @@ describe("useCatalogoPublicoPaginado", () => {
   });
 
   it("deve usar limite padrão quando limit for inválido", async () => {
-    const fetcher: ICatalogoFetcher = vi
-      .fn()
-      .mockResolvedValue({
-        items: [],
-        page: 1,
-        limit: 12,
-        total: 0,
-      });
+    const fetcher: ICatalogoFetcher = vi.fn().mockResolvedValue({
+      items: [],
+      page: 1,
+      limit: 12,
+      total: 0,
+    });
 
     renderHook(() =>
       useCatalogoPublicoPaginado({
@@ -154,7 +152,7 @@ describe("useCatalogoPublicoPaginado", () => {
           limit: 0,
         },
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -166,20 +164,27 @@ describe("useCatalogoPublicoPaginado", () => {
   });
 
   it("não deve chamar fetcher no loadMore quando não houver mais itens", async () => {
-    const fetcher: ICatalogoFetcher = vi
-      .fn()
-      .mockResolvedValue({
-        items: [{ id: "1", kind: "evento", cidadeId: "d", cidadeSlug: "d", titulo: "A", descricao: "B" }],
-        page: 1,
-        limit: 6,
-        total: 1,
-      });
+    const fetcher: ICatalogoFetcher = vi.fn().mockResolvedValue({
+      items: [
+        {
+          id: "1",
+          kind: "evento",
+          cidadeId: "d",
+          cidadeSlug: "d",
+          titulo: "A",
+          descricao: "B",
+        },
+      ],
+      page: 1,
+      limit: 6,
+      total: 1,
+    });
 
     const { result } = renderHook(() =>
       useCatalogoPublicoPaginado({
         baseQuery: { cidade: "dourados", limit: 6 },
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -197,7 +202,16 @@ describe("useCatalogoPublicoPaginado", () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce({
-        items: [{ id: "1", kind: "evento", cidadeId: "d", cidadeSlug: "d", titulo: "A", descricao: "B" }],
+        items: [
+          {
+            id: "1",
+            kind: "evento",
+            cidadeId: "d",
+            cidadeSlug: "d",
+            titulo: "A",
+            descricao: "B",
+          },
+        ],
         page: 1,
         limit: 1,
         total: 2,
@@ -208,7 +222,7 @@ describe("useCatalogoPublicoPaginado", () => {
       useCatalogoPublicoPaginado({
         baseQuery: { cidade: "dourados", limit: 1 },
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -223,20 +237,27 @@ describe("useCatalogoPublicoPaginado", () => {
   });
 
   it("deve recarregar os dados com reload", async () => {
-    const fetcher = vi
-      .fn()
-      .mockResolvedValue({
-        items: [{ id: "1", kind: "evento", cidadeId: "d", cidadeSlug: "d", titulo: "A", descricao: "B" }],
-        page: 1,
-        limit: 6,
-        total: 1,
-      });
+    const fetcher = vi.fn().mockResolvedValue({
+      items: [
+        {
+          id: "1",
+          kind: "evento",
+          cidadeId: "d",
+          cidadeSlug: "d",
+          titulo: "A",
+          descricao: "B",
+        },
+      ],
+      page: 1,
+      limit: 6,
+      total: 1,
+    });
 
     const { result } = renderHook(() =>
       useCatalogoPublicoPaginado({
         baseQuery: { cidade: "dourados", limit: 6 },
         fetcher,
-      })
+      }),
     );
 
     await waitFor(() => {
@@ -251,14 +272,12 @@ describe("useCatalogoPublicoPaginado", () => {
   });
 
   it("não deve chamar fetcher enquanto enabled for false", async () => {
-    const fetcher: ICatalogoFetcher = vi
-      .fn()
-      .mockResolvedValue({
-        items: [],
-        page: 1,
-        limit: 6,
-        total: 0,
-      });
+    const fetcher: ICatalogoFetcher = vi.fn().mockResolvedValue({
+      items: [],
+      page: 1,
+      limit: 6,
+      total: 0,
+    });
 
     renderHook(() =>
       useCatalogoPublicoPaginado({

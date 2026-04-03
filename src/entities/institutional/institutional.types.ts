@@ -40,4 +40,3 @@ export type ICreateInstitutionalContentInput = Omit<
   IInstitutionalContent,
   "id" | "updatedAt"
 >;
-

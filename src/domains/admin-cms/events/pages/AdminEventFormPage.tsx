@@ -105,11 +105,16 @@ export function AdminEventFormPage(): ReactElement {
 
   const isEditMode: boolean = Boolean(eventId);
 
-  const { cities, event: loadedEvent, isLoading, error: loadError, notFound } =
-    useAdminEventFormSource(eventId);
+  const {
+    cities,
+    event: loadedEvent,
+    isLoading,
+    error: loadError,
+    notFound,
+  } = useAdminEventFormSource(eventId);
 
   const [formState, setFormState] = useState<IEventFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -144,7 +149,9 @@ export function AdminEventFormPage(): ReactElement {
   }, [isEditMode]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ): void {
     const { name, value, type } = event.target;
 
@@ -159,7 +166,7 @@ export function AdminEventFormPage(): ReactElement {
 
       if (name === "cityId") {
         const selectedCity: ICity | undefined = cities.find(
-          (city: ICity) => city.id === Number(value)
+          (city: ICity) => city.id === Number(value),
         );
 
         nextState.citySlug = selectedCity?.slug ?? "";
@@ -178,7 +185,7 @@ export function AdminEventFormPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -292,10 +299,16 @@ export function AdminEventFormPage(): ReactElement {
         </Card>
       ) : null}
 
-      <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)}>
+      <form
+        className="space-y-6"
+        onSubmit={(event) => void handleSubmit(event)}
+      >
         <Card className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="cityId" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="cityId"
+              className="text-sm font-medium text-zinc-700"
+            >
               Cidade
             </label>
             <select
@@ -327,7 +340,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="category" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="category"
+              className="text-sm font-medium text-zinc-700"
+            >
               Categoria
             </label>
             <select
@@ -355,7 +371,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="location" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="location"
+              className="text-sm font-medium text-zinc-700"
+            >
               Local
             </label>
             <input
@@ -368,7 +387,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="startDate" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="startDate"
+              className="text-sm font-medium text-zinc-700"
+            >
               Data início
             </label>
             <input
@@ -383,7 +405,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="endDate" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="endDate"
+              className="text-sm font-medium text-zinc-700"
+            >
               Data fim
             </label>
             <input
@@ -398,7 +423,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="formattedDate" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="formattedDate"
+              className="text-sm font-medium text-zinc-700"
+            >
               Data formatada
             </label>
             <input
@@ -412,7 +440,10 @@ export function AdminEventFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="description" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-zinc-700"
+            >
               Descrição
             </label>
             <textarea

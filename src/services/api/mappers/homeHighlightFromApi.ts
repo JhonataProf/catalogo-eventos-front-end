@@ -7,8 +7,7 @@ export function mapHomeHighlightFromApi(
   return {
     id: Number(raw.id),
     type: raw.type as IHomeHighlight["type"],
-    referenceId:
-      ref !== undefined && ref !== null ? String(ref) : undefined,
+    referenceId: ref !== undefined && ref !== null ? String(ref) : undefined,
     title: String(raw.title ?? ""),
     description: String(raw.description ?? ""),
     cityName: raw.cityName !== undefined ? String(raw.cityName) : undefined,

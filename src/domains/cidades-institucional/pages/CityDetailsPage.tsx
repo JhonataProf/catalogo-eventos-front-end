@@ -20,8 +20,12 @@ export function CityDetailsPage(): ReactElement {
   const params = useParams<keyof ICityRouteParams>();
   const slug: string | undefined = params.slug;
 
-  const { city: cidade, isLoading, notFound, error } =
-    usePublishedCityBySlug(slug);
+  const {
+    city: cidade,
+    isLoading,
+    notFound,
+    error,
+  } = usePublishedCityBySlug(slug);
 
   const canonicalCidadePath = slug ? `/cidades/${slug}` : "/cidades";
 
@@ -34,7 +38,9 @@ export function CityDetailsPage(): ReactElement {
           ? "Carregando cidade… | Celeiro do MS"
           : "Cidade | Celeiro do MS",
     description: cidade
-      ? truncateMetaDescription(cidade.summary || cidade.description || cidade.name)
+      ? truncateMetaDescription(
+          cidade.summary || cidade.description || cidade.name,
+        )
       : undefined,
     canonicalPath: canonicalCidadePath,
   });
@@ -50,10 +56,7 @@ export function CityDetailsPage(): ReactElement {
   if (error) {
     return (
       <Section spacing="xl">
-        <EmptyState
-          title="Erro ao carregar a cidade"
-          description={error}
-        />
+        <EmptyState title="Erro ao carregar a cidade" description={error} />
         <div className="mt-6">
           <Link
             to="/cidades"

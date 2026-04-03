@@ -12,7 +12,9 @@ export interface IUsePublicHomeContentResult {
 }
 
 export function usePublicHomeContent(): IUsePublicHomeContentResult {
-  const [content, setContent] = useState<IPublicHomeContentResponse | null>(null);
+  const [content, setContent] = useState<IPublicHomeContentResponse | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
@@ -24,10 +26,10 @@ export function usePublicHomeContent(): IUsePublicHomeContentResult {
         setIsLoading(true);
         setError("");
 
-        const data: IPublicHomeContentResponse = await getOrCreateSessionPromise(
-          CACHE_KEY,
-          () => publicApiClient.getHomeContent(),
-        );
+        const data: IPublicHomeContentResponse =
+          await getOrCreateSessionPromise(CACHE_KEY, () =>
+            publicApiClient.getHomeContent(),
+          );
 
         if (!isActive) {
           return;

@@ -16,7 +16,7 @@ export function AdminCitiesListPage(): ReactElement {
       await adminApiClient.deleteCity(id);
 
       setItems((currentItems: ICity[]) =>
-        currentItems.filter((item: ICity) => item.id !== id)
+        currentItems.filter((item: ICity) => item.id !== id),
       );
     } catch {
       setError("Não foi possível remover a cidade.");

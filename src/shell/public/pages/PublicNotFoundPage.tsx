@@ -31,7 +31,8 @@ export function PublicNotFoundPage(): ReactElement {
             Página não encontrada
           </h1>
           <p className="mt-4 text-sm text-zinc-600">
-            Verifique o endereço ou retorne à página inicial para continuar navegando.
+            Verifique o endereço ou retorne à página inicial para continuar
+            navegando.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link

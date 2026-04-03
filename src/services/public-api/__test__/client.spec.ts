@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type PublicApiModule = typeof import("../client");
 
-async function loadPublicApiClient(): Promise<PublicApiModule["publicApiClient"]> {
+async function loadPublicApiClient(): Promise<
+  PublicApiModule["publicApiClient"]
+> {
   vi.stubEnv("VITE_PUBLIC_BFF_BASE_URL", "");
   vi.stubEnv("VITE_USE_API_MOCKS", "");
   vi.resetModules();
@@ -32,7 +34,9 @@ describe("publicApiClient", () => {
       const allCities = await publicApiClient.listPublishedCities();
       const firstCity = allCities[0];
 
-      const result = await publicApiClient.getPublishedCityBySlug(firstCity.slug);
+      const result = await publicApiClient.getPublishedCityBySlug(
+        firstCity.slug,
+      );
 
       expect(result).not.toBeNull();
       expect(result?.slug).toBe(firstCity.slug);
@@ -42,9 +46,8 @@ describe("publicApiClient", () => {
     it("deve retornar null ao buscar cidade inexistente ou não publicada", async () => {
       const publicApiClient = await loadPublicApiClient();
 
-      const result = await publicApiClient.getPublishedCityBySlug(
-        "cidade-inexistente",
-      );
+      const result =
+        await publicApiClient.getPublishedCityBySlug("cidade-inexistente");
 
       expect(result).toBeNull();
     });
@@ -91,9 +94,9 @@ describe("publicApiClient", () => {
       });
 
       expect(result.items.length).toBeGreaterThan(0);
-      expect(result.items.every((item) => item.category === "gastronomia")).toBe(
-        true,
-      );
+      expect(
+        result.items.every((item) => item.category === "gastronomia"),
+      ).toBe(true);
     });
 
     it("deve filtrar eventos por busca", async () => {
@@ -258,9 +261,7 @@ describe("publicApiClient", () => {
     it("deve retornar null ao buscar ponto turístico inexistente", async () => {
       const publicApiClient = await loadPublicApiClient();
 
-      const result = await publicApiClient.getPublishedTouristPointById(
-        999999,
-      );
+      const result = await publicApiClient.getPublishedTouristPointById(999999);
 
       expect(result).toBeNull();
     });
@@ -289,7 +290,9 @@ describe("publicApiClient", () => {
       expect(result.every((item) => item.active)).toBe(true);
 
       for (let index = 1; index < result.length; index += 1) {
-        expect(result[index - 1].order).toBeLessThanOrEqual(result[index].order);
+        expect(result[index - 1].order).toBeLessThanOrEqual(
+          result[index].order,
+        );
       }
     });
   });

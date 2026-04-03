@@ -1,6 +1,8 @@
 import type { IHomeBanner } from "@/entities/home-content/homeContent.types";
 
-export function mapHomeBannerFromApi(raw: Record<string, unknown>): IHomeBanner {
+export function mapHomeBannerFromApi(
+  raw: Record<string, unknown>,
+): IHomeBanner {
   return {
     id: Number(raw.id),
     title: String(raw.title ?? ""),

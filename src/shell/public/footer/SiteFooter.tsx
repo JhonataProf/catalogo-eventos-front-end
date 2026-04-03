@@ -12,7 +12,8 @@ export function SiteFooter(): ReactElement {
 
     async function loadSocialLinks(): Promise<void> {
       try {
-        const response: ISocialLink[] = await publicApiClient.listActiveSocialLinks()
+        const response: ISocialLink[] =
+          await publicApiClient.listActiveSocialLinks();
 
         if (!isActive) {
           return;
@@ -99,7 +100,8 @@ export function SiteFooter(): ReactElement {
           <div>
             <p className="text-sm font-semibold text-zinc-900">Créditos</p>
             <p className="mt-2 text-sm text-zinc-600">
-              © {new Date().getFullYear()} Celeiro do MS. Todos os direitos reservados.
+              © {new Date().getFullYear()} Celeiro do MS. Todos os direitos
+              reservados.
             </p>
             <p className="mt-2 text-xs text-zinc-500">
               Desenvolvido para divulgação regional.

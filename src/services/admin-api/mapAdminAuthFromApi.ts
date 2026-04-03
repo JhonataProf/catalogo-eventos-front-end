@@ -4,11 +4,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-const ADMIN_ROLE_VALUES = new Set([
-  "admin",
-  "administrator",
-  "administrador",
-]);
+const ADMIN_ROLE_VALUES = new Set(["admin", "administrator", "administrador"]);
 
 function normalizeAdminRole(role: unknown): "Admin" | null {
   const s = String(role ?? "")

@@ -44,10 +44,14 @@ function buildInitialFormState(): IHomeHighlightFormState {
 }
 
 export function AdminHomeHighlightsPage(): ReactElement {
-  const { items, setItems, isLoading, error: loadError } =
-    useAdminHomeHighlights();
+  const {
+    items,
+    setItems,
+    isLoading,
+    error: loadError,
+  } = useAdminHomeHighlights();
   const [formState, setFormState] = useState<IHomeHighlightFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -59,7 +63,9 @@ export function AdminHomeHighlightsPage(): ReactElement {
   }, [items]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ): void {
     const { name, value, type } = event.target;
 
@@ -82,7 +88,7 @@ export function AdminHomeHighlightsPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -103,7 +109,9 @@ export function AdminHomeHighlightsPage(): ReactElement {
         (formState.type === "event" || formState.type === "tourist-point") &&
         (refTrim === "" || !Number.isFinite(Number(refTrim)))
       ) {
-        setError("Selecione um evento ou ponto turístico na lista de resultados.");
+        setError(
+          "Selecione um evento ou ponto turístico na lista de resultados.",
+        );
         return;
       }
 
@@ -124,8 +132,9 @@ export function AdminHomeHighlightsPage(): ReactElement {
 
       setItems((currentItems: IHomeHighlight[]) =>
         [...currentItems, createdItem].sort(
-          (left: IHomeHighlight, right: IHomeHighlight) => left.order - right.order
-        )
+          (left: IHomeHighlight, right: IHomeHighlight) =>
+            left.order - right.order,
+        ),
       );
 
       setFormState({
@@ -135,7 +144,9 @@ export function AdminHomeHighlightsPage(): ReactElement {
 
       setSuccessMessage("Destaque cadastrado com sucesso.");
     } catch (caught) {
-      setError(toApiError(caught, "Não foi possível salvar o destaque.").message);
+      setError(
+        toApiError(caught, "Não foi possível salvar o destaque.").message,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -156,10 +167,12 @@ export function AdminHomeHighlightsPage(): ReactElement {
       await adminApiClient.deleteHomeHighlight(id);
 
       setItems((currentItems: IHomeHighlight[]) =>
-        currentItems.filter((item: IHomeHighlight) => item.id !== id)
+        currentItems.filter((item: IHomeHighlight) => item.id !== id),
       );
     } catch (caught) {
-      setError(toApiError(caught, "Não foi possível remover o destaque.").message);
+      setError(
+        toApiError(caught, "Não foi possível remover o destaque.").message,
+      );
     }
   }
 
@@ -192,7 +205,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
       <Card className="space-y-4">
         <h2 className="text-lg font-semibold text-zinc-900">Novo destaque</h2>
 
-        <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="grid gap-4 md:grid-cols-2"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div className="space-y-2">
             <label htmlFor="type" className="text-sm font-medium text-zinc-700">
               Tipo
@@ -225,7 +241,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
           />
 
           <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="title"
+              className="text-sm font-medium text-zinc-700"
+            >
               Título
             </label>
             <input
@@ -238,7 +257,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="cityName" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="cityName"
+              className="text-sm font-medium text-zinc-700"
+            >
               Cidade
             </label>
             <input
@@ -251,7 +273,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="description" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-zinc-700"
+            >
               Descrição
             </label>
             <textarea
@@ -278,7 +303,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
           />
 
           <div className="space-y-2">
-            <label htmlFor="ctaUrl" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="ctaUrl"
+              className="text-sm font-medium text-zinc-700"
+            >
               CTA URL
             </label>
             <input
@@ -291,7 +319,10 @@ export function AdminHomeHighlightsPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="order" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="order"
+              className="text-sm font-medium text-zinc-700"
+            >
               Ordem
             </label>
             <input
@@ -327,24 +358,38 @@ export function AdminHomeHighlightsPage(): ReactElement {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-semibold text-zinc-900">Destaques cadastrados</h2>
+        <h2 className="text-lg font-semibold text-zinc-900">
+          Destaques cadastrados
+        </h2>
 
-        {isLoading ? <p className="mt-4 text-sm text-zinc-600">Carregando dados...</p> : null}
+        {isLoading ? (
+          <p className="mt-4 text-sm text-zinc-600">Carregando dados...</p>
+        ) : null}
 
         {!isLoading && items.length === 0 ? (
-          <p className="mt-4 text-sm text-zinc-600">Nenhum destaque cadastrado.</p>
+          <p className="mt-4 text-sm text-zinc-600">
+            Nenhum destaque cadastrado.
+          </p>
         ) : null}
 
         {!isLoading && items.length > 0 ? (
           <div className="mt-4 space-y-4">
             {items.map((item: IHomeHighlight) => (
-              <div key={item.id} className="rounded-2xl border border-zinc-200 p-4">
+              <div
+                key={item.id}
+                className="rounded-2xl border border-zinc-200 p-4"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-base font-semibold text-zinc-900">{item.title}</p>
-                    <p className="mt-1 text-sm text-zinc-600">{item.description}</p>
+                    <p className="text-base font-semibold text-zinc-900">
+                      {item.title}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-600">
+                      {item.description}
+                    </p>
                     <p className="mt-2 text-xs text-zinc-500">
-                      {item.type} • ordem {item.order} • {item.active ? "Ativo" : "Inativo"}
+                      {item.type} • ordem {item.order} •{" "}
+                      {item.active ? "Ativo" : "Inativo"}
                     </p>
                   </div>
 

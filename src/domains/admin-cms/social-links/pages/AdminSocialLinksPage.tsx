@@ -40,10 +40,14 @@ const PLATFORM_OPTIONS: Array<{
 ];
 
 export function AdminSocialLinksPage(): ReactElement {
-  const { items, setItems, isLoading, error: loadError } =
-    useAdminSocialLinksList();
+  const {
+    items,
+    setItems,
+    isLoading,
+    error: loadError,
+  } = useAdminSocialLinksList();
   const [formState, setFormState] = useState<ISocialLinkFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -58,7 +62,7 @@ export function AdminSocialLinksPage(): ReactElement {
   }, [items]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ): void {
     const { name, value, type } = event.target;
 
@@ -78,7 +82,7 @@ export function AdminSocialLinksPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -95,14 +99,13 @@ export function AdminSocialLinksPage(): ReactElement {
         order: formState.order,
       };
 
-      const createdItem: ISocialLink = await adminApiClient.createSocialLink(
-        input
-      );
+      const createdItem: ISocialLink =
+        await adminApiClient.createSocialLink(input);
 
       setItems((currentItems: ISocialLink[]) =>
         [...currentItems, createdItem].sort(
-          (left: ISocialLink, right: ISocialLink) => left.order - right.order
-        )
+          (left: ISocialLink, right: ISocialLink) => left.order - right.order,
+        ),
       );
 
       setFormState({
@@ -132,8 +135,8 @@ export function AdminSocialLinksPage(): ReactElement {
 
       setItems((currentItems: ISocialLink[]) =>
         currentItems.map((currentItem: ISocialLink) =>
-          currentItem.id === updatedItem.id ? updatedItem : currentItem
-        )
+          currentItem.id === updatedItem.id ? updatedItem : currentItem,
+        ),
       );
     } catch (caught) {
       setError(
@@ -153,7 +156,7 @@ export function AdminSocialLinksPage(): ReactElement {
       await adminApiClient.deleteSocialLink(id);
 
       setItems((currentItems: ISocialLink[]) =>
-        currentItems.filter((item: ISocialLink) => item.id !== id)
+        currentItems.filter((item: ISocialLink) => item.id !== id),
       );
 
       setSuccessMessage("Mídia social removida com sucesso.");
@@ -195,7 +198,10 @@ export function AdminSocialLinksPage(): ReactElement {
           Novo link social
         </h2>
 
-        <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="grid gap-4 md:grid-cols-2"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div className="space-y-2">
             <label
               htmlFor="platform"
@@ -235,10 +241,7 @@ export function AdminSocialLinksPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label
-              htmlFor="url"
-              className="text-sm font-medium text-zinc-700"
-            >
+            <label htmlFor="url" className="text-sm font-medium text-zinc-700">
               URL
             </label>
             <input

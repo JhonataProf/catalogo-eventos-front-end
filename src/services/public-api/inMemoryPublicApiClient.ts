@@ -108,7 +108,9 @@ export function createInMemoryPublicApiClient(): IPublicApiClient {
           matchesSearch(item.name, params.search) ||
           matchesSearch(item.description, params.search);
 
-        return matchesPublished && matchesCity && matchesCategory && matchesText;
+        return (
+          matchesPublished && matchesCity && matchesCategory && matchesText
+        );
       });
 
       return paginateItems(filteredItems, params.page, params.limit);
@@ -162,9 +164,8 @@ export function createInMemoryPublicApiClient(): IPublicApiClient {
     async getPublishedTouristPointById(
       id: number,
     ): Promise<ITouristPoint | null> {
-      const touristPoint: ITouristPoint | undefined = getTouristPointsMock().find(
-        (item: ITouristPoint) => item.id === id,
-      );
+      const touristPoint: ITouristPoint | undefined =
+        getTouristPointsMock().find((item: ITouristPoint) => item.id === id);
 
       if (!touristPoint || !touristPoint.published) {
         return null;
@@ -196,7 +197,9 @@ export function createInMemoryPublicApiClient(): IPublicApiClient {
       const touristPoints: ITouristPoint[] = getTouristPointsMock();
 
       return {
-        events: events.filter((item: IEvent) => item.published && item.featured),
+        events: events.filter(
+          (item: IEvent) => item.published && item.featured,
+        ),
         touristPoints: touristPoints.filter(
           (item: ITouristPoint) => item.published && item.featured,
         ),

@@ -19,12 +19,9 @@ function renderWithRoute(initialEntry: string) {
           path="/pontos-turisticos/:id"
           element={<PontoTuristicoDetailsPage />}
         />
-        <Route
-          path="/pontos-turisticos"
-          element={<div>Pontos fallback</div>}
-        />
+        <Route path="/pontos-turisticos" element={<div>Pontos fallback</div>} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -35,7 +32,7 @@ describe("PontoTuristicoDetailsPage", () => {
 
   it("deve renderizar loading inicial", () => {
     vi.mocked(publicApiClient.getPublishedTouristPointById).mockImplementation(
-      () => new Promise(() => undefined)
+      () => new Promise(() => undefined),
     );
 
     renderWithRoute("/pontos-turisticos/1");
@@ -67,22 +64,26 @@ describe("PontoTuristicoDetailsPage", () => {
     renderWithRoute("/pontos-turisticos/1");
 
     expect(
-      await screen.findByText("Parque Antenor Martins")
+      await screen.findByText("Parque Antenor Martins"),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Área verde com lago, pista de caminhada e espaço de lazer.")
+      screen.getByText(
+        "Área verde com lago, pista de caminhada e espaço de lazer.",
+      ),
     ).toBeInTheDocument();
 
     expect(screen.getAllByText("Parque")).toHaveLength(2);
     expect(
-      screen.getAllByText("Rua Antônio Emílio de Figueiredo").length
+      screen.getAllByText("Rua Antônio Emílio de Figueiredo").length,
     ).toBeGreaterThan(0);
     expect(screen.getAllByText("08:00").length).toBeGreaterThan(0);
   });
 
   it("deve redirecionar para /pontos-turisticos quando o ponto não existir", async () => {
-    vi.mocked(publicApiClient.getPublishedTouristPointById).mockResolvedValue(null);
+    vi.mocked(publicApiClient.getPublishedTouristPointById).mockResolvedValue(
+      null,
+    );
 
     renderWithRoute("/pontos-turisticos/999999");
 
@@ -93,17 +94,17 @@ describe("PontoTuristicoDetailsPage", () => {
 
   it("deve exibir estado de erro quando a API falhar", async () => {
     vi.mocked(publicApiClient.getPublishedTouristPointById).mockRejectedValue(
-      new Error("timeout")
+      new Error("timeout"),
     );
 
     renderWithRoute("/pontos-turisticos/1");
 
     expect(
-      await screen.findByText("Erro ao carregar o ponto turístico")
+      await screen.findByText("Erro ao carregar o ponto turístico"),
     ).toBeInTheDocument();
     expect(screen.getByText("timeout")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Voltar para pontos turísticos" })
+      screen.getByRole("link", { name: "Voltar para pontos turísticos" }),
     ).toHaveAttribute("href", "/pontos-turisticos");
   });
 });

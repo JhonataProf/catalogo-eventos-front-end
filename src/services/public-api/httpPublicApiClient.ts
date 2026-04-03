@@ -168,7 +168,9 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       id: number,
     ): Promise<ITouristPoint | null> {
       try {
-        const { data } = await http.get<unknown>(`/public/tourist-points/${id}`);
+        const { data } = await http.get<unknown>(
+          `/public/tourist-points/${id}`,
+        );
         const raw = unwrapResource<Record<string, unknown>>(data);
         const point = mapTouristPointFromApi(raw);
         if (!point.published) {
@@ -233,7 +235,9 @@ export function createHttpPublicApiClient(baseURL: string): IPublicApiClient {
       const { data } = await http.get<unknown>("/public/institutional-content");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
       if (items.length === 0) {
-        throw new Error("Conteúdo institucional não encontrado na API pública.");
+        throw new Error(
+          "Conteúdo institucional não encontrado na API pública.",
+        );
       }
       const sorted = [...items].sort((a, b) => {
         const ta = new Date(

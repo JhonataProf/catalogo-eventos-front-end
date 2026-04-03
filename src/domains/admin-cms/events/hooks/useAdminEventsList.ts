@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { IEvent } from "@/entities/event/event.types";
 import { toApiError } from "@/services/api/apiError";
 import { listAdminEvents } from "@/services/admin-api/adminEvents.api";

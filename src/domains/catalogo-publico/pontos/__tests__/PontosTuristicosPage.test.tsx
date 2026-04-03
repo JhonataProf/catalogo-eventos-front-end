@@ -11,7 +11,7 @@ vi.mock(
   "@/domains/catalogo-publico/shared/hooks/useCatalogoPublicoPaginado",
   () => ({
     useCatalogoPublicoPaginado: vi.fn(),
-  })
+  }),
 );
 
 import { useCatalogoCidade } from "@/domains/catalogo-publico/shared/hooks/useCatalogoCidade";
@@ -28,8 +28,26 @@ describe("PontosTuristicosPage", () => {
       errorCidades: null,
       isCitiesReady: true,
       cidades: [
-        { id: 1, name: "Dourados", slug: "dourados", state: "MS", published: true, summary: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-        { id: 2, name: "Itaporã", slug: "itapora", state: "MS", published: true, summary: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+        {
+          id: 1,
+          name: "Dourados",
+          slug: "dourados",
+          state: "MS",
+          published: true,
+          summary: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          name: "Itaporã",
+          slug: "itapora",
+          state: "MS",
+          published: true,
+          summary: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       ],
       handleCidadeChange: vi.fn(),
       setCidadeSlug: vi.fn(),
@@ -56,11 +74,11 @@ describe("PontosTuristicosPage", () => {
     render(
       <MemoryRouter>
         <PontosTuristicosPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText("Pontos turísticos em Dourados")
+      screen.getByText("Pontos turísticos em Dourados"),
     ).toBeInTheDocument();
   });
 
@@ -97,15 +115,13 @@ describe("PontosTuristicosPage", () => {
     render(
       <MemoryRouter>
         <PontosTuristicosPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(
-      screen.getByText("Parque Antenor Martins")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Parque Antenor Martins")).toBeInTheDocument();
 
     expect(
-      screen.getByText("Área verde com espaço de lazer.")
+      screen.getByText("Área verde com espaço de lazer."),
     ).toBeInTheDocument();
   });
 
@@ -129,11 +145,11 @@ describe("PontosTuristicosPage", () => {
     render(
       <MemoryRouter>
         <PontosTuristicosPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText("Nenhum ponto turístico encontrado")
+      screen.getByText("Nenhum ponto turístico encontrado"),
     ).toBeInTheDocument();
   });
 
@@ -157,11 +173,11 @@ describe("PontosTuristicosPage", () => {
     render(
       <MemoryRouter>
         <PontosTuristicosPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText("Erro ao carregar pontos turísticos")
+      screen.getByText("Erro ao carregar pontos turísticos"),
     ).toBeInTheDocument();
   });
 
@@ -195,11 +211,11 @@ describe("PontosTuristicosPage", () => {
     render(
       <MemoryRouter>
         <PontosTuristicosPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByRole("button", { name: /carregar mais/i })
+      screen.getByRole("button", { name: /carregar mais/i }),
     ).toBeInTheDocument();
   });
 });

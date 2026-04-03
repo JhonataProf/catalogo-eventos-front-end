@@ -1,4 +1,3 @@
-
 export interface ICatalogoFilterOption {
   label: string;
   value: string;

@@ -12,7 +12,9 @@ describe("CatalogListingShell", () => {
 
     expect(screen.queryByText("Conteúdo real")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("status", { name: /carregando resultados do catálogo/i }),
+      screen.getByRole("status", {
+        name: /carregando resultados do catálogo/i,
+      }),
     ).toBeInTheDocument();
   });
 

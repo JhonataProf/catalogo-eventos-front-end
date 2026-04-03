@@ -4,8 +4,7 @@ import type { ButtonHTMLAttributes, ReactElement, ReactNode } from "react";
 type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
 type ButtonSize = "sm" | "md" | "lg";
 
-interface IButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -52,7 +51,7 @@ export function Button({
         variantClasses[variant],
         sizeClasses[size],
         fullWidth && "w-full",
-        className
+        className,
       )}
       {...rest}
     >

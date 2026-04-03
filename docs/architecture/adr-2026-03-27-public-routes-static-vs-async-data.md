@@ -37,11 +37,11 @@ Nenhuma decisão arquitetural final de renderização (SSR/SSG/pré-render) é t
 
 ## Legenda
 
-| Termo | Significado |
-|--------|-------------|
-| **Shell estático** | Estrutura de layout/markup presente no bundle; títulos genéricos de seção podem aparecer antes dos dados. |
-| **Dados em bundle** | Constantes ou módulos importados (ex.: lista fixa no JS), sem `fetch` naquele trecho. |
-| **Assíncrono (cliente)** | Conteúdo relevante para SEO ou UX só após Promise/`useEffect` (hoje via `publicApiClient`). |
+| Termo                    | Significado                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| **Shell estático**       | Estrutura de layout/markup presente no bundle; títulos genéricos de seção podem aparecer antes dos dados. |
+| **Dados em bundle**      | Constantes ou módulos importados (ex.: lista fixa no JS), sem `fetch` naquele trecho.                     |
+| **Assíncrono (cliente)** | Conteúdo relevante para SEO ou UX só após Promise/`useEffect` (hoje via `publicApiClient`).               |
 
 ---
 
@@ -49,63 +49,63 @@ Nenhuma decisão arquitetural final de renderização (SSR/SSG/pré-render) é t
 
 ### `/` — `HomePage`
 
-| Bloco | Tipo | Detalhe (arquivo / contrato) |
-|--------|------|--------------------------------|
-| Estrutura da página | Shell estático | `HomePage.tsx` compõe três seções. |
-| Hero / carrossel | Assíncrono | `HomeHeroCarousel.tsx` — `useEffect` → `publicApiClient.getHomeContent()` (banners/destaques). |
-| Intro “Quem somos” | Assíncrono | `CeleiroIntroSection.tsx` → `useInstitutionalContent` → `getInstitutionalContent()`. |
-| Grade de cidades | Assíncrono | `CitiesGridSection.tsx` → `usePublicCities` → `listPublishedCities()`. |
+| Bloco               | Tipo           | Detalhe (arquivo / contrato)                                                                   |
+| ------------------- | -------------- | ---------------------------------------------------------------------------------------------- |
+| Estrutura da página | Shell estático | `HomePage.tsx` compõe três seções.                                                             |
+| Hero / carrossel    | Assíncrono     | `HomeHeroCarousel.tsx` — `useEffect` → `publicApiClient.getHomeContent()` (banners/destaques). |
+| Intro “Quem somos”  | Assíncrono     | `CeleiroIntroSection.tsx` → `useInstitutionalContent` → `getInstitutionalContent()`.           |
+| Grade de cidades    | Assíncrono     | `CitiesGridSection.tsx` → `usePublicCities` → `listPublishedCities()`.                         |
 
 **Nota:** há fallbacks de texto no hero institucional quando `content` é null (`AboutPage` / intro); ainda assim o conteúdo “oficial” CMS/mock chega de forma assíncrona.
 
 ### `/eventos` — `EventosPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
-| Título da seção (“Eventos em …”) | Shell + **assíncrono (cidades)** | `useCatalogoCidade` carrega cidades via `publicApiClient.listPublishedCities()`; o slug efetivo usa query `?cidade=` após a lista estar disponível. |
-| Lista de cidades no filtro | Assíncrono | Mesma fonte que o restante do portal publicado (`listPublishedCities`). |
-| Grade de eventos, totais, “carregar mais” | Assíncrono | `useCatalogoPublicoPaginado` → `fetchEventosCatalogo` → `publicApiClient.listPublishedEvents()`. |
+| Bloco                                     | Tipo                             | Detalhe                                                                                                                                             |
+| ----------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Título da seção (“Eventos em …”)          | Shell + **assíncrono (cidades)** | `useCatalogoCidade` carrega cidades via `publicApiClient.listPublishedCities()`; o slug efetivo usa query `?cidade=` após a lista estar disponível. |
+| Lista de cidades no filtro                | Assíncrono                       | Mesma fonte que o restante do portal publicado (`listPublishedCities`).                                                                             |
+| Grade de eventos, totais, “carregar mais” | Assíncrono                       | `useCatalogoPublicoPaginado` → `fetchEventosCatalogo` → `publicApiClient.listPublishedEvents()`.                                                    |
 
 ### `/eventos/:id` — `EventoDetailsPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
+| Bloco                                               | Tipo       | Detalhe                                                                                                                  |
+| --------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Conteúdo da ficha (título, descrição, imagem, `h1`) | Assíncrono | `useEffect` → `getPublishedEventById(id)`. Até carregar: mensagem de loading; HTML inicial não contém o texto do evento. |
 
 ### `/pontos-turisticos` — `PontosTuristicosPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
-| Título / filtro de cidade | Igual a `/eventos` | `useCatalogoCidade` + `publicApiClient.listPublishedCities()`. |
-| Grade de pontos | Assíncrono | `useCatalogoPublicoPaginado` → `fetchPontosCatalogo` → `listPublishedTouristPoints()`. |
+| Bloco                     | Tipo               | Detalhe                                                                                |
+| ------------------------- | ------------------ | -------------------------------------------------------------------------------------- |
+| Título / filtro de cidade | Igual a `/eventos` | `useCatalogoCidade` + `publicApiClient.listPublishedCities()`.                         |
+| Grade de pontos           | Assíncrono         | `useCatalogoPublicoPaginado` → `fetchPontosCatalogo` → `listPublishedTouristPoints()`. |
 
 ### `/pontos-turisticos/:id` — `PontoTuristicoDetailsPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
+| Bloco                                 | Tipo       | Detalhe                                           |
+| ------------------------------------- | ---------- | ------------------------------------------------- |
 | Ficha completa (`h1`, textos, imagem) | Assíncrono | `useEffect` → `getPublishedTouristPointById(id)`. |
 
 ### `/cidades/:slug` — `CityDetailsPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
+| Bloco                                | Tipo       | Detalhe                                       |
+| ------------------------------------ | ---------- | --------------------------------------------- |
 | Ficha da cidade (`h1`, resumo, etc.) | Assíncrono | `useEffect` → `getPublishedCityBySlug(slug)`. |
 
 ### `/sobre` — `AboutPage`
 
-| Bloco | Tipo | Detalhe |
-|--------|------|---------|
+| Bloco                        | Tipo  | Detalhe                                                                                                                                                                              |
+| ---------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Hero e textos institucionais | Misto | `HeroSection` usa fallbacks **estáticos** quando `content` é null; corpo “Missão/Visão/Valores” depende de `useInstitutionalContent` → `getInstitutionalContent()` (**assíncrono**). |
 
 ---
 
 ## Área CRM (`/admin/*`)
 
-| Rota (exemplos) | Tipo (resumo) |
-|------------------|----------------|
-| `/admin/login` | Shell + auth simulada no cliente (`AuthProvider`); sem SEO público. |
-| `/admin` (dashboard) | Conteúdo majoritariamente **estático** no bundle (`AdminDashboardPage` — números fixos no markup). |
-| Demais telas CRUD | Padrão típico: carregamento/submissão via `adminApiClient` em handlers ou efeitos (detalhamento omitido aqui por não impactar indexação pública). |
+| Rota (exemplos)      | Tipo (resumo)                                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/admin/login`       | Shell + auth simulada no cliente (`AuthProvider`); sem SEO público.                                                                               |
+| `/admin` (dashboard) | Conteúdo majoritariamente **estático** no bundle (`AdminDashboardPage` — números fixos no markup).                                                |
+| Demais telas CRUD    | Padrão típico: carregamento/submissão via `adminApiClient` em handlers ou efeitos (detalhamento omitido aqui por não impactar indexação pública). |
 
 ---
 

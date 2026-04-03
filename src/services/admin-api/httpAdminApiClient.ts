@@ -166,8 +166,7 @@ async function listInstitutionalSorted(
     mapInstitutionalFromApi(row as Record<string, unknown>),
   );
   return mapped.sort(
-    (a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
 }
 
@@ -212,8 +211,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async updateInstitutionalContent(
       input: IUpdateInstitutionalContentInput,
     ): Promise<IInstitutionalContent> {
-      const list: IInstitutionalContent[] =
-        await listInstitutionalSorted(http);
+      const list: IInstitutionalContent[] = await listInstitutionalSorted(http);
 
       if (list.length === 0) {
         throw new Error(
@@ -272,7 +270,9 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listSocialLinks(): Promise<ISocialLink[]> {
       const { data } = await http.get<unknown>("/admin/social-links");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapSocialLinkFromApi(row as Record<string, unknown>));
+      return items.map((row) =>
+        mapSocialLinkFromApi(row as Record<string, unknown>),
+      );
     },
 
     async createSocialLink(
@@ -393,17 +393,19 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         params: { page: 1, limit: 100, sortDir: "asc" },
       });
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapEventFromApi(row as Record<string, unknown>));
+      return items.map((row) =>
+        mapEventFromApi(row as Record<string, unknown>),
+      );
     },
 
-    async listEventsForPick(
-      query?: IAdminListPickQuery,
-    ): Promise<IEvent[]> {
+    async listEventsForPick(query?: IAdminListPickQuery): Promise<IEvent[]> {
       const { data } = await http.get<unknown>("/admin/events", {
         params: buildAdminEventPickParams(query),
       });
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapEventFromApi(row as Record<string, unknown>));
+      return items.map((row) =>
+        mapEventFromApi(row as Record<string, unknown>),
+      );
     },
 
     async getEventById(id: number): Promise<IEvent | null> {
@@ -554,7 +556,9 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listHomeBanners(): Promise<IHomeBanner[]> {
       const { data } = await http.get<unknown>("/admin/home-banners");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapHomeBannerFromApi(row as Record<string, unknown>));
+      return items.map((row) =>
+        mapHomeBannerFromApi(row as Record<string, unknown>),
+      );
     },
 
     async createHomeBanner(
@@ -577,7 +581,9 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         active: input.active,
         order: input.order,
       });
-      return mapHomeBannerFromApi(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeBannerFromApi(
+        unwrapResource<Record<string, unknown>>(data),
+      );
     },
 
     async updateHomeBanner(
@@ -596,7 +602,9 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/home-banners/${id}`,
         body,
       );
-      return mapHomeBannerFromApi(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeBannerFromApi(
+        unwrapResource<Record<string, unknown>>(data),
+      );
     },
 
     async deleteHomeBanner(id: number): Promise<void> {
@@ -606,15 +614,20 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
     async listHomeHighlights(): Promise<IHomeHighlight[]> {
       const { data } = await http.get<unknown>("/admin/home-highlights");
       const { items } = unwrapCollection<Record<string, unknown>>(data);
-      return items.map((row) => mapHomeHighlightFromApi(row as Record<string, unknown>));
+      return items.map((row) =>
+        mapHomeHighlightFromApi(row as Record<string, unknown>),
+      );
     },
 
     async createHomeHighlight(
       input: ICreateHomeHighlightInput,
     ): Promise<IHomeHighlight> {
-      const ref = input.referenceId !== undefined ? Number(input.referenceId) : NaN;
+      const ref =
+        input.referenceId !== undefined ? Number(input.referenceId) : NaN;
       if (!Number.isFinite(ref)) {
-        throw new Error("referenceId numérico é obrigatório para criar destaque.");
+        throw new Error(
+          "referenceId numérico é obrigatório para criar destaque.",
+        );
       }
       const image = await resolveWebImagePayloadFromImageUrlField(
         input.imageUrl,
@@ -625,13 +638,18 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         referenceId: ref,
         title: input.title,
         description: input.description,
-        cityName: input.cityName && input.cityName.length >= 3 ? input.cityName : "Cidade",
+        cityName:
+          input.cityName && input.cityName.length >= 3
+            ? input.cityName
+            : "Cidade",
         image,
         ctaUrl: input.ctaUrl ?? "https://example.com",
         active: input.active,
         order: input.order,
       });
-      return mapHomeHighlightFromApi(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeHighlightFromApi(
+        unwrapResource<Record<string, unknown>>(data),
+      );
     },
 
     async updateHomeHighlight(
@@ -653,7 +671,9 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
         `/admin/home-highlights/${id}`,
         body,
       );
-      return mapHomeHighlightFromApi(unwrapResource<Record<string, unknown>>(data));
+      return mapHomeHighlightFromApi(
+        unwrapResource<Record<string, unknown>>(data),
+      );
     },
 
     async deleteHomeHighlight(id: number): Promise<void> {

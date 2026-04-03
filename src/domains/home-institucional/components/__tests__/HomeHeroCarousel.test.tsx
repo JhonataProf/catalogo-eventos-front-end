@@ -12,9 +12,10 @@ vi.mock("@/services/public-api/client", () => ({
 }));
 
 vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual<typeof import("react-router-dom")>(
-    "react-router-dom"
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router-dom")>(
+      "react-router-dom",
+    );
 
   return {
     ...actual,
@@ -79,11 +80,11 @@ describe("HomeHeroCarousel", () => {
     render(
       <MemoryRouter>
         <HomeHeroCarousel />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      await screen.findByText("Festival Gastronômico de Dourados")
+      await screen.findByText("Festival Gastronômico de Dourados"),
     ).toBeInTheDocument();
 
     expect(screen.getByText("1/3")).toBeInTheDocument();
@@ -93,7 +94,7 @@ describe("HomeHeroCarousel", () => {
     render(
       <MemoryRouter>
         <HomeHeroCarousel />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText("Festival Gastronômico de Dourados");

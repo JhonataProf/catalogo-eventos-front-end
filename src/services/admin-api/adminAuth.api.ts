@@ -26,7 +26,10 @@ export async function loginWithPassword(
     const inner = unwrapResource<unknown>(data);
     return mapLoginDataToSession(inner);
   } catch (error: unknown) {
-    throw toApiError(error, "Falha no login. Verifique credenciais e tente novamente.");
+    throw toApiError(
+      error,
+      "Falha no login. Verifique credenciais e tente novamente.",
+    );
   }
 }
 

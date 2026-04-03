@@ -72,7 +72,5 @@ export function openingHoursFromApiToForm(value: string | undefined): string {
   if (!value?.trim()) {
     return "";
   }
-  return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.trim())
-    ? value.trim()
-    : "";
+  return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.trim()) ? value.trim() : "";
 }

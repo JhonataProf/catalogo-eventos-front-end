@@ -31,9 +31,14 @@ function buildInitialFormState(): IHomeBannerFormState {
 }
 
 export function AdminHomeBannersPage(): ReactElement {
-  const { items, setItems, isLoading, error: loadError } = useAdminHomeBanners();
+  const {
+    items,
+    setItems,
+    isLoading,
+    error: loadError,
+  } = useAdminHomeBanners();
   const [formState, setFormState] = useState<IHomeBannerFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -45,7 +50,7 @@ export function AdminHomeBannersPage(): ReactElement {
   }, [items]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
     const { name, value, type } = event.target;
 
@@ -61,7 +66,7 @@ export function AdminHomeBannersPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -85,8 +90,8 @@ export function AdminHomeBannersPage(): ReactElement {
 
       setItems((currentItems: IHomeBanner[]) =>
         [...currentItems, createdItem].sort(
-          (left: IHomeBanner, right: IHomeBanner) => left.order - right.order
-        )
+          (left: IHomeBanner, right: IHomeBanner) => left.order - right.order,
+        ),
       );
 
       setFormState({
@@ -110,10 +115,12 @@ export function AdminHomeBannersPage(): ReactElement {
       await adminApiClient.deleteHomeBanner(id);
 
       setItems((currentItems: IHomeBanner[]) =>
-        currentItems.filter((item: IHomeBanner) => item.id !== id)
+        currentItems.filter((item: IHomeBanner) => item.id !== id),
       );
     } catch (caught) {
-      setError(toApiError(caught, "Não foi possível remover o banner.").message);
+      setError(
+        toApiError(caught, "Não foi possível remover o banner.").message,
+      );
     }
   }
 
@@ -146,21 +153,40 @@ export function AdminHomeBannersPage(): ReactElement {
       <Card className="space-y-4">
         <h2 className="text-lg font-semibold text-zinc-900">Novo banner</h2>
 
-        <form className="grid gap-4 md:grid-cols-2" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="grid gap-4 md:grid-cols-2"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="title"
+              className="text-sm font-medium text-zinc-700"
+            >
               Título
             </label>
-            <input id="title" name="title" value={formState.title} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
+            <input
+              id="title"
+              name="title"
+              value={formState.title}
+              onChange={handleInputChange}
+              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="subtitle" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="subtitle"
+              className="text-sm font-medium text-zinc-700"
+            >
               Subtítulo
             </label>
-            <input id="subtitle" name="subtitle" value={formState.subtitle ?? ""} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
+            <input
+              id="subtitle"
+              name="subtitle"
+              value={formState.subtitle ?? ""}
+              onChange={handleInputChange}
+              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
+            />
           </div>
 
           <AdminImageUrlField
@@ -177,31 +203,63 @@ export function AdminHomeBannersPage(): ReactElement {
           />
 
           <div className="space-y-2">
-            <label htmlFor="ctaLabel" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="ctaLabel"
+              className="text-sm font-medium text-zinc-700"
+            >
               CTA label
             </label>
-            <input id="ctaLabel" name="ctaLabel" value={formState.ctaLabel ?? ""} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
+            <input
+              id="ctaLabel"
+              name="ctaLabel"
+              value={formState.ctaLabel ?? ""}
+              onChange={handleInputChange}
+              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="ctaUrl" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="ctaUrl"
+              className="text-sm font-medium text-zinc-700"
+            >
               CTA URL
             </label>
-            <input id="ctaUrl" name="ctaUrl" value={formState.ctaUrl ?? ""} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
+            <input
+              id="ctaUrl"
+              name="ctaUrl"
+              value={formState.ctaUrl ?? ""}
+              onChange={handleInputChange}
+              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="order" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="order"
+              className="text-sm font-medium text-zinc-700"
+            >
               Ordem
             </label>
-            <input id="order" name="order" type="number" min={1} value={formState.order} onChange={handleInputChange}
-              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]" />
+            <input
+              id="order"
+              name="order"
+              type="number"
+              min={1}
+              value={formState.order}
+              onChange={handleInputChange}
+              className="w-full rounded-xl border border-zinc-300 px-3 py-3 text-sm outline-none transition focus:border-[var(--color-primary)]"
+            />
           </div>
 
           <div className="flex items-center gap-3 pt-8">
-            <input id="active" name="active" type="checkbox" checked={formState.active} onChange={handleInputChange} />
+            <input
+              id="active"
+              name="active"
+              type="checkbox"
+              checked={formState.active}
+              onChange={handleInputChange}
+            />
             <label htmlFor="active" className="text-sm text-zinc-700">
               Ativo
             </label>
@@ -216,23 +274,36 @@ export function AdminHomeBannersPage(): ReactElement {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-semibold text-zinc-900">Banners cadastrados</h2>
+        <h2 className="text-lg font-semibold text-zinc-900">
+          Banners cadastrados
+        </h2>
 
-        {isLoading ? <p className="mt-4 text-sm text-zinc-600">Carregando dados...</p> : null}
+        {isLoading ? (
+          <p className="mt-4 text-sm text-zinc-600">Carregando dados...</p>
+        ) : null}
 
         {!isLoading && items.length === 0 ? (
-          <p className="mt-4 text-sm text-zinc-600">Nenhum banner cadastrado.</p>
+          <p className="mt-4 text-sm text-zinc-600">
+            Nenhum banner cadastrado.
+          </p>
         ) : null}
 
         {!isLoading && items.length > 0 ? (
           <div className="mt-4 space-y-4">
             {items.map((item: IHomeBanner) => (
-              <div key={item.id} className="rounded-2xl border border-zinc-200 p-4">
+              <div
+                key={item.id}
+                className="rounded-2xl border border-zinc-200 p-4"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-base font-semibold text-zinc-900">{item.title}</p>
+                    <p className="text-base font-semibold text-zinc-900">
+                      {item.title}
+                    </p>
                     {item.subtitle ? (
-                      <p className="mt-1 text-sm text-zinc-600">{item.subtitle}</p>
+                      <p className="mt-1 text-sm text-zinc-600">
+                        {item.subtitle}
+                      </p>
                     ) : null}
                     <p className="mt-2 text-xs text-zinc-500">
                       Ordem: {item.order} • {item.active ? "Ativo" : "Inativo"}

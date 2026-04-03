@@ -37,9 +37,9 @@ export function AdminForbiddenBanner(): ReactElement | null {
     >
       <div className="mx-auto flex max-w-6xl items-start justify-between gap-4">
         <p>
-          <span className="font-semibold">Acesso negado.</span> Sua conta não tem
-          permissão para esta operação. Se precisar de outro nível de acesso,
-          fale com o administrador do sistema.
+          <span className="font-semibold">Acesso negado.</span> Sua conta não
+          tem permissão para esta operação. Se precisar de outro nível de
+          acesso, fale com o administrador do sistema.
         </p>
         <button
           type="button"

@@ -8,11 +8,7 @@ export function AdminRouteGuard(): ReactElement {
 
   if (!isAuthenticated) {
     return (
-      <Navigate
-        to="/admin/login"
-        replace
-        state={{ from: location.pathname }}
-      />
+      <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
     );
   }
 

@@ -76,9 +76,7 @@ export function AdminDashboardPage(): ReactElement {
       </div>
 
       <Card>
-        <h2 className="text-lg font-semibold text-zinc-900">
-          Navegação
-        </h2>
+        <h2 className="text-lg font-semibold text-zinc-900">Navegação</h2>
         <p className="mt-3 text-sm leading-6 text-zinc-600">
           Use o menu lateral para gerenciar cidades, eventos, pontos turísticos,
           conteúdo da home, institucional e demais módulos.

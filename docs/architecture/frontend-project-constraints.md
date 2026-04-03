@@ -1,15 +1,18 @@
 # Frontend project constraints
+
 - uso de tag manager
 - uso de ferramentas que otimizam a presença e mensuração web
 - necessidade de boa governança para scripts e instrumentação
 
 ### Regras obrigatórias
+
 - não espalhar lógica de analytics diretamente por componentes sem padrão
 - definir pontos claros de integração com analytics e tag manager
 - separar, quando necessário, a mensuração da área pública e da área CRM
 - avaliar impacto de scripts de terceiros em performance e indexação
 
 ### Implicação arquitetural
+
 A instrumentação não pode ser tratada apenas como detalhe operacional; ela deve ser considerada na arquitetura de páginas públicas e na decisão de publicação.
 
 ---
@@ -17,9 +20,11 @@ A instrumentação não pode ser tratada apenas como detalhe operacional; ela de
 ## 8. Restrições de testes e qualidade
 
 ### Situação oficial
+
 - Vitest é a ferramenta de testes do projeto
 
 ### Regras obrigatórias
+
 - toda mudança relevante deve considerar verificabilidade
 - testar fluxos críticos da área pública e da área CRM
 - testar transformações de dados e hooks relevantes
@@ -30,6 +35,7 @@ A instrumentação não pode ser tratada apenas como detalhe operacional; ela de
 ## 9. Restrições de organização da codebase
 
 ### Regras obrigatórias
+
 - preservar organização por domínios
 - evitar criação de pastas genéricas sem responsabilidade clara
 - evitar acoplamento desnecessário entre área pública e CRM
@@ -55,6 +61,7 @@ Antes de propor mudanças arquiteturais, de SEO ou de deploy, o agente deve resp
 ## 11. Critério de pronto para mudanças relevantes no front
 
 Uma mudança relevante só pode ser considerada pronta quando:
+
 - o domínio afetado está claro
 - foi identificado se a mudança impacta área pública, CRM ou ambas
 - o impacto em SEO foi avaliado quando aplicável

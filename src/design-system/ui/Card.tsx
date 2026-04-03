@@ -29,7 +29,7 @@ export function Card({
         "rounded-2xl border border-black/5 bg-white shadow-soft",
         paddingClasses[padding],
         hoverable && "transition hover:-translate-y-0.5 hover:shadow-md",
-        className
+        className,
       )}
       {...rest}
     >

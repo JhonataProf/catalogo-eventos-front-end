@@ -25,12 +25,14 @@ export function useAdminDashboardStats(): IUseAdminDashboardStatsResult {
       setIsLoading(true);
       setError("");
 
-      const [cities, events, touristPoints, homeHighlights] = await Promise.all([
-        adminApiClient.listCities(),
-        adminApiClient.listEvents(),
-        adminApiClient.listTouristPoints(),
-        adminApiClient.listHomeHighlights(),
-      ]);
+      const [cities, events, touristPoints, homeHighlights] = await Promise.all(
+        [
+          adminApiClient.listCities(),
+          adminApiClient.listEvents(),
+          adminApiClient.listTouristPoints(),
+          adminApiClient.listHomeHighlights(),
+        ],
+      );
 
       setStats({
         cityCount: cities.length,

@@ -13,6 +13,7 @@
 O projeto deve considerar observabilidade e mensuração desde cedo.
 
 Regras obrigatórias:
+
 - tratar analytics e tag manager com governança mínima
 - evitar scripts espalhados sem padrão
 - definir pontos claros de integração para eventos e rastreamento
@@ -26,6 +27,7 @@ Regras obrigatórias:
 Terraform é o padrão oficial de infraestrutura.
 
 Toda estratégia de publicação deve considerar:
+
 - simplicidade operacional
 - impacto em SEO
 - domínio e HTTPS
@@ -37,6 +39,7 @@ Toda estratégia de publicação deve considerar:
 - separação de ambientes
 
 Regras obrigatórias:
+
 - não assumir automaticamente que deploy estático é suficiente
 - avaliar se a área pública e a área CRM exigem estratégias diferentes
 - toda decisão de publicação deve explicitar trade-offs entre SEO, custo, simplicidade e operação
@@ -47,6 +50,7 @@ Regras obrigatórias:
 ## Variáveis de ambiente
 
 Regras obrigatórias:
+
 - mapear claramente variáveis de build
 - não expor segredos no front-end
 - distinguir valores públicos de valores sensíveis
@@ -58,6 +62,7 @@ Regras obrigatórias:
 ## Critério de pronto para mudanças relevantes
 
 Uma mudança relevante só deve ser considerada pronta quando:
+
 1. a solução respeita a organização por domínios
 2. o impacto no BFF foi avaliado
 3. o impacto em SEO foi avaliado quando houver páginas públicas envolvidas
@@ -71,6 +76,7 @@ Uma mudança relevante só deve ser considerada pronta quando:
 ## Regra para o agente de IA
 
 Ao analisar ou alterar este projeto, o agente deve obrigatoriamente:
+
 1. identificar o domínio impactado
 2. identificar se a mudança afeta área pública, CRM ou ambas
 3. avaliar impacto em BFF

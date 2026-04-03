@@ -13,9 +13,7 @@ export function mapEventFromApi(raw: Record<string, unknown>): IEvent {
       raw.startDate !== undefined ? toIsoDate(raw.startDate, "") : undefined,
     endDate: raw.endDate !== undefined ? toIsoDate(raw.endDate, "") : undefined,
     formattedDate:
-      raw.formattedDate !== undefined
-        ? String(raw.formattedDate)
-        : undefined,
+      raw.formattedDate !== undefined ? String(raw.formattedDate) : undefined,
     location: raw.location !== undefined ? String(raw.location) : undefined,
     imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : undefined,
     featured: Boolean(raw.featured),

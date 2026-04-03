@@ -19,7 +19,9 @@ describe("useAdminDashboardStats", () => {
   });
 
   it("agrega contagens das listagens admin", async () => {
-    vi.mocked(adminApiClient.listCities).mockResolvedValue([{ id: 1 }] as never);
+    vi.mocked(adminApiClient.listCities).mockResolvedValue([
+      { id: 1 },
+    ] as never);
     vi.mocked(adminApiClient.listEvents).mockResolvedValue([{}, {}] as never);
     vi.mocked(adminApiClient.listTouristPoints).mockResolvedValue([] as never);
     vi.mocked(adminApiClient.listHomeHighlights).mockResolvedValue([

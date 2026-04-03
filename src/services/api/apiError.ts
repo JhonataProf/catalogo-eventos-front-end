@@ -78,7 +78,9 @@ function readErrorCodeFromResponseData(data: unknown): string | undefined {
     return undefined;
   }
   const code = (nested as Record<string, unknown>).code;
-  return typeof code === "string" && code.trim() !== "" ? code.trim() : undefined;
+  return typeof code === "string" && code.trim() !== ""
+    ? code.trim()
+    : undefined;
 }
 
 function readMessageFromResponseData(data: unknown): string | undefined {
@@ -117,7 +119,10 @@ function readCorrelationIdFromResponseData(data: unknown): string | undefined {
 /**
  * Converte falha de rede/HTTP em {@link ApiError}. Útil após verificar 404/not found.
  */
-export function toApiError(error: unknown, fallbackMessage = "Falha na comunicação com o servidor."): ApiError {
+export function toApiError(
+  error: unknown,
+  fallbackMessage = "Falha na comunicação com o servidor.",
+): ApiError {
   if (error instanceof ApiError) {
     return error;
   }
@@ -134,8 +139,7 @@ export function toApiError(error: unknown, fallbackMessage = "Falha na comunica�
     const correlationId = readCorrelationIdFromResponseData(data);
     const requestId = requestIdHeader ?? correlationId;
     const validationSummary = readValidationErrorsMessage(data);
-    const fromBody =
-      validationSummary ?? readMessageFromResponseData(data);
+    const fromBody = validationSummary ?? readMessageFromResponseData(data);
     const message = fromBody ?? error.message ?? fallbackMessage;
     const code = readErrorCodeFromResponseData(data);
     return new ApiError(message, status, code, requestId);

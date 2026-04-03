@@ -19,6 +19,7 @@ Este documento registra restrições e decisões práticas sobre analytics, tag 
 ## O que deve ser mapeado neste arquivo
 
 ### Área pública
+
 - páginas mais importantes para aquisição
 - eventos mais importantes de conversão
 - páginas que exigem rastreamento de campanha
@@ -26,6 +27,7 @@ Este documento registra restrições e decisões práticas sobre analytics, tag 
 - riscos de performance e governança
 
 ### Área CRM
+
 - eventos importantes de operação
 - ações críticas que merecem mensuração
 - dependências de analytics interno, se existirem

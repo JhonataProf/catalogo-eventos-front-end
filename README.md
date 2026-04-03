@@ -6,11 +6,11 @@ Aplicação **React + TypeScript + Vite** (área pública + CRM). Este README co
 
 ## Pré-requisitos na máquina do desenvolvedor
 
-| Ferramenta | Uso |
-|------------|-----|
-| **Node.js** (ex.: 20) + **Yarn** | Desenvolvimento e build local |
-| **Terraform** ≥ 1.5 | Provisionar S3 + CloudFront (opcional se a infra já existir) |
-| **AWS CLI** | `terraform` com backend S3, `aws s3 sync`, inspeção de recursos |
+| Ferramenta                       | Uso                                                             |
+| -------------------------------- | --------------------------------------------------------------- |
+| **Node.js** (ex.: 20) + **Yarn** | Desenvolvimento e build local                                   |
+| **Terraform** ≥ 1.5              | Provisionar S3 + CloudFront (opcional se a infra já existir)    |
+| **AWS CLI**                      | `terraform` com backend S3, `aws s3 sync`, inspeção de recursos |
 
 ---
 
@@ -80,10 +80,10 @@ Valores que você vai precisar depois para **GitHub Secrets** ou deploy manual:
 
 **Caminho no console:** **IAM → Identity providers → Add provider** (OpenID Connect).
 
-| Campo | Valor |
-|-------|--------|
+| Campo            | Valor                                         |
+| ---------------- | --------------------------------------------- |
 | **Provider URL** | `https://token.actions.githubusercontent.com` |
-| **Audience** | `sts.amazonaws.com` |
+| **Audience**     | `sts.amazonaws.com`                           |
 
 Isto permite que o GitHub Actions obtenha um token que a AWS aceita para **assumir uma IAM Role** sem chaves de longa duração no GitHub.
 
@@ -97,12 +97,12 @@ Isto permite que o GitHub Actions obtenha um token que a AWS aceita para **assum
 
 **Dois tipos de documento (não confundir):**
 
-1. **Trust policy** — aba **Trust relationships** **da role**  
-   - Contém `Principal` (Federated → ARN do OIDC provider) e ação `sts:AssumeRoleWithWebIdentity`.  
-   - Condições: `token.actions.githubusercontent.com:aud` = `sts.amazonaws.com` e `...:sub` alinhado ao **repositório e branch** (ex.: `repo:ORG/REPO:ref:refs/heads/main`).  
+1. **Trust policy** — aba **Trust relationships** **da role**
+   - Contém `Principal` (Federated → ARN do OIDC provider) e ação `sts:AssumeRoleWithWebIdentity`.
+   - Condições: `token.actions.githubusercontent.com:aud` = `sts.amazonaws.com` e `...:sub` alinhado ao **repositório e branch** (ex.: `repo:ORG/REPO:ref:refs/heads/main`).
    - **Não** cole isto em **IAM → Policies** avulsas: políticas de identidade **não** podem ter `Principal`.
 
-2. **Identity policy** — aba **Permissions** **da mesma role**  
+2. **Identity policy** — aba **Permissions** **da mesma role**
    - Apenas `Effect`, `Action`, `Resource` (sem `Principal`).
 
 **Erro comum:** trust policy restrita à `main` mas o workflow corre noutra branch → `Not authorized to perform sts:AssumeRoleWithWebIdentity`. Ajuste o `sub` ou execute o deploy na branch permitida.
@@ -115,17 +115,17 @@ Isto permite que o GitHub Actions obtenha um token que a AWS aceita para **assum
 
 **S3** (necessário para `aws s3 sync`):
 
-| Ação | Recurso |
-|------|---------|
-| `s3:ListBucket`, `s3:GetBucketLocation` | `arn:aws:s3:::NOME_DO_BUCKET` (sem `/*`) |
-| `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` | `arn:aws:s3:::NOME_DO_BUCKET/*` |
+| Ação                                              | Recurso                                  |
+| ------------------------------------------------- | ---------------------------------------- |
+| `s3:ListBucket`, `s3:GetBucketLocation`           | `arn:aws:s3:::NOME_DO_BUCKET` (sem `/*`) |
+| `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` | `arn:aws:s3:::NOME_DO_BUCKET/*`          |
 
 Sem `ListBucket` no ARN do **bucket**, o sync falha com `AccessDenied` em `ListObjectsV2`.
 
 **CloudFront:**
 
-| Ação | Recurso |
-|------|---------|
+| Ação                            | Recurso                                                       |
+| ------------------------------- | ------------------------------------------------------------- |
 | `cloudfront:CreateInvalidation` | `arn:aws:cloudfront::ACCOUNT_ID:distribution/DISTRIBUTION_ID` |
 
 Use o **ID completo** da distribuição; ARN incompleto ou placeholder inválido impede a política de funcionar como esperado.
@@ -200,15 +200,15 @@ terraform -chdir=infra/terraform/environments/dev state list
 
 **Caminho:** repositório GitHub → **Settings → Secrets and variables → Actions → New repository secret**.
 
-| Secret | Descrição |
-|--------|-----------|
-| `AWS_ROLE_ARN` | ARN da IAM Role para OIDC (ex.: `arn:aws:iam::ACCOUNT:role/nome-da-role`) |
-| `S3_BUCKET` | **Somente** o nome do bucket (letras minúsculas/números/hífen conforme regras S3; **sem** `s3://`, **sem** barra final, **sem** espaços ao colar) |
-| `CLOUDFRONT_DISTRIBUTION_ID` | ID da distribuição (ex.: `E...`) |
-| `VITE_PUBLIC_BFF_BASE_URL` | URL HTTPS da API pública usada no build |
-| `VITE_PUBLIC_SITE_URL` | Opcional até haver domínio estável: URL pública HTTPS **sem** barra final (canonical, robots, sitemap) |
-| `VITE_ADMIN_BFF_BASE_URL` | Opcional |
-| `VITE_PUBLIC_GTM_ID` | Opcional (Google Tag Manager) |
+| Secret                       | Descrição                                                                                                                                         |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AWS_ROLE_ARN`               | ARN da IAM Role para OIDC (ex.: `arn:aws:iam::ACCOUNT:role/nome-da-role`)                                                                         |
+| `S3_BUCKET`                  | **Somente** o nome do bucket (letras minúsculas/números/hífen conforme regras S3; **sem** `s3://`, **sem** barra final, **sem** espaços ao colar) |
+| `CLOUDFRONT_DISTRIBUTION_ID` | ID da distribuição (ex.: `E...`)                                                                                                                  |
+| `VITE_PUBLIC_BFF_BASE_URL`   | URL HTTPS da API pública usada no build                                                                                                           |
+| `VITE_PUBLIC_SITE_URL`       | Opcional até haver domínio estável: URL pública HTTPS **sem** barra final (canonical, robots, sitemap)                                            |
+| `VITE_ADMIN_BFF_BASE_URL`    | Opcional                                                                                                                                          |
+| `VITE_PUBLIC_GTM_ID`         | Opcional (Google Tag Manager)                                                                                                                     |
 
 **Erro comum:** `S3_BUCKET` com `s3://...` ou URL → falha de validação do CLI (`Invalid bucket name`). O workflow também rejeita nomes inválidos **antes** do `sync`.
 
@@ -218,14 +218,14 @@ O mesmo passo de validação exige **`CLOUDFRONT_DISTRIBUTION_ID`** com formato 
 
 ### B3. Variáveis (Settings → Variables)
 
-| Variable | Uso |
-|----------|-----|
-| `AWS_REGION` | Opcional; padrão do workflow: `us-east-1` |
-| `AWS_AUTH_METHOD` | Defina `access-key` **apenas** se usar chaves IAM no GitHub (legado); para OIDC, omita |
-| `DEPLOY_S3_BUCKET_PREFIX` | Opcional; se definida, o secret `S3_BUCKET` **tem** de começar por esse texto (reduz risco de `sync --delete` no bucket errado) |
-| `REQUIRE_VITE_PUBLIC_SITE_URL` | Defina `true` em go-live para **falhar** o job se `VITE_PUBLIC_SITE_URL` estiver vazio |
-| `DEPLOY_GITHUB_ENVIRONMENT` | Opcional; nome do GitHub Environment do job (padrão: `frontend-deploy`) |
-| `DEPLOY_ALLOW_HTTP_BFF` | **`true` só em laboratório.** Se definida, o secret `VITE_PUBLIC_BFF_BASE_URL` pode ser `http://` (ex.: ALB dev sem certificado). Em produção, omita e use sempre HTTPS. |
+| Variable                       | Uso                                                                                                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AWS_REGION`                   | Opcional; padrão do workflow: `us-east-1`                                                                                                                                |
+| `AWS_AUTH_METHOD`              | Defina `access-key` **apenas** se usar chaves IAM no GitHub (legado); para OIDC, omita                                                                                   |
+| `DEPLOY_S3_BUCKET_PREFIX`      | Opcional; se definida, o secret `S3_BUCKET` **tem** de começar por esse texto (reduz risco de `sync --delete` no bucket errado)                                          |
+| `REQUIRE_VITE_PUBLIC_SITE_URL` | Defina `true` em go-live para **falhar** o job se `VITE_PUBLIC_SITE_URL` estiver vazio                                                                                   |
+| `DEPLOY_GITHUB_ENVIRONMENT`    | Opcional; nome do GitHub Environment do job (padrão: `frontend-deploy`)                                                                                                  |
+| `DEPLOY_ALLOW_HTTP_BFF`        | **`true` só em laboratório.** Se definida, o secret `VITE_PUBLIC_BFF_BASE_URL` pode ser `http://` (ex.: ALB dev sem certificado). Em produção, omita e use sempre HTTPS. |
 
 **Termo “OIDC” neste repositório:** no deploy, refere-se a **GitHub Actions → AWS IAM** (`aws-actions/configure-aws-credentials` com `role-to-assume`), **não** a login OAuth no browser. O CRM continua com **email/senha + JWT** via `POST .../auth/login` no BFF.
 
@@ -271,7 +271,7 @@ Servir `dist` localmente (opcional): `npx serve -s dist`.
 
 ## Documentação relacionada
 
-- [`README-ENGINEERING.md`](./README-ENGINEERING.md) — visão técnica do projeto  
-- [`infra/README.md`](./infra/README.md) — Fase 1/2, rollback, domínio próprio  
-- [`docs/operations/fase3-public-delivery-hardening.md`](./docs/operations/fase3-public-delivery-hardening.md) — SEO técnico mínimo, checklist go-live  
-- [`docs/operations/production-gate.md`](./docs/operations/production-gate.md) — gate de produção  
+- [`README-ENGINEERING.md`](./README-ENGINEERING.md) — visão técnica do projeto
+- [`infra/README.md`](./infra/README.md) — Fase 1/2, rollback, domínio próprio
+- [`docs/operations/fase3-public-delivery-hardening.md`](./docs/operations/fase3-public-delivery-hardening.md) — SEO técnico mínimo, checklist go-live
+- [`docs/operations/production-gate.md`](./docs/operations/production-gate.md) — gate de produção

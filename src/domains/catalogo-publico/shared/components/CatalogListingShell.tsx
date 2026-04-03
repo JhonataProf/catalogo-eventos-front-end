@@ -38,11 +38,7 @@ export function CatalogListingShell({
     staleLayer !== null
   ) {
     return (
-      <div
-        className={className}
-        aria-busy="true"
-        aria-live="polite"
-      >
+      <div className={className} aria-busy="true" aria-live="polite">
         <div className="relative min-h-[120px]">
           <div className="pointer-events-none select-none opacity-60 motion-reduce:opacity-90">
             {staleLayer}
@@ -66,13 +62,11 @@ export function CatalogListingShell({
       role={showSkeleton ? "status" : undefined}
       aria-busy={showSkeleton}
       aria-live={showSkeleton ? "polite" : undefined}
-      aria-label={showSkeleton ? "Carregando resultados do catálogo" : undefined}
+      aria-label={
+        showSkeleton ? "Carregando resultados do catálogo" : undefined
+      }
     >
-      {showSkeleton ? (
-        <CatalogGridSkeleton count={skeletonCount} />
-      ) : (
-        children
-      )}
+      {showSkeleton ? <CatalogGridSkeleton count={skeletonCount} /> : children}
     </div>
   );
 }

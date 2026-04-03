@@ -14,7 +14,7 @@ describe("HeroSection", () => {
         kicker="Institucional"
         title="Sobre o portal"
         subtitle="Texto de apoio"
-      />
+      />,
     );
 
     expect(screen.getByText("Institucional")).toBeInTheDocument();
@@ -31,13 +31,12 @@ describe("HeroSection", () => {
           { label: "Ir para eventos", href: "/eventos", variant: "primary" },
           { label: "Ação local", onClick, variant: "secondary" },
         ]}
-      />
+      />,
     );
 
-    expect(screen.getByRole("link", { name: "Ir para eventos" })).toHaveAttribute(
-      "href",
-      "/eventos"
-    );
+    expect(
+      screen.getByRole("link", { name: "Ir para eventos" }),
+    ).toHaveAttribute("href", "/eventos");
 
     fireEvent.click(screen.getByRole("button", { name: "Ação local" }));
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -48,20 +47,14 @@ describe("HeroSection", () => {
       <HeroSection
         title="Hero"
         rightSlot={<div data-testid="right-slot">Right slot</div>}
-      />
+      />,
     );
 
     expect(screen.getByTestId("right-slot")).toBeInTheDocument();
   });
 
   it("deve suportar align='center' e tone='warning'", () => {
-    render(
-      <HeroSection
-        title="Hero central"
-        align="center"
-        tone="warning"
-      />
-    );
+    render(<HeroSection title="Hero central" align="center" tone="warning" />);
 
     expect(screen.getByText("Hero central")).toBeInTheDocument();
   });

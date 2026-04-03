@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { adminApiClient } from "@/services/admin-api/client";
 
@@ -20,7 +26,8 @@ export function useAdminTouristPointsList(): IUseAdminTouristPointsListResult {
       setIsLoading(true);
       setError("");
 
-      const response: ITouristPoint[] = await adminApiClient.listTouristPoints();
+      const response: ITouristPoint[] =
+        await adminApiClient.listTouristPoints();
       setItems(response);
     } catch {
       setError("Não foi possível carregar os pontos turísticos.");

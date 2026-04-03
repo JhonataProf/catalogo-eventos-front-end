@@ -55,7 +55,9 @@ function removeRobotsMeta(): void {
  * Atualiza title, meta description e (opcional) canonical para rotas públicas.
  * Restaura o título anterior ao desmontar; description volta ao default do index.
  */
-export function usePublicPageMetadata(options: IPublicPageMetadataOptions): void {
+export function usePublicPageMetadata(
+  options: IPublicPageMetadataOptions,
+): void {
   const { title, description, canonicalPath, noIndex } = options;
 
   useEffect(() => {
@@ -70,7 +72,9 @@ export function usePublicPageMetadata(options: IPublicPageMetadataOptions): void
 
     const base = getPublicSiteBaseUrl();
     if (canonicalPath !== undefined && base) {
-      const path = canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`;
+      const path = canonicalPath.startsWith("/")
+        ? canonicalPath
+        : `/${canonicalPath}`;
       const url = path === "/" ? `${base}/` : `${base}${path}`;
       upsertCanonical(url);
     } else {

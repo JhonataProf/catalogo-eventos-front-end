@@ -41,18 +41,20 @@ export interface IPublicHomeContentResponse {
 export interface IPublicApiClient {
   listPublishedCities: () => Promise<ICity[]>;
   getPublishedCityBySlug: (slug: string) => Promise<ICity | null>;
-  
+
   listPublishedEvents: (
     params: IPublicListParams,
   ) => Promise<IPublicListResponse<IEvent>>;
   getPublishedEventById: (id: number) => Promise<IEvent | null>;
-  listPublishedEventByCityId(cityId: number): Promise<IEvent[] | null>
+  listPublishedEventByCityId(cityId: number): Promise<IEvent[] | null>;
 
   listPublishedTouristPoints: (
     params: IPublicListParams,
   ) => Promise<IPublicListResponse<ITouristPoint>>;
   getPublishedTouristPointById: (id: number) => Promise<ITouristPoint | null>;
-  listPublishedTouristPointByCityId(cityId: number): Promise<ITouristPoint[] | null>
+  listPublishedTouristPointByCityId(
+    cityId: number,
+  ): Promise<ITouristPoint[] | null>;
 
   getInstitutionalContent: () => Promise<IInstitutionalContent>;
   listActiveSocialLinks: () => Promise<ISocialLink[]>;

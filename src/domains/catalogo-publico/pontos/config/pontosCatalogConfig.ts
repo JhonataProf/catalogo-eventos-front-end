@@ -9,7 +9,7 @@ import type {
 } from "../../shared/model/catalogo.types";
 
 function mapTouristPointToCatalogItem(
-  touristPoint: ITouristPoint
+  touristPoint: ITouristPoint,
 ): ICatalogoItem {
   return {
     id: touristPoint.id,

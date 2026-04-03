@@ -28,7 +28,6 @@ export function capturePublicSentryException(
   if (!sentryEnabled) {
     return;
   }
-  const err: Error =
-    error instanceof Error ? error : new Error(String(error));
+  const err: Error = error instanceof Error ? error : new Error(String(error));
   Sentry.captureException(err, { extra: context });
 }

@@ -52,7 +52,9 @@ describe("AdminSocialLinksPage", () => {
     render(<AdminSocialLinksPage />);
 
     expect(
-      await screen.findByRole("link", { name: "https://instagram.com/celeiro" }),
+      await screen.findByRole("link", {
+        name: "https://instagram.com/celeiro",
+      }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Ativo").length).toBeGreaterThanOrEqual(1);
   });

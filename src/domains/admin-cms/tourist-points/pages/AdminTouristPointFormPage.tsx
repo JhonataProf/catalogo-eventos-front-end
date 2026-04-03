@@ -62,7 +62,7 @@ function buildInitialFormState(): ITouristPointFormState {
 }
 
 function mapTouristPointToFormState(
-  touristPoint: ITouristPoint
+  touristPoint: ITouristPoint,
 ): ITouristPointFormState {
   return {
     cityId: touristPoint.cityId,
@@ -98,7 +98,7 @@ export function AdminTouristPointFormPage(): ReactElement {
   } = useAdminTouristPointFormSource(touristPointId);
 
   const [formState, setFormState] = useState<ITouristPointFormState>(
-    buildInitialFormState()
+    buildInitialFormState(),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -133,7 +133,9 @@ export function AdminTouristPointFormPage(): ReactElement {
   }, [isEditMode]);
 
   function handleInputChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ): void {
     const { name, value, type } = event.target;
 
@@ -148,7 +150,7 @@ export function AdminTouristPointFormPage(): ReactElement {
 
       if (name === "cityId") {
         const selectedCity: ICity | undefined = cities.find(
-          (city: ICity) => city.id === Number(value)
+          (city: ICity) => city.id === Number(value),
         );
 
         nextState.citySlug = selectedCity?.slug ?? "";
@@ -186,7 +188,7 @@ export function AdminTouristPointFormPage(): ReactElement {
   }
 
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -232,7 +234,8 @@ export function AdminTouristPointFormPage(): ReactElement {
       }
     } catch (caught) {
       setError(
-        toApiError(caught, "Não foi possível salvar o ponto turístico.").message,
+        toApiError(caught, "Não foi possível salvar o ponto turístico.")
+          .message,
       );
     } finally {
       setIsSubmitting(false);
@@ -287,10 +290,16 @@ export function AdminTouristPointFormPage(): ReactElement {
         </Card>
       ) : null}
 
-      <form className="space-y-6" onSubmit={(event) => void handleSubmit(event)}>
+      <form
+        className="space-y-6"
+        onSubmit={(event) => void handleSubmit(event)}
+      >
         <Card className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="cityId" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="cityId"
+              className="text-sm font-medium text-zinc-700"
+            >
               Cidade
             </label>
             <select
@@ -322,7 +331,10 @@ export function AdminTouristPointFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="category" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="category"
+              className="text-sm font-medium text-zinc-700"
+            >
               Categoria
             </label>
             <select
@@ -350,7 +362,10 @@ export function AdminTouristPointFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="address" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="address"
+              className="text-sm font-medium text-zinc-700"
+            >
               Endereço
             </label>
             <input
@@ -363,7 +378,10 @@ export function AdminTouristPointFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="openingHours" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="openingHours"
+              className="text-sm font-medium text-zinc-700"
+            >
               Horário de funcionamento
             </label>
             <input
@@ -385,7 +403,10 @@ export function AdminTouristPointFormPage(): ReactElement {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <label htmlFor="description" className="text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-zinc-700"
+            >
               Descrição
             </label>
             <textarea

@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  clearAdminUser,
-  loadAdminUser,
-  saveAdminUser,
-} from "../auth.storage";
+import { clearAdminUser, loadAdminUser, saveAdminUser } from "../auth.storage";
 import type { IAdminUser } from "../auth.types";
 
 describe("auth.storage", () => {

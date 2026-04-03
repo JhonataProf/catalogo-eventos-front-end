@@ -12,7 +12,7 @@ describe("PublicLayout", () => {
             <Route index element={<div>Conteúdo da página</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     // expect(screen.getByText("Celeiro do MS")).toBeInTheDocument();

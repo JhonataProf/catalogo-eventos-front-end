@@ -3,5 +3,8 @@ import type { ICatalogoFiltersConfig } from "@/domains/catalogo-publico/shared/m
 
 export const eventosFiltersConfig: ICatalogoFiltersConfig = {
   searchPlaceholder: "Busque um evento por nome",
-  categorias: EVENT_CATEGORY_OPTIONS.map(({ label, value }) => ({ label, value })),
+  categorias: EVENT_CATEGORY_OPTIONS.map(({ label, value }) => ({
+    label,
+    value,
+  })),
 };

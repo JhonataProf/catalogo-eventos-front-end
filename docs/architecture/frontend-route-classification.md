@@ -8,15 +8,15 @@ Classificar rotas reais entre área pública, CRM e impactos em SEO, cache e men
 
 ## Rotas públicas indexáveis (prioridade SEO)
 
-| Rota | Conteúdo | Metadata (v1) |
-|------|----------|----------------|
-| `/` | Home | title + description + canonical |
-| `/eventos` | Lista de eventos | idem |
-| `/eventos/:id` | Ficha evento | cliente (title/description/canonical dinâmicos) |
-| `/pontos-turisticos` | Lista pontos | idem |
-| `/pontos-turisticos/:id` | Ficha ponto | cliente |
-| `/cidades/:slug` | Ficha cidade | cliente |
-| `/sobre` | Institucional | idem |
+| Rota                     | Conteúdo         | Metadata (v1)                                   |
+| ------------------------ | ---------------- | ----------------------------------------------- |
+| `/`                      | Home             | title + description + canonical                 |
+| `/eventos`               | Lista de eventos | idem                                            |
+| `/eventos/:id`           | Ficha evento     | cliente (title/description/canonical dinâmicos) |
+| `/pontos-turisticos`     | Lista pontos     | idem                                            |
+| `/pontos-turisticos/:id` | Ficha ponto      | cliente                                         |
+| `/cidades/:slug`         | Ficha cidade     | cliente                                         |
+| `/sobre`                 | Institucional    | idem                                            |
 
 **Sitemap estático (v1):** apenas `/`, `/eventos`, `/pontos-turisticos`, `/sobre` — ver `scripts/finalize-public-seo.mjs`.
 
@@ -30,9 +30,9 @@ Classificar rotas reais entre área pública, CRM e impactos em SEO, cache e men
 
 ## Rotas CRM (`/admin`)
 
-| Rota | Notas |
-|------|--------|
-| `/admin/login` | `noindex,nofollow` (`useAdminAreaSeo`) |
+| Rota                | Notas                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `/admin/login`      | `noindex,nofollow` (`useAdminAreaSeo`)                                                       |
 | `/admin/*` (demais) | guard + `noindex`; mensuração operacional **não** misturar com GTM de aquisição sem critério |
 
 ---

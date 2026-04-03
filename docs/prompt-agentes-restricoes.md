@@ -1,4 +1,5 @@
 Leia e adote como fontes oficiais deste projeto:
+
 - README-ENGINEERING.md
 - .cursor/rules
 - docs/architecture/frontend-project-constraints.md
@@ -7,6 +8,7 @@ Leia e adote como fontes oficiais deste projeto:
 - demais documentos de docs/architecture
 
 Antes de qualquer recomendação de arquitetura, SEO, BFF ou deploy:
+
 - identifique se a mudança afeta área pública, CRM ou ambas
 - avalie se a rota ou tela impactada é indexável
 - avalie se o conteúdo essencial depende de dados dinâmicos

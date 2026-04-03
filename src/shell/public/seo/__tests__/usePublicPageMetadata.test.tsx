@@ -42,7 +42,9 @@ describe("usePublicPageMetadata", () => {
       expect(document.title).toBe("Página teste");
     });
     expect(
-      document.querySelector('meta[name="description"]')?.getAttribute("content"),
+      document
+        .querySelector('meta[name="description"]')
+        ?.getAttribute("content"),
     ).toBe("Descrição única para teste.");
     expect(document.querySelector('link[rel="canonical"]')).toBeNull();
   });

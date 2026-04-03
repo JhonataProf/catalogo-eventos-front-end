@@ -7,7 +7,8 @@ import { isApiMocksForced } from "@/services/api/apiClientMode";
  */
 export function resolveAdminBffBaseUrl(): string {
   const adminRaw: string | undefined = import.meta.env.VITE_ADMIN_BFF_BASE_URL;
-  const publicRaw: string | undefined = import.meta.env.VITE_PUBLIC_BFF_BASE_URL;
+  const publicRaw: string | undefined = import.meta.env
+    .VITE_PUBLIC_BFF_BASE_URL;
 
   const chosen: string =
     typeof adminRaw === "string" && adminRaw.trim() !== ""

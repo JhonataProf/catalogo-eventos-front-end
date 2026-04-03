@@ -13,8 +13,7 @@ function parseLegacyUser(raw: unknown): IAdminUser | null {
     "token" in raw
   ) {
     const u = raw as IAdminUser & { role: string };
-    const roleNorm =
-      u.role === "Admin" || u.role === "admin" ? "Admin" : null;
+    const roleNorm = u.role === "Admin" || u.role === "admin" ? "Admin" : null;
     if (!roleNorm) {
       return null;
     }
@@ -25,7 +24,8 @@ function parseLegacyUser(raw: unknown): IAdminUser | null {
 
 export function loadAdminSession(): IAdminAuthSession | null {
   try {
-    const rawValue: string | null = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    const rawValue: string | null =
+      window.localStorage.getItem(AUTH_STORAGE_KEY);
     if (!rawValue) {
       return null;
     }

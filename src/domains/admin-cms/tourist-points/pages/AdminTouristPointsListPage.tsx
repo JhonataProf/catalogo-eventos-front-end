@@ -7,8 +7,12 @@ import { useAdminTouristPointsList } from "@/domains/admin-cms/tourist-points/ho
 import { adminApiClient } from "@/services/admin-api/client";
 
 export function AdminTouristPointsListPage(): ReactElement {
-  const { items, setItems, isLoading, error: loadError } =
-    useAdminTouristPointsList();
+  const {
+    items,
+    setItems,
+    isLoading,
+    error: loadError,
+  } = useAdminTouristPointsList();
   const [error, setError] = useState<string>("");
 
   async function handleDelete(id: number): Promise<void> {
@@ -18,7 +22,7 @@ export function AdminTouristPointsListPage(): ReactElement {
       await adminApiClient.deleteTouristPoint(id);
 
       setItems((currentItems: ITouristPoint[]) =>
-        currentItems.filter((item: ITouristPoint) => item.id !== id)
+        currentItems.filter((item: ITouristPoint) => item.id !== id),
       );
     } catch {
       setError("Não foi possível remover o ponto turístico.");
@@ -77,9 +81,7 @@ export function AdminTouristPointsListPage(): ReactElement {
                     <td className="py-4">{item.name}</td>
                     <td className="py-4">{item.citySlug}</td>
                     <td className="py-4">{item.category ?? "-"}</td>
-                    <td className="py-4">
-                      {item.featured ? "Sim" : "Não"}
-                    </td>
+                    <td className="py-4">{item.featured ? "Sim" : "Não"}</td>
                     <td className="py-4">
                       {item.published ? "Publicado" : "Rascunho"}
                     </td>

@@ -24,7 +24,9 @@ const STATIC_SITEMAP_PATHS = [
 
 function main() {
   if (!fs.existsSync(distDir)) {
-    console.error("[finalize-public-seo] Pasta dist/ não encontrada. Rode o build antes.");
+    console.error(
+      "[finalize-public-seo] Pasta dist/ não encontrada. Rode o build antes.",
+    );
     process.exit(1);
   }
 
@@ -50,7 +52,11 @@ function main() {
     );
   }
 
-  fs.writeFileSync(path.join(distDir, "robots.txt"), robotsLines.join("\n"), "utf8");
+  fs.writeFileSync(
+    path.join(distDir, "robots.txt"),
+    robotsLines.join("\n"),
+    "utf8",
+  );
 
   const sitemapPath = path.join(distDir, "sitemap.xml");
   if (base) {
