@@ -1,5 +1,7 @@
 # Infraestrutura — front estático (Terraform)
 
+Documentação de entrega e inventário auditável: [`../docs/index.md`](../docs/index.md) · [`../docs/INFRASTRUCTURE_INVENTORY.md`](../docs/INFRASTRUCTURE_INVENTORY.md) · [`../docs/DEPLOY_CHECKLIST.md`](../docs/DEPLOY_CHECKLIST.md).
+
 ## Objetivo
 
 Provisionar **S3 (privado) + CloudFront + OAC**, **fallback SPA** (403/404 → `index.html`), **cache** (`assets/*` otimizado, default sem cache agressivo), **headers de segurança** e, na **Fase 2 opcional**, **ACM (us-east-1) + Route 53** para **HTTPS no domínio próprio** e **HSTS**.
@@ -143,7 +145,7 @@ terraform -chdir=infra/terraform/environments/dev state list
 
 ## Estado e lock
 
-Backend remoto: copie `backend.tf.example` → `backend.tf`. O repositório pode ignorar `.terraform.lock.hcl` por política local; em times, costuma-se **versionar** o lock — alinhe com o time.
+Backend remoto: copie `backend.tf.example` → `backend.tf`. O ficheiro `environments/dev/.terraform.lock.hcl` deve ser **versionado** no Git para reprodutibilidade de providers (handover e CI local).
 
 ## Deploy via GitHub Actions
 

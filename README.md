@@ -1,6 +1,6 @@
 # Catálogo de eventos — front-end
 
-Aplicação **React + TypeScript + Vite** (área pública + CRM). Este README concentra **como deixar o front publicado e operável**: AWS, GitHub Actions, Terraform e variáveis de build. Detalhes de engenharia: [`README-ENGINEERING.md`](./README-ENGINEERING.md). Infra Terraform aprofundada: [`infra/README.md`](./infra/README.md).
+Aplicação **React + TypeScript + Vite** (área pública + CRM). Este README concentra **como deixar o front publicado e operável**: AWS, GitHub Actions, Terraform e variáveis de build. Detalhes de engenharia: [`README-ENGINEERING.md`](./README-ENGINEERING.md). Infra Terraform aprofundada: [`infra/README.md`](./infra/README.md). **Handover / entrega ao cliente:** [`docs/index.md`](./docs/index.md).
 
 ---
 

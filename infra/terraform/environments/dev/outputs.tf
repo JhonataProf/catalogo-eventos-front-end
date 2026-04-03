@@ -2,8 +2,18 @@ output "s3_bucket_name" {
   value = module.spa.s3_bucket_name
 }
 
+output "s3_bucket_arn" {
+  description = "ARN do bucket (módulo github_oidc_frontend_deploy / políticas IAM)."
+  value       = module.spa.s3_bucket_arn
+}
+
 output "cloudfront_distribution_id" {
   value = module.spa.cloudfront_distribution_id
+}
+
+output "cloudfront_distribution_arn" {
+  description = "ARN da distribuição (módulo github_oidc_frontend_deploy / políticas IAM)."
+  value       = module.spa.cloudfront_distribution_arn
 }
 
 output "cloudfront_domain_name" {
