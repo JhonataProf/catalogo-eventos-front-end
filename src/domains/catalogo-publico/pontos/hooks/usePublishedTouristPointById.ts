@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { isValidPublishedCatalogId } from "@/domains/catalogo-publico/shared/utils/isValidPublishedCatalogId";
 import type { ITouristPoint } from "@/entities/tourist-point/touristPoint.types";
 import { toApiError } from "@/services/api/apiError";
 import { publicApiClient } from "@/services/public-api/client";
+import { useEffect, useState } from "react";
 
 export interface IUsePublishedTouristPointByIdResult {
   touristPoint: ITouristPoint | null;
@@ -10,23 +11,23 @@ export interface IUsePublishedTouristPointByIdResult {
   error: string | null;
 }
 
-function isValidId(id: number | undefined): id is number {
-  return id !== undefined && Number.isFinite(id) && id > 0;
-}
-
 export function usePublishedTouristPointById(
   id: number | undefined,
 ): IUsePublishedTouristPointByIdResult {
   const [touristPoint, setTouristPoint] = useState<ITouristPoint | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(isValidId(id));
-  const [notFound, setNotFound] = useState<boolean>(!isValidId(id));
+  const [isLoading, setIsLoading] = useState<boolean>(
+    isValidPublishedCatalogId(id),
+  );
+  const [notFound, setNotFound] = useState<boolean>(
+    !isValidPublishedCatalogId(id),
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive: boolean = true;
 
     async function load(): Promise<void> {
-      if (!isValidId(id)) {
+      if (!isValidPublishedCatalogId(id)) {
         setTouristPoint(null);
         setError(null);
         setNotFound(true);

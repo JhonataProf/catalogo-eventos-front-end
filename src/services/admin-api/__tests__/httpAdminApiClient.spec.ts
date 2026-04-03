@@ -235,10 +235,10 @@ describe("createHttpAdminApiClient", () => {
     saveAdminSession(sessionFixture);
     createHttpAdminApiClient("https://bff.test/");
 
-    const config: InternalAxiosRequestConfig = {
+    const config = {
       headers: {},
       url: "/admin/cities",
-    };
+    } as InternalAxiosRequestConfig;
     const next: InternalAxiosRequestConfig =
       mockHandles.applyRequestInterceptors(config);
 

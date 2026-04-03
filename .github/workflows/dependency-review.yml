@@ -1,0 +1,22 @@
+# Compara dependências da base da PR com o head e alerta sobre alterações com vulnerabilidades conhecidas.
+# Requer Dependency graph ativo (repositórios públicos: por defeito).
+
+name: Dependency review
+
+on:
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4

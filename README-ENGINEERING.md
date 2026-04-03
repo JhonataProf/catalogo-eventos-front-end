@@ -59,6 +59,13 @@ Regras obrigatórias:
 
 ---
 
+## Automação local e governança no GitHub
+
+- **Husky:** após `yarn install`, os hooks registam **pre-commit** (`lint-staged`: Prettier + ESLint nos ficheiros em stage) e **pre-push** (`yarn typecheck`). Ver `docs/operations/github-governance-and-security.md` para branch protection, CODEOWNERS e segurança no GitHub.
+- **CI/CD:** workflows em `.github/workflows/` (incl. execução manual do **CI** via `workflow_dispatch`); Dependabot em `.github/dependabot.yml`; política de vulnerabilidades em `SECURITY.md`; modelo de PR em `.github/pull_request_template.md`.
+
+---
+
 ## Critério de pronto para mudanças relevantes
 
 Uma mudança relevante só deve ser considerada pronta quando:

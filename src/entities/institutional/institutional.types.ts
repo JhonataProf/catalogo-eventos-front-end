@@ -21,18 +21,9 @@ interface IInstitutionalContentMeta {
 export interface IInstitutionalContent
   extends IInstitutionalContentFields, IInstitutionalContentMeta {}
 
-export type IUpdateInstitutionalContentInput = Pick<
-  IInstitutionalContent,
-  | "id"
-  | "aboutTitle"
-  | "aboutText"
-  | "whoWeAreTitle"
-  | "whoWeAreText"
-  | "purposeTitle"
-  | "purposeText"
-  | "mission"
-  | "vision"
-  | "values"
+/** PATCH: `id` obrigatório; demais campos opcionais conforme o BFF aceita atualização parcial. */
+export type IUpdateInstitutionalContentInput = { id: number } & Partial<
+  Omit<IInstitutionalContent, "id" | "updatedAt">
 >;
 
 /** Cadastro do único registro institucional (sem id; servidor define id e updatedAt). */

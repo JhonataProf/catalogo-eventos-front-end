@@ -9,6 +9,11 @@ lerna-debug.log*
 
 coverage
 node_modules
+
+# Gestor de pacotes: Yarn apenas (yarn.lock). Não commitar lockfiles de npm/pnpm.
+package-lock.json
+pnpm-lock.yaml
+
 dist
 dist-ssr
 *.local

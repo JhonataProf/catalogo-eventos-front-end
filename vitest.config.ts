@@ -47,7 +47,7 @@ export default mergeConfig(
            * Shell de lazy imports: coberto indiretamente por `routes.test.tsx`;
            * testar cada export isoladamente tende a testes frágeis com pouco sinal de regressão.
            */
-          "src/app/AppLazyPages.tsx",
+          "src/app/adminLazyPages.tsx",
         ],
         thresholds: {
           lines: 79,

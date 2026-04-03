@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { isValidPublishedCatalogId } from "@/domains/catalogo-publico/shared/utils/isValidPublishedCatalogId";
 import type { IEvent } from "@/entities/event/event.types";
 import { toApiError } from "@/services/api/apiError";
 import { publicApiClient } from "@/services/public-api/client";
+import { useEffect, useState } from "react";
 
 export interface IUsePublishedEventByIdResult {
   event: IEvent | null;
@@ -10,23 +11,23 @@ export interface IUsePublishedEventByIdResult {
   error: string | null;
 }
 
-function isValidId(id: number | undefined): id is number {
-  return id !== undefined && Number.isFinite(id) && id > 0;
-}
-
 export function usePublishedEventById(
   id: number | undefined,
 ): IUsePublishedEventByIdResult {
   const [event, setEvent] = useState<IEvent | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(isValidId(id));
-  const [notFound, setNotFound] = useState<boolean>(!isValidId(id));
+  const [isLoading, setIsLoading] = useState<boolean>(
+    isValidPublishedCatalogId(id),
+  );
+  const [notFound, setNotFound] = useState<boolean>(
+    !isValidPublishedCatalogId(id),
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive: boolean = true;
 
     async function loadEvent(): Promise<void> {
-      if (!isValidId(id)) {
+      if (!isValidPublishedCatalogId(id)) {
         setEvent(null);
         setError(null);
         setNotFound(true);

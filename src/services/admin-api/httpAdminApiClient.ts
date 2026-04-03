@@ -58,24 +58,8 @@ function trimBaseUrl(baseURL: string): string {
   return baseURL.replace(/\/+$/, "");
 }
 
-function buildAdminEventPickParams(
-  query?: IAdminListPickQuery,
-): Record<string, string | number> {
-  const out: Record<string, string | number> = {
-    page: query?.page ?? 1,
-    limit: query?.limit ?? 30,
-    sortDir: "asc",
-  };
-  if (query?.search?.trim()) {
-    out.name = query.search.trim();
-  }
-  if (query?.category?.trim()) {
-    out.category = query.category.trim();
-  }
-  return out;
-}
-
-function buildAdminTouristPointPickParams(
+/** Query params comuns para listagens admin em modo "pick" (eventos, pontos turísticos, etc.). */
+function buildAdminListPickParams(
   query?: IAdminListPickQuery,
 ): Record<string, string | number> {
   const out: Record<string, string | number> = {
@@ -400,7 +384,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
 
     async listEventsForPick(query?: IAdminListPickQuery): Promise<IEvent[]> {
       const { data } = await http.get<unknown>("/admin/events", {
-        params: buildAdminEventPickParams(query),
+        params: buildAdminListPickParams(query),
       });
       const { items } = unwrapCollection<Record<string, unknown>>(data);
       return items.map((row) =>
@@ -482,7 +466,7 @@ export function createHttpAdminApiClient(baseURL: string): IAdminApiClient {
       query?: IAdminListPickQuery,
     ): Promise<ITouristPoint[]> {
       const { data } = await http.get<unknown>("/admin/tourist-points", {
-        params: buildAdminTouristPointPickParams(query),
+        params: buildAdminListPickParams(query),
       });
       const { items } = unwrapCollection<Record<string, unknown>>(data);
       return items.map((row) =>
